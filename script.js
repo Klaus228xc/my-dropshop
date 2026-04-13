@@ -1,7 +1,7 @@
 const XML_URL = "https://websklad.biz.ua";
 const PROXY = "https://allorigins.win";
 
-const MY_PHONE = "380XXXXXXXXX"; // ЗАМЕНИ НА СВОЙ НОМЕР БЕЗ ПЛЮСА
+const MY_PHONE = "380998261128"; // ЗАМЕНИ НА СВОЙ НОМЕР БЕЗ ПЛЮСА
 const MARGIN = 1.2; // Наценка 20%
 
 let allProducts = [];
