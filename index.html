@@ -3,20 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UA-Drop Store</title>
+    <title>UADrop | Магазин</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <input type="text" id="searchInput" placeholder="Пошук товарів..." oninput="searchProducts(this.value)" style="padding: 10px; border-radius: 5px; border: none; width: 250px;">
         <div class="logo">UA<span>Drop</span></div>
-        <div class="cart-btn">🛒 Кошик: <span id="cartCount">0</span></div>
+        <input type="text" id="searchInput" placeholder="Пошук товарів..." oninput="searchProducts(this.value)">
     </header>
 
-    <div id="categories" class="menu"></div>
-
-    <!-- ЭТОТ БЛОК ОБЯЗАТЕЛЕН -->
     <main id="products" class="grid"></main>
+
+    <!-- Кнопка Кошика -->
+    <div id="cartToggle" onclick="toggleCartModal()">
+        🛒 <span id="cartCountGlobal">0</span>
+    </div>
+
+    <!-- Модальне вікно замовлення -->
+    <div id="cartModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Твій кошик</h2>
+            <div id="cartItemsList"></div>
+            <div class="total">Разом: <span id="cartTotalSum">0</span> грн</div>
+            
+            <hr>
+            <h3>Дані для доставки:</h3>
+            <input type="text" id="orderName" placeholder="Прізвище та Ім'я">
+            <input type="tel" id="orderPhone" placeholder="Номер телефону">
+            <input type="text" id="orderCity" placeholder="Місто та № відділення НП">
+            
+            <button onclick="checkoutOrder()" class="checkout-btn">Замовити у WhatsApp</button>
+            <button onclick="toggleCartModal()" class="close-btn">Закрити</button>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
