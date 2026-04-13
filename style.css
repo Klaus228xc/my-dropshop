@@ -2,39 +2,41 @@ body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #f8fafc;
 header { background: #1e293b; padding: 20px; text-align: center; border-bottom: 2px solid #38bdf8; position: sticky; top: 0; z-index: 100; }
 .logo span { color: #38bdf8; }
 
+/* Сетка товаров */
 .grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
     gap: 20px; 
     padding: 20px; 
     max-width: 1200px; 
     margin: 0 auto; 
 }
 
+/* Карточка товара */
 .card { 
     background: #1e293b; 
-    border-radius: 15px; 
+    border-radius: 12px; 
     padding: 15px; 
     text-align: center; 
-    transition: 0.3s; 
     border: 1px solid #334155;
+    transition: 0.3s;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 }
 .card:hover { transform: translateY(-5px); border-color: #38bdf8; }
-.card img { width: 100%; height: 200px; object-fit: contain; background: white; border-radius: 10px; }
-.card h3 { font-size: 0.95rem; margin: 15px 0; height: 3rem; overflow: hidden; color: #e2e8f0; }
-.price { font-size: 1.4rem; font-weight: bold; color: #38bdf8; margin-bottom: 15px; }
+.card img { width: 100%; height: 180px; object-fit: contain; background: white; border-radius: 8px; }
+.card h3 { font-size: 14px; margin: 12px 0; height: 40px; overflow: hidden; color: #e2e8f0; }
+.price { font-size: 1.2rem; font-weight: bold; color: #38bdf8; margin-bottom: 12px; }
 
-.buy { 
-    background: #38bdf8; 
-    color: #0f172a; 
-    border: none; 
-    padding: 12px; 
-    border-radius: 8px; 
-    font-weight: bold; 
-    cursor: pointer; 
-    width: 100%;
+/* Кнопки */
+.buy-btn { 
+    background: #38bdf8; color: #0f172a; border: none; padding: 10px; 
+    border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; 
 }
-.buy:hover { background: #0ea5e9; }
+.social-btns { display: flex; gap: 8px; margin-top: 10px; }
+.social-btns a { 
+    flex: 1; padding: 6px; border-radius: 4px; color: white; 
+    text-decoration: none; font-size: 11px; font-weight: bold; 
+}
+.viber { background: #7360f2; }
+.wa { background: #25d366; }
