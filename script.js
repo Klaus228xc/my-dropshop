@@ -1,28 +1,55 @@
-const products = [
-    { id: 1, name: "PowerBank 30000mAh", price: 1800, img: "https://picsum.photos" },
-    { id: 2, name: "Лампа на акумуляторі", price: 650, img: "https://picsum.photos" }
-];
+const XML_URL = "https://websklad.biz.ua";
+const PROXY_URL = "https://herokuapp.com"; // Прокси для обхода блокировки
 
 let cart = [];
 
-// Рендер товарів
-const grid = document.getElementById('products');
-products.forEach(p => {
-    grid.innerHTML += `
-        <div class="card">
-            <img src="${p.img}">
-            <h3>${p.name}</h3>
-            <p class="price">${p.price} грн</p>
-            <button onclick="addToCart(${p.id})">Купити</button>
-        </div>
-    `;
-});
+// Функция для загрузки товаров из XML
+async function loadProducts() {
+    const grid = document.getElementById('products');
+    grid.innerHTML = "<h2>Завантаження товарів...</h2>";
 
-function addToCart(id) {
-    const item = products.find(p => p.id === id);
-    cart.push(item);
+    try {
+        // Загружаем XML (используем прокси, если напрямую блокирует)
+        const response = await fetch(PROXY_URL + XML_URL);
+        const str = await response.text();
+        const data = new window.DOMParser().parseFromString(str, "text/xml");
+        
+        const items = data.querySelectorAll("offer");
+        grid.innerHTML = ""; // Очищаем текст загрузки
+
+        items.forEach((item, index) => {
+            // Берем только первые 20 товаров, чтобы не тормозило
+            if (index > 20) return; 
+
+            const id = item.getAttribute("id");
+            const name = item.querySelector("name").textContent;
+            const price = item.querySelector("price").textContent;
+            const picture = item.querySelector("picture").textContent;
+            const vendor = item.querySelector("vendor")?.textContent || "Websklad";
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${picture}" alt="${name}">
+                <h3>${name}</h3>
+                <p style="color: gray; font-size: 0.8em;">Виробник: ${vendor}</p>
+                <p class="price">${price} грн</p>
+                <button onclick="addToCart('${id}', '${name.replace(/'/g, "")}', ${price})">Купити</button>
+            `;
+            grid.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Ошибка загрузки товаров:", error);
+        grid.innerHTML = "<h2>Помилка завантаження товарів. Спробуйте пізніше.</h2>";
+    }
+}
+
+// Корзина
+function addToCart(id, name, price) {
+    cart.push({ id, name, price });
     document.getElementById('cartCount').innerText = cart.length;
-    alert('Товар додано!');
+    alert(`Додано: ${name}`);
 }
 
 function toggleCart() {
@@ -31,17 +58,27 @@ function toggleCart() {
     document.getElementById('totalSum').innerText = total;
 }
 
-// Обробка замовлення
-document.getElementById('orderForm').onsubmit = async (e) => {
+// Форма заказа
+document.getElementById('orderForm').onsubmit = (e) => {
     e.preventDefault();
     const payType = document.querySelector('input[name="payType"]:checked').value;
     const total = document.getElementById('totalSum').innerText;
+    
+    // Формируем текст для сообщения (например, для Telegram)
+    let orderText = `Нове замовлення!\nСума: ${total} грн\nОплата: ${payType}\nТовари:\n`;
+    cart.forEach(item => orderText += `- ${item.name}\n`);
 
     if (payType === 'card') {
-        // Імітація виклику API Monobank/WayForPay
-        alert(`Перехід на сторінку оплати WayForPay... Сума: ${total} грн`);
-        window.location.href = "https://wayforpay.com..."; // Приклад посилання
+        alert("Перенаправлення на оплату...");
+        // Тут можно вставить ссылку на твой Monobank или WayForPay
     } else {
-        alert(`Дякуємо! Замовлення на суму ${total} грн оформлено післяплатою. Чекайте на дзвінок.`);
-        cart = [];
-        location.reload();
+        alert("Дякуємо! Замовлення прийнято.");
+    }
+    
+    console.log(orderText); // В консоли можно увидеть готовый текст заказа
+    cart = [];
+    toggleCart();
+};
+
+// Запуск загрузки при открытии страницы
+loadProducts();
