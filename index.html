@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UADrop | Магазин</title>
+    <title>UA-Drop Store 2026</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,27 +12,23 @@
         <input type="text" id="searchInput" placeholder="Пошук товарів..." oninput="searchProducts(this.value)">
     </header>
 
-    <main id="products" class="grid"></main>
+    <main id="products" class="grid">
+        <!-- Сюди завантажаться товари -->
+    </main>
 
-    <!-- Кнопка Кошика -->
     <div id="cartToggle" onclick="toggleCartModal()">
         🛒 <span id="cartCountGlobal">0</span>
     </div>
 
-    <!-- Модальне вікно замовлення -->
     <div id="cartModal" class="modal hidden">
         <div class="modal-content">
-            <h2>Твій кошик</h2>
+            <h2>Ваше замовлення</h2>
             <div id="cartItemsList"></div>
             <div class="total">Разом: <span id="cartTotalSum">0</span> грн</div>
-            
             <hr>
-            <h3>Дані для доставки:</h3>
-            <input type="text" id="orderName" placeholder="Прізвище та Ім'я">
+            <input type="text" id="orderName" placeholder="Ваше Ім'я">
             <input type="tel" id="orderPhone" placeholder="Номер телефону">
-            <input type="text" id="orderCity" placeholder="Місто та № відділення НП">
-            
-            <button onclick="checkoutOrder()" class="checkout-btn">Замовити у WhatsApp</button>
+            <button onclick="checkoutOrder()" class="checkout-btn">Оформити у WhatsApp</button>
             <button onclick="toggleCartModal()" class="close-btn">Закрити</button>
         </div>
     </div>
