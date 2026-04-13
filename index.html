@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UA-Drop 2026 | Магазин майбутнього</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="logo">UA<span>Drop</span></div>
+        <div class="cart-info" onclick="toggleCart()">🛒 Кошик: <span id="cartCount">0</span></div>
+    </header>
+
+    <main id="products"></main>
+
+    <!-- Оформлення замовлення -->
+    <div id="checkoutModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Оформлення замовлення</h2>
+            <form id="orderForm">
+                <input type="text" id="name" placeholder="Прізвище та Ім'я" required>
+                <input type="tel" id="phone" placeholder="+380..." required>
+                <input type="text" id="city" placeholder="Місто доставки" required>
+                
+                <select id="delivery">
+                    <option value="np">Нова Пошта (Відділення)</option>
+                    <option value="ukr">Укрпошта</option>
+                </select>
+
+                <div class="payment-box">
+                    <p>Спосіб оплати:</p>
+                    <label><input type="radio" name="payType" value="card" checked> 💳 Карткою онлайн (ApplePay/GooglePay)</label><br>
+                    <label><input type="radio" name="payType" value="cod"> 📦 Післяплата (при отриманні)</label>
+                </div>
+
+                <div class="total">До сплати: <span id="totalSum">0</span> грн</div>
+                <button type="submit" id="submitBtn">Підтвердити замовлення</button>
+                <button type="button" class="close" onclick="toggleCart()">Скасувати</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
