@@ -3,38 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UADrop Store</title>
+    <title>StoreX | Твій Магазин</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://googleapis.com" rel="stylesheet">
 </head>
 <body>
     <header>
-        <div class="logo">UA<span>Drop</span></div>
-        <input type="text" id="searchInput" placeholder="Пошук товарів..." oninput="searchProducts(this.value)">
+        <div class="header-container">
+            <div class="logo">Store<span>X</span></div>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Пошук товарів..." oninput="searchProducts(this.value)">
+            </div>
+            <div class="cart-icon" onclick="toggleCartModal()">
+                🛒 <span id="cartCountGlobal">0</span>
+            </div>
+        </div>
     </header>
 
-    <!-- ТУТ БУДУТ ТОВАРЫ -->
-    <main id="products" class="grid"></main>
+    <section class="hero">
+        <h1>Найкращі гаджети 2026</h1>
+        <p>Прямі поставки • Найкраща ціна • Гарантія</p>
+    </section>
 
-    <!-- КНОПКА КОРЗИНЫ -->
-    <div id="cartToggle" onclick="toggleCartModal()">
-        🛒 <span id="cartCountGlobal">0</span>
+    <div class="container">
+        <main id="products" class="grid"></main>
     </div>
 
-    <!-- ОКНО ЗАКАЗА -->
+    <!-- Модальне вікно кошика -->
     <div id="cartModal" class="modal hidden">
         <div class="modal-content">
             <h2>Твоє замовлення</h2>
             <div id="cartItemsList"></div>
-            <div class="total">Разом: <span id="cartTotalSum">0</span> грн</div>
-            <hr>
-            <div class="order-form">
+            <div class="total-line">Разом: <span id="cartTotalSum">0</span> грн</div>
+            
+            <div class="order-fields">
                 <input type="text" id="orderName" placeholder="Прізвище та Ім'я">
                 <input type="tel" id="orderPhone" placeholder="Номер телефону">
-                <input type="text" id="orderCity" placeholder="Місто доставки">
-                <input type="text" id="orderPost" placeholder="№ Відділення Нової Пошти">
+                <input type="text" id="orderCity" placeholder="Місто">
+                <input type="text" id="orderPost" placeholder="Відділення Нової Пошти">
             </div>
-            <button onclick="checkoutOrder()" class="checkout-btn">Оформити замовлення</button>
-            <button onclick="toggleCartModal()" class="close-btn">Повернутись</button>
+            
+            <button onclick="checkoutOrder()" class="btn-checkout">Оформити замовлення</button>
+            <button onclick="toggleCartModal()" class="btn-close">Повернутись</button>
         </div>
     </div>
 
