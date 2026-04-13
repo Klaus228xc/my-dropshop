@@ -52,13 +52,13 @@ function render(items) {
     });
 }
 
-// Поиск
+// ПОИСК
 window.searchProducts = (q) => {
     const filtered = allProducts.filter(p => p.name.toLowerCase().includes(q.toLowerCase()));
     render(filtered);
 };
 
-// КОРЗИНА
+// КОРЗИНА (Логика)
 window.addToCart = (id) => {
     const product = allProducts.find(p => p.id === id);
     if (product) {
