@@ -1,38 +1,16 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UA-Drop Store 2026</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <header>
-        <div class="logo">UA<span>Drop</span></div>
-        <input type="text" id="searchInput" placeholder="Пошук товарів..." oninput="searchProducts(this.value)">
-    </header>
-
-    <main id="products" class="grid">
-        <!-- Сюди завантажаться товари -->
-    </main>
-
-    <div id="cartToggle" onclick="toggleCartModal()">
-        🛒 <span id="cartCountGlobal">0</span>
-    </div>
-
-    <div id="cartModal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Ваше замовлення</h2>
-            <div id="cartItemsList"></div>
-            <div class="total">Разом: <span id="cartTotalSum">0</span> грн</div>
-            <hr>
-            <input type="text" id="orderName" placeholder="Ваше Ім'я">
-            <input type="tel" id="orderPhone" placeholder="Номер телефону">
-            <button onclick="checkoutOrder()" class="checkout-btn">Оформити у WhatsApp</button>
-            <button onclick="toggleCartModal()" class="close-btn">Закрити</button>
+<div id="cartModal" class="modal hidden">
+    <div class="modal-content">
+        <h2>Твоє замовлення</h2>
+        <div id="cartItemsList"></div>
+        <div class="total">Разом: <span id="cartTotalSum">0</span> грн</div>
+        <hr>
+        <div class="order-form">
+            <input type="text" id="orderName" placeholder="Прізвище та Ім'я" required>
+            <input type="tel" id="orderPhone" placeholder="Номер телефону" required>
+            <input type="text" id="orderCity" placeholder="Місто доставки" required>
+            <input type="text" id="orderPost" placeholder="№ Відділення Нової Пошти" required>
         </div>
+        <button onclick="checkoutOrder()" class="checkout-btn">Оформити замовлення</button>
+        <button onclick="toggleCartModal()" class="close-btn">Повернутись до покупок</button>
     </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+</div>
