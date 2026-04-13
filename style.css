@@ -1,14 +1,10 @@
-:root { --blue: #0057b7; --yellow: #ffd700; --dark: #1a1a1a; }
-body { font-family: sans-serif; margin: 0; background: #f4f4f4; }
-header { display: flex; justify-content: space-between; padding: 20px 5%; background: var(--dark); color: white; position: sticky; top: 0; z-index: 10; }
-.logo span { color: var(--yellow); }
-#products { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 40px 5%; }
-.card { background: white; padding: 15px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.card img { width: 100%; border-radius: 10px; }
-.price { font-size: 1.5rem; font-weight: bold; color: var(--blue); margin: 10px 0; }
-button { width: 100%; padding: 12px; background: var(--blue); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
-button:hover { opacity: 0.9; }
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 100; }
-.modal-content { background: white; padding: 30px; border-radius: 20px; width: 400px; }
-.hidden { display: none; }
-input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+body { font-family: sans-serif; margin: 0; background: #121212; color: white; }
+header { display: flex; justify-content: space-between; padding: 20px; background: #1f1f1f; }
+.logo span { color: #ffd700; }
+.menu { display: flex; flex-wrap: wrap; gap: 10px; padding: 20px; justify-content: center; }
+.menu button { background: #333; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
+.card { background: #1f1f1f; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #333; }
+.card img { width: 100%; height: 200px; object-fit: contain; background: white; border-radius: 5px; }
+.price { font-size: 1.2rem; font-weight: bold; color: #ffd700; margin: 10px 0; }
+button.buy { width: 100%; padding: 10px; background: #ffd700; color: black; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
