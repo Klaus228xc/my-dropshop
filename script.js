@@ -1,62 +1,45 @@
 const XML_URL = "https://websklad.biz.ua";
-// Используем более надежный прокси для GitHub Pages
-const PROXY_URL = "https://allorigins.win";
+const PROXY = "https://allorigins.win";
 
 let allProducts = [];
 
 async function loadData() {
     const grid = document.getElementById('products');
-    if (!grid) return;
-    grid.innerHTML = "<h2 style='color:white; text-align:center;'>Завантаження товарів Websklad...</h2>";
+    grid.innerHTML = "<h2>Завантаження товарів...</h2>";
 
     try {
-        const response = await fetch(PROXY_URL + encodeURIComponent(XML_URL));
-        const json = await response.json();
+        const response = await fetch(PROXY + encodeURIComponent(XML_URL));
+        const data = await response.json();
         const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(json.contents, "text/xml");
+        const xml = parser.parseFromString(data.contents, "text/xml");
 
-        const items = xmlDoc.querySelectorAll("offer");
-        allProducts = [];
+        const offers = xml.querySelectorAll("offer");
+        allProducts = Array.from(offers).map(offer => ({
+            id: offer.getAttribute("id"),
+            name: offer.querySelector("name")?.textContent || "Без назви",
+            price: offer.querySelector("price")?.textContent || "0",
+            picture: offer.querySelector("picture")?.textContent || "",
+        }));
 
-        items.forEach(item => {
-            try {
-                allProducts.push({
-                    id: item.getAttribute("id"),
-                    name: item.querySelector("name")?.textContent || "Без назви",
-                    price: item.querySelector("price")?.textContent || "0",
-                    picture: item.querySelector("picture")?.textContent || "https://placeholder.com",
-                });
-            } catch (e) { console.error("Помилка парсингу товару", e); }
-        });
-
-        renderProducts(allProducts);
-
-    } catch (error) {
-        console.error("Ошибка:", error);
-        grid.innerHTML = "<h2 style='color:white;'>Помилка завантаження. Спробуйте оновити сторінку.</h2>";
+        render(allProducts);
+    } catch (err) {
+        grid.innerHTML = "Помилка завантаження. Спробуйте оновити сторінку.";
     }
 }
 
-function renderProducts(list) {
+function render(items) {
     const grid = document.getElementById('products');
     grid.innerHTML = "";
-    
-    // Показуємо перші 50 товарів для швидкості
-    list.slice(0, 50).forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-            <img src="${p.picture}" alt="${p.name}" style="width:100%; height:200px; object-fit:contain;">
-            <h3 style="font-size: 1rem; height: 3rem; overflow: hidden;">${p.name}</h3>
-            <p class="price">${p.price} грн</p>
-            <button onclick="addToCart('${p.id}', '${p.name.replace(/'/g, "")}', ${p.price})">Купити</button>
+    items.slice(0, 50).forEach(item => {
+        grid.innerHTML += `
+            <div class="card">
+                <img src="${item.picture}">
+                <h3>${item.name}</h3>
+                <p class="price">${item.price} грн</p>
+                <button class="buy" onclick="alert('Додано!')">Купити</button>
+            </div>
         `;
-        grid.appendChild(card);
     });
-}
-
-function addToCart(id, name, price) {
-    alert("Товар додано в кошик: " + name);
 }
 
 loadData();
