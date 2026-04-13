@@ -5,7 +5,8 @@ let allProducts = [];
 
 async function loadData() {
     const grid = document.getElementById('products');
-    grid.innerHTML = "<h2>Завантаження товарів...</h2>";
+    if (!grid) return; // Защита, если блок еще не создался
+    grid.innerHTML = "<h2 style='text-align:center; width:100%;'>Завантаження товарів...</h2>";
 
     try {
         const response = await fetch(PROXY + encodeURIComponent(XML_URL));
@@ -23,6 +24,7 @@ async function loadData() {
 
         render(allProducts);
     } catch (err) {
+        console.error(err);
         grid.innerHTML = "Помилка завантаження. Спробуйте оновити сторінку.";
     }
 }
@@ -30,16 +32,24 @@ async function loadData() {
 function render(items) {
     const grid = document.getElementById('products');
     grid.innerHTML = "";
-    items.slice(0, 50).forEach(item => {
-        grid.innerHTML += `
-            <div class="card">
-                <img src="${item.picture}">
-                <h3>${item.name}</h3>
-                <p class="price">${item.price} грн</p>
-                <button class="buy" onclick="alert('Додано!')">Купити</button>
-            </div>
+    if (items.length === 0) {
+        grid.innerHTML = "Товари не знайдено.";
+        return;
+    }
+    // Берем первые 60 товаров
+    items.slice(0, 60).forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <img src="${item.picture}" alt="${item.name}" loading="lazy">
+            <h3>${item.name}</h3>
+            <p class="price">${item.price} грн</p>
+            <button class="buy" onclick="alert('Додано в кошик!')">Купити</button>
         `;
+        grid.appendChild(card);
     });
 }
 
+// Запуск
 loadData();
+
