@@ -383,6 +383,16 @@
     let cart = {};
     let selectedPayment = "online";
 
+    // Функція збереження замовлення в localStorage
+    function saveOrder(orderData) {
+        let orders = JSON.parse(localStorage.getItem('ua_drop_orders')) || [];
+        orderData.id = Date.now(); // унікальний ID
+        orderData.date = new Date().toLocaleString('uk-UA');
+        orderData.status = 'Нове';
+        orders.push(orderData);
+        localStorage.setItem('ua_drop_orders', JSON.stringify(orders));
+    }
+
     function renderProducts() {
         const grid = document.getElementById('productsGrid');
         if (!grid) return;
@@ -527,6 +537,16 @@
             return sum + (prod ? prod.price * qty : 0);
         }, 0);
 
+        // Збираємо деталі замовлення
+        const orderDetails = {
+            items: items.map(([sku, qty]) => {
+                const prod = productsData.find(p => p.sku === sku);
+                return { name: prod.name, sku, price: prod.price, quantity: qty, total: prod.price * qty };
+            }),
+            total: total,
+            paymentMethod: selectedPayment === 'online' ? 'Онлайн-оплата' : 'Накладений платіж'
+        };
+
         if (selectedPayment === 'cod') {
             const name = document.getElementById('customerName')?.value.trim();
             const phone = document.getElementById('customerPhone')?.value.trim();
@@ -535,8 +555,11 @@
                 showToast('Заповніть імʼя, телефон та адресу для накладеного платежу', '#b91c1c');
                 return;
             }
-            showToast(`✅ Замовлення на суму ${total} грн оформлено (накладений платіж). Менеджер звʼяжеться з вами.`, '#2c6e2f');
-            console.log('Замовлення (нал. платіж):', { items, total, customer: { name, phone, address } });
+            orderDetails.customer = { name, phone, address };
+            // Зберігаємо замовлення
+            saveOrder(orderDetails);
+            showToast(`✅ Замовлення №${orderDetails.id} на суму ${total} грн оформлено (накладений платіж). Менеджер звʼяжеться з вами.`, '#2c6e2f');
+            console.log('Замовлення збережено:', orderDetails);
             cart = {};
             updateCartUI();
             modal.style.display = 'none';
@@ -546,8 +569,12 @@
         // Онлайн-оплата (демо)
         try {
             showToast('Перенаправлення на оплату...', '#2c6e2f');
+            // Імітуємо успішну оплату через 1 секунду
             setTimeout(() => {
-                alert(`✅ Онлайн-оплата на суму ${total} грн успішно завершена (демо-режим).\nУ реальному проєкті тут буде перехід на платіжний шлюз.`);
+                // Після успішної оплати теж зберігаємо замовлення
+                orderDetails.paymentStatus = 'Оплачено (демо)';
+                saveOrder(orderDetails);
+                alert(`✅ Онлайн-оплата на суму ${total} грн успішно завершена (демо-режим).\nВаше замовлення №${orderDetails.id} збережено.`);
                 cart = {};
                 updateCartUI();
                 modal.style.display = 'none';
