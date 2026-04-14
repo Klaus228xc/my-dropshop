@@ -7,7 +7,7 @@
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -22,7 +22,6 @@
             line-height: 1.5;
         }
 
-        /* Шапка */
         .header {
             background: white;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -79,7 +78,6 @@
             font-weight: 700;
         }
 
-        /* Контейнер */
         .container {
             max-width: 1300px;
             margin: 2rem auto;
@@ -163,7 +161,7 @@
             transform: scale(0.96);
         }
 
-        /* Боковая корзина */
+        /* Корзина */
         .cart-overlay {
             position: fixed;
             top: 0;
@@ -325,20 +323,32 @@
         }
         .loader-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             padding: 4rem;
             gap: 1rem;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #2c7a6e;
         }
         .error-message {
             background: #fee2e2;
             border-left: 5px solid #dc2626;
-            padding: 1rem;
+            padding: 1.5rem;
             border-radius: 20px;
             margin: 2rem;
+            text-align: center;
             color: #991b1b;
+        }
+        .retry-btn {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 1rem;
+            font-weight: 500;
         }
         footer {
             text-align: center;
@@ -360,7 +370,7 @@
 <div class="header">
     <div class="logo">
         <h1>DropShop <i class="fas fa-box-open" style="color:#2c7a6e;"></i></h1>
-        <span>Дропшиппинг | Товары из XML фида websklad.biz.ua</span>
+        <span>Импорт из XML: websklad.biz.ua</span>
     </div>
     <button class="cart-icon-btn" id="openCartBtn">
         <i class="fas fa-shopping-cart"></i> Корзина
@@ -371,33 +381,35 @@
 <main class="container">
     <div id="productsGrid" class="products-grid">
         <div class="loader-container">
-            <i class="fas fa-spinner fa-pulse fa-2x"></i> Загрузка товаров из XML-фида...
+            <i class="fas fa-spinner fa-pulse fa-2x"></i>
+            <span>🚀 Начинаем импорт товаров из XML-фида...</span>
+            <small style="font-size:0.8rem;">https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml</small>
         </div>
     </div>
 </main>
 
 <footer>
-    <p><i class="fas fa-truck-fast"></i> Дропшиппинг модель — товары напрямую от поставщика (<strong>websklad.biz.ua</strong>)</p>
-    <p style="margin-top: 8px;">© 2025 DropShop — автоматический импорт из Universalnaya.xml</p>
+    <p><i class="fas fa-truck-fast"></i> Дропшиппинг — товары отправляются напрямую от поставщика (<strong>websklad.biz.ua</strong>)</p>
+    <p style="margin-top: 8px;">© 2025 DropShop | Автоматический импорт товаров из XML</p>
 </footer>
 
-<!-- Боковая корзина -->
+<!-- Корзина -->
 <div class="cart-overlay" id="cartOverlay">
     <div class="cart-sidebar" id="cartSidebar">
         <div class="cart-header">
-            <span><i class="fas fa-bag-shopping"></i> Моя корзина</span>
+            <span><i class="fas fa-bag-shopping"></i> Корзина</span>
             <button class="close-cart" id="closeCartBtn">&times;</button>
         </div>
         <div class="cart-items-list" id="cartItemsList">
             <div class="empty-cart-msg">Корзина пуста</div>
         </div>
-        <div class="cart-footer" id="cartFooter">
+        <div class="cart-footer">
             <div class="total-price" id="cartTotalPrice">0 ₽</div>
             <div class="checkout-form">
-                <input type="text" id="customerName" placeholder="Ваше имя *" required>
-                <input type="email" id="customerEmail" placeholder="Email *" required>
-                <input type="tel" id="customerPhone" placeholder="Телефон *" required>
-                <input type="text" id="customerAddress" placeholder="Адрес доставки *" required>
+                <input type="text" id="customerName" placeholder="Ваше имя *" autocomplete="name">
+                <input type="email" id="customerEmail" placeholder="Email *" autocomplete="email">
+                <input type="tel" id="customerPhone" placeholder="Телефон *">
+                <input type="text" id="customerAddress" placeholder="Адрес доставки *">
                 <button class="checkout-btn" id="checkoutBtn">Оформить заказ <i class="fas fa-arrow-right"></i></button>
             </div>
         </div>
@@ -407,17 +419,12 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-    // ------------------------------------------------------------------
-    // 1. Конфигурация: URL XML-фида и CORS-прокси (публичный allorigins.win)
-    // ------------------------------------------------------------------
-    const XML_FEED_URL = "https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml";
-    const CORS_PROXY = "https://api.allorigins.win/get?url=";  // возвращает JSON { contents: "xml text" }
+    // ---------- КОНФИГУРАЦИЯ ----------
+    const XML_URL = "https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml";
+    const CORS_PROXY = "https://api.allorigins.win/get?url=";  // возвращает { contents: "xml text" }
 
-    // Глобальный массив товаров (после парсинга)
-    let products = [];
-
-    // Корзина (структура: { id, quantity })
-    let cart = [];
+    let products = [];      // массив товаров после парсинга
+    let cart = [];          // { id, quantity }
 
     // DOM элементы
     const productsGrid = document.getElementById('productsGrid');
@@ -431,193 +438,179 @@
     const checkoutBtn = document.getElementById('checkoutBtn');
     const toastMsgDiv = document.getElementById('toastMsg');
 
-    // Вспомогательные UI
     function showToast(message, duration = 2500) {
         toastMsgDiv.textContent = message;
         toastMsgDiv.style.opacity = '1';
-        setTimeout(() => {
-            toastMsgDiv.style.opacity = '0';
-        }, duration);
+        setTimeout(() => toastMsgDiv.style.opacity = '0', duration);
     }
 
-    // ------------------------------------------------------------------
-    // 2. Парсинг XML (универсальный для Яндекс.Маркет / стандартных фидов)
-    // ------------------------------------------------------------------
+    // ---------- УНИВЕРСАЛЬНЫЙ ПАРСИНГ XML (Яндекс.Маркет / произвольный) ----------
     function parseXMLToProducts(xmlText) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlText, "text/xml");
         
-        // Проверка на ошибки парсинга
         if (xmlDoc.querySelector('parsererror')) {
-            throw new Error("Ошибка структуры XML");
+            throw new Error("Синтаксическая ошибка XML");
         }
-
-        // Ищем offers / offer (стандарт YML) или просто товары в узлах 'offer'
+        
+        // Пытаемся найти все элементы offer (стандарт YML)
         let offerNodes = xmlDoc.querySelectorAll('offer');
-        // Если нет offer, попробуем найти 'product' или 'item'
         if (offerNodes.length === 0) {
-            offerNodes = xmlDoc.querySelectorAll('product');
+            // Альтернативные названия: product, item, товар
+            offerNodes = xmlDoc.querySelectorAll('product, item, товар');
         }
+        
+        // Если всё равно пусто — ищем любые родительские узлы, содержащие name и price
         if (offerNodes.length === 0) {
-            offerNodes = xmlDoc.querySelectorAll('item');
-        }
-        // Если ничего не найдено, пробуем более общий поиск: любые узлы с name и price
-        if (offerNodes.length === 0) {
-            // ищем любые элементы, у которых есть потомки name и price (альтернативный парсинг)
             const allElements = xmlDoc.getElementsByTagName('*');
-            const possibleParents = [];
+            const candidates = [];
             for (let el of allElements) {
-                if (el.querySelector(':scope > name, :scope > Name') && el.querySelector(':scope > price, :scope > Price')) {
-                    possibleParents.push(el);
+                if ((el.querySelector(':scope > name, :scope > Name, :scope > title') || el.querySelector(':scope > name, :scope > Name')) &&
+                    (el.querySelector(':scope > price, :scope > Price, :scope > amount'))) {
+                    candidates.push(el);
                 }
             }
-            if (possibleParents.length > 0) offerNodes = possibleParents;
+            if (candidates.length) offerNodes = candidates;
         }
-
+        
         const productList = [];
         for (let i = 0; i < offerNodes.length; i++) {
             const node = offerNodes[i];
-            // Извлечение ID
+            // ID
             let id = node.getAttribute('id');
             if (!id) {
-                const idNode = node.querySelector('id, offerId, productId, article');
+                const idNode = node.querySelector('id, offerId, productId, article, vendorCode');
                 if (idNode) id = idNode.textContent.trim();
                 else id = `xml_${i + 1}_${Date.now()}_${Math.random()}`;
             }
+            
             // Название
             let name = '';
-            const nameNode = node.querySelector('name, Name, title, productName, model');
+            const nameNode = node.querySelector('name, Name, title, productName, model, fullname');
             if (nameNode) name = nameNode.textContent.trim();
             else name = `Товар ${i+1}`;
             
-            // Цена
+            // Цена (ищем в разных местах)
             let price = 0;
-            const priceNode = node.querySelector('price, Price, amount, retailPrice');
+            const priceNode = node.querySelector('price, Price, amount, retailPrice, purchasePrice');
             if (priceNode) {
-                let priceRaw = priceNode.textContent.trim();
-                price = parseFloat(priceRaw.replace(/[^0-9.,]/g, '').replace(',', '.'));
+                let raw = priceNode.textContent.trim().replace(/[^0-9.,]/g, '').replace(',', '.');
+                price = parseFloat(raw);
                 if (isNaN(price)) price = 0;
             }
-            // Если цена 0, ищем в атрибутах
             if (price === 0 && node.getAttribute('price')) price = parseFloat(node.getAttribute('price'));
             
             // Изображение
             let image = '';
-            const imgNode = node.querySelector('picture, image, img, gallery img, mainImage');
+            const imgNode = node.querySelector('picture, image, img, gallery img, mainImage, url');
             if (imgNode) {
                 let imgUrl = imgNode.textContent.trim();
-                if (!imgUrl.startsWith('http')) imgUrl = 'https://via.placeholder.com/300x220?text=No+Image';
+                if (imgUrl && !imgUrl.startsWith('http')) imgUrl = 'https://via.placeholder.com/300x220?text=Фото+товара';
                 image = imgUrl;
-            } else {
-                const imgAttr = node.getAttribute('image');
-                if (imgAttr && imgAttr.startsWith('http')) image = imgAttr;
-                else image = 'https://picsum.photos/300/220?random=' + id;
             }
+            if (!image) image = `https://picsum.photos/300/220?random=${i}`;
             
             // Описание
-            let description = '';
-            const descNode = node.querySelector('description, desc, shortDescription, fullDescription');
-            if (descNode) description = descNode.textContent.trim().substring(0, 150);
-            if (!description) description = 'Поставка напрямую от проверенного поставщика.';
+            let desc = '';
+            const descNode = node.querySelector('description, desc, shortDescription, fullDescription, annotation');
+            if (descNode) desc = descNode.textContent.trim().substring(0, 140);
+            if (!desc) desc = 'Товар напрямую от поставщика. Уточняйте детали при заказе.';
             
-            // Поставщик (можно указать из фида или общий)
+            // Поставщик
             let supplier = 'Поставщик: websklad.biz.ua';
-            const vendorNode = node.querySelector('vendor, brand, manufacturer');
+            const vendorNode = node.querySelector('vendor, brand, manufacturer, maker');
             if (vendorNode) supplier = `Поставщик: ${vendorNode.textContent.trim()}`;
             
-            productList.push({
-                id: String(id),
-                name: name,
-                price: price,
-                image: image,
-                desc: description,
-                supplier: supplier
-            });
+            if (price > 0 || productList.length === 0) { // добавляем даже если цена 0, но лучше фильтровать
+                productList.push({
+                    id: String(id),
+                    name: name,
+                    price: price,
+                    image: image,
+                    desc: desc,
+                    supplier: supplier
+                });
+            }
         }
         
-        // Фильтруем товары с нулевой ценой (опционально)
-        const validProducts = productList.filter(p => p.price > 0);
-        if (validProducts.length === 0 && productList.length > 0) {
-            // Если у всех цена 0, но товары есть — всё равно покажем с предупреждением
-            return productList;
-        }
-        return validProducts.length ? validProducts : productList;
+        // Если после парсинга нет товаров — выбросим ошибку
+        if (productList.length === 0) throw new Error('В XML не найдено ни одного товара с ценой и названием');
+        return productList;
     }
-
-    // ------------------------------------------------------------------
-    // 3. Загрузка и парсинг XML через прокси
-    // ------------------------------------------------------------------
-    async function loadProductsFromXML() {
+    
+    // ---------- ЗАГРУЗКА XML ЧЕРЕЗ ПРОКСИ ----------
+    async function loadAndImportXML() {
+        // Показываем индикатор загрузки с конкретным сообщением об импорте
+        productsGrid.innerHTML = `
+            <div class="loader-container">
+                <i class="fas fa-spinner fa-pulse fa-2x"></i>
+                <span>📡 Импорт данных из XML-фида...</span>
+                <small>${XML_URL}</small>
+            </div>
+        `;
+        
         try {
-            // Показываем лоадер
-            productsGrid.innerHTML = `<div class="loader-container"><i class="fas fa-spinner fa-pulse fa-2x"></i> Загрузка каталога от websklad.biz.ua ...</div>`;
-            
-            const proxyUrl = CORS_PROXY + encodeURIComponent(XML_FEED_URL);
+            const proxyUrl = CORS_PROXY + encodeURIComponent(XML_URL);
             const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            if (!response.ok) throw new Error(`HTTP ${response.status} — не удалось загрузить файл`);
             const data = await response.json();
             if (!data.contents) throw new Error('Прокси не вернул содержимое');
             
-            const xmlString = data.contents;
-            const parsedProducts = parseXMLToProducts(xmlString);
-            if (!parsedProducts.length) {
-                throw new Error('В XML не найдено ни одного товара с ценой/названием');
-            }
+            const parsed = parseXMLToProducts(data.contents);
+            products = parsed;
             
-            products = parsedProducts;
-            // При успешной загрузке новых товаров очищаем корзину (старые ID могут не совпадать)
+            // Очищаем корзину, так как ID товаров могут измениться
             if (cart.length > 0) {
                 cart = [];
                 saveCart();
                 updateCartUI();
                 updateCartBadge();
-                showToast('🔄 Каталог обновлён из XML, корзина очищена', 2000);
-            } else {
-                showToast(`✅ Загружено ${products.length} товаров из XML-фида!`, 2500);
             }
-            renderProducts();
+            
+            renderProductsGrid();
+            showToast(`✅ Импорт завершён! Загружено ${products.length} товаров.`, 3000);
         } catch (err) {
-            console.error('Ошибка загрузки XML:', err);
+            console.error('Ошибка импорта:', err);
             productsGrid.innerHTML = `
                 <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i> Не удалось загрузить товары из XML-фида.<br>
-                    ${err.message}<br><br>
-                    <button id="retryLoadBtn" style="background:#0f172a; color:white; border:none; padding:8px 20px; border-radius:40px; cursor:pointer;">🔄 Повторить попытку</button>
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
+                    <p style="margin: 1rem 0;"><strong>Не удалось импортировать товары из XML.</strong><br>${err.message}</p>
+                    <p style="font-size: 0.85rem;">Возможные причины: недоступен источник, проблемы CORS или неверная структура XML.</p>
+                    <button class="retry-btn" id="retryImportBtn"><i class="fas fa-sync-alt"></i> Повторить импорт</button>
                 </div>
             `;
-            const retryBtn = document.getElementById('retryLoadBtn');
-            if (retryBtn) retryBtn.addEventListener('click', () => loadProductsFromXML());
-            // Показываем заглушку с демо-товарами, чтобы магазин не был пустым
-            setFallbackProducts();
-            renderProducts();
+            const retryBtn = document.getElementById('retryImportBtn');
+            if (retryBtn) retryBtn.addEventListener('click', () => loadAndImportXML());
+            // Временно показываем демо-товары, чтобы магазин не пустовал (но с пометкой)
+            setFallbackDemoProducts();
+            renderProductsGrid();
         }
     }
     
-    // Запасной вариант: статические товары (если XML не загрузился)
-    function setFallbackProducts() {
+    // Резервные товары на случай, если XML не загрузился (чтобы сайт не был пустым)
+    function setFallbackDemoProducts() {
         if (products.length === 0) {
             products = [
-                { id: "demo1", name: "Демо-товар (XML недоступен)", price: 1990, image: "https://picsum.photos/id/13/300/220", desc: "Пожалуйста, проверьте URL фида или настройки CORS. Это демо-позиция.", supplier: "Резервный источник" },
-                { id: "demo2", name: "Универсальный адаптер", price: 790, image: "https://picsum.photos/id/26/300/220", desc: "Запасной товар для демонстрации работы магазина.", supplier: "Техно-склад" }
+                { id: "demo1", name: "📦 Демо-товар (XML временно недоступен)", price: 1990, image: "https://picsum.photos/id/13/300/220", desc: "Это демонстрационная карточка. Как только XML-фид станет доступен, товары обновятся автоматически.", supplier: "Резервный источник" },
+                { id: "demo2", name: "🔄 Повторите импорт", price: 0, image: "https://picsum.photos/id/26/300/220", desc: "Нажмите кнопку 'Повторить импорт' для загрузки реальных товаров из вашего XML-фида.", supplier: "Инструкция" }
             ];
         }
     }
     
-    // ------------------------------------------------------------------
-    // 4. Рендер товаров в сетке
-    // ------------------------------------------------------------------
-    function renderProducts() {
+    // ---------- ОТОБРАЖЕНИЕ ТОВАРОВ В СЕТКЕ ----------
+    function renderProductsGrid() {
         if (!productsGrid) return;
         if (products.length === 0) {
-            productsGrid.innerHTML = `<div class="loader-container">Нет товаров для отображения</div>`;
+            productsGrid.innerHTML = `<div class="loader-container">Товары не найдены. Попробуйте обновить страницу.</div>`;
             return;
         }
+        
         productsGrid.innerHTML = '';
         products.forEach(product => {
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
-                <img class="product-img" src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://picsum.photos/300/220?random=fallback'">
+                <img class="product-img" src="${product.image}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.src='https://picsum.photos/300/220?random=fallback'">
                 <div class="product-info">
                     <div class="product-title">${escapeHtml(product.name)}</div>
                     <div class="product-desc">${escapeHtml(product.desc)}</div>
@@ -630,6 +623,7 @@
             `;
             productsGrid.appendChild(card);
         });
+        
         // Добавляем события на кнопки "В корзину"
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -649,15 +643,13 @@
         });
     }
     
-    // ------------------------------------------------------------------
-    // 5. Работа с корзиной (localStorage)
-    // ------------------------------------------------------------------
+    // ---------- КОРЗИНА (LOCALSTORAGE) ----------
     function saveCart() {
-        localStorage.setItem('dropshop_cart_xml', JSON.stringify(cart));
+        localStorage.setItem('dropshop_cart_v2', JSON.stringify(cart));
     }
     
-    function loadCartFromStorage() {
-        const saved = localStorage.getItem('dropshop_cart_xml');
+    function loadCart() {
+        const saved = localStorage.getItem('dropshop_cart_v2');
         if (saved) {
             try {
                 cart = JSON.parse(saved);
@@ -754,7 +746,7 @@
             `;
         });
         cartItemsList.innerHTML = html;
-        // Делегирование
+        
         document.querySelectorAll('.cart-qty-dec').forEach(btn => {
             btn.removeEventListener('click', handleDec);
             btn.addEventListener('click', handleDec);
@@ -793,9 +785,7 @@
         updateCartTotalPrice();
     }
     
-    // ------------------------------------------------------------------
-    // 6. Оформление заказа (дропшиппинг)
-    // ------------------------------------------------------------------
+    // ---------- ОФОРМЛЕНИЕ ЗАКАЗА (ДРОПШИППИНГ) ----------
     async function onCheckout() {
         const name = document.getElementById('customerName').value.trim();
         const email = document.getElementById('customerEmail').value.trim();
@@ -813,13 +803,8 @@
             showToast('🛒 Корзина пуста', 2000);
             return;
         }
-        const orderProducts = cart.map(item => {
-            const p = getProductById(item.id);
-            return { name: p?.name, quantity: item.quantity, price: p?.price, supplier: p?.supplier };
-        });
-        const total = getCartTotal();
-        // Симуляция отправки заказа поставщикам
         showToast('⏳ Оформление заказа...', 1500);
+        // Имитация отправки заказа поставщикам (дропшиппинг)
         setTimeout(() => {
             const orderId = 'DS-' + Math.floor(Math.random() * 1000000);
             cart = [];
@@ -831,7 +816,7 @@
             document.getElementById('customerEmail').value = '';
             document.getElementById('customerPhone').value = '';
             document.getElementById('customerAddress').value = '';
-            showToast(`🎉 Заказ ${orderId} оформлен! Товары будут отправлены напрямую от поставщиков (дропшиппинг).`, 5000);
+            showToast(`🎉 Заказ №${orderId} оформлен! Товары будут отправлены напрямую от поставщиков (дропшиппинг).`, 5000);
         }, 600);
     }
     
@@ -845,19 +830,17 @@
         cartSidebar.classList.remove('open');
     }
     
-    // ------------------------------------------------------------------
-    // 7. Инициализация приложения
-    // ------------------------------------------------------------------
+    // ---------- ИНИЦИАЛИЗАЦИЯ ----------
     function init() {
-        loadCartFromStorage();
+        loadCart();
         openCartBtn.addEventListener('click', openCartSidebar);
         closeCartBtn.addEventListener('click', closeCartSidebar);
         cartOverlay.addEventListener('click', (e) => {
             if (e.target === cartOverlay) closeCartSidebar();
         });
         checkoutBtn.addEventListener('click', onCheckout);
-        // Загружаем товары из XML фида
-        loadProductsFromXML();
+        // ЗАПУСКАЕМ ИМПОРТ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+        loadAndImportXML();
     }
     
     init();
