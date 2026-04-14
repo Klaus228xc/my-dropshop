@@ -139,14 +139,11 @@
             width: fit-content;
             margin-bottom: 12px;
         }
-        .price-row {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
+        .price {
+            font-size: 1.4rem;
+            font-weight: 700;
             margin: 8px 0;
         }
-        .price { font-size: 1.4rem; font-weight: 700; }
-        .old-price { font-size: 0.8rem; text-decoration: line-through; color: #94a3b8; }
         .stock {
             font-size: 0.75rem;
             padding: 4px 10px;
@@ -198,9 +195,28 @@
         .cart-item-quantity { display: flex; align-items: center; gap: 8px; }
         .cart-item-quantity input { width: 60px; padding: 6px; text-align: center; border-radius: 20px; border: 1px solid #cbd5e1; }
         .cart-total { text-align: right; font-size: 1.2rem; font-weight: 700; margin-top: 20px; }
-        .order-form { margin-top: 32px; border-top: 2px solid #e2e8f0; padding-top: 24px; }
-        .order-form input, .order-form textarea { width: 100%; margin-bottom: 12px; padding: 12px; border-radius: 28px; border: 1px solid #cbd5e1; }
-        .order-form button { background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 40px; width: 100%; font-weight: 600; cursor: pointer; }
+        .order-form {
+            margin-top: 32px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 24px;
+        }
+        .order-form input, .order-form select, .order-form textarea {
+            width: 100%;
+            margin-bottom: 12px;
+            padding: 12px;
+            border-radius: 28px;
+            border: 1px solid #cbd5e1;
+        }
+        .order-form button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+        }
         .back-to-catalog {
             background: none;
             border: none;
@@ -254,57 +270,57 @@
 
 <script>
     // --------------------------------------------------------------
-    // ПОЛНЫЙ КАТАЛОГ ТОВАРОВ (основные позиции из CSV)
+    // ПОЛНЫЙ КАТАЛОГ ТОВАРОВ (основные позиции из CSV, убраны старые цены)
     // --------------------------------------------------------------
     const catalogData = [
-  {title:"Массажная подушка Car and Home Massage Pillow", sku:"ws78472", price:529, oldPrice:356, stock:"instock", category:"Автотовары", img:"https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg"},
-  {title:"Настольный бокс для хранения косметики с выдвижными ящиками", sku:"ws30483", price:399, oldPrice:291, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg"},
-  {title:"Лампа для маникюра ZH-818, УФ лампа для сушки гель лака", sku:"ws87556", price:499, oldPrice:355, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/wdefqd.jpg"},
-  {title:"Точилка для ножей Bavarian Edge", sku:"ws53905", price:249, oldPrice:170, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd132.jpg"},
-  {title:"Расческа выпрямитель Fast Hair Straightener", sku:"ws33813", price:299, oldPrice:178, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/tgwesdgesae.jpg"},
-  {title:"Тканевый шкаф органайзер 105х45х170см", sku:"ws36558", price:629, oldPrice:402, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewx23.png"},
-  {title:"Пояс для похудения Neotex Hot Shapers", sku:"ws52037", price:149, oldPrice:80, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/1wqeds.jpg"},
-  {title:"Весы кухонные Domotec SF-400 белые", sku:"ws46146", price:249, oldPrice:123, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd.jpg"},
-  {title:"Беспроводная зарядка Awei W2", sku:"ws56917", price:298, oldPrice:187, stock:"outofstock", category:"Электроника", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/ewfdqedscd2.jpg"},
-  {title:"Тройное зеркало для макияжа с подсветкой", sku:"ws72465", price:399, oldPrice:300, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_2736.jpg"},
-  {title:"Автокомпрессор Air Compressor DC12V", sku:"ws71351", price:299, oldPrice:205, stock:"outofstock", category:"Автотовары", img:"https://www.websklad.biz.ua/wp-content/uploads/uaivukaifvvif.jpg"},
-  {title:"Машинка для удаления катышков Hengda HD-779", sku:"ws27255", price:229, oldPrice:149, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/81520725_images_11695556319.jpg"},
-  {title:"Домашний тренажер Revoflex Xtreme", sku:"ws53562", price:399, oldPrice:264, stock:"outofstock", category:"Спорт, здоровье, отдых", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/edfwfwe.jpg"},
-  {title:"Массажер для шеи с подогревом", sku:"ws25204", price:749, oldPrice:606, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/e4upaveucyvpkvyaav.jpg"},
-  {title:"Ланч бокс электрический Lunch Heater", sku:"ws88434", price:359, oldPrice:243, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/3kcvaypeuyavpvy.jpg"},
-  {title:"Обогреватель Rovus Handy Heater", sku:"ws50896", price:379, oldPrice:255, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/kcuvyfafavyf.jpg"},
-  {title:"Электрическая турка для кофе", sku:"ws78089", price:299, oldPrice:209, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/r3dsaferfasd.jpg"},
-  {title:"Лазерная указка Green Laser", sku:"ws78682", price:299, oldPrice:187, stock:"outofstock", category:"Фонари, лампы, зажигалки", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/c2rxf3e.jpg"},
-  {title:"Проектор звездное небо Star Master", sku:"ws78523", price:199, oldPrice:114, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4332.jpg"},
-  {title:"Алкотестер цифровой с мундштуками", sku:"ws34264", price:279, oldPrice:189, stock:"instock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/3rqwfdasgereafeds.jpg"},
-  {title:"Аппарат для сладкой ваты Cotton Candy", sku:"ws78125", price:769, oldPrice:561, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/kcfvaykucvy.jpg"},
-  {title:"Вафельница DOMOTEC MS-7710", sku:"ws64912", price:649, oldPrice:515, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/IMG_5490.jpg"},
-  {title:"Весы кухонные DOMOTEC MS-125 Plastic", sku:"ws93562", price:299, oldPrice:232, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/198653491_images_17528255887.jpg"},
-  {title:"Кольцевая лампа 16 см USB", sku:"ws49164", price:219, oldPrice:135, stock:"outofstock", category:"Фонари, лампы, зажигалки", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/e323rz2r32.jpg"},
-  {title:"Магнитный конструктор Buckyballs", sku:"ws75124", price:329, oldPrice:223, stock:"outofstock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/235322275_images_19262344711.jpg"},
-  {title:"Неокуб Золотой 216 шариков", sku:"ws22421", price:399, oldPrice:287, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/3753.jpg"},
-  {title:"Муляж камеры PT-1900", sku:"ws99566", price:249, oldPrice:156, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/163664684_images_15835715806.jpg"},
-  {title:"Набор блогера с кольцевой лампой", sku:"ws41182", price:299, oldPrice:209, stock:"instock", category:"Фонари, лампы, зажигалки", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/182568828_images_20256391481.jpg"},
-  {title:"Ночник Луна Moon Lamp", sku:"ws35123", price:299, oldPrice:196, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/236207929_images_19301561335.jpg"},
-  {title:"Ортопедическая подушка EGG SITTER", sku:"ws98546", price:349, oldPrice:218, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/133258885_images_14566998611.jpg"},
-  {title:"Отпариватель TOBI", sku:"ws17577", price:449, oldPrice:314, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/kcfyvafvfvy.jpg"},
-  {title:"Разноцветный магнитный конструктор 64 детали", sku:"ws21228", price:339, oldPrice:232, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/189790427_images_17103663452.jpg"},
-  {title:"Слуховой аппарат XM 909T", sku:"ws68486", price:299, oldPrice:212, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/81189411_images_11682804237.jpg"},
-  {title:"Сушилка для ногтей UV LAMP CCF+LED", sku:"ws17165", price:599, oldPrice:447, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/IMG_2828.jpg"},
-  {title:"Терка Nicer Dicer PLUS", sku:"ws13559", price:399, oldPrice:250, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/101108557_images_12892882422.jpg"},
-  {title:"Трещотка универсальная 7-19 мм", sku:"ws18436", price:249, oldPrice:164, stock:"instock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/wqz.jpg"},
-  {title:"Триммер GEMEI GM-3112 2в1", sku:"ws19242", price:249, oldPrice:164, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/kciavakafivif.jpg"},
-  {title:"Швабра Titan Twist Mop", sku:"ws58887", price:439, oldPrice:292, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/223982377_images_18700259629.jpg"},
-  {title:"Швейная машинка 4в1 портативная", sku:"ws13635", price:499, oldPrice:401, stock:"instock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/cfyauyfavyfvyf.jpg"},
-  {title:"Штатив Tripod 3110 PRO", sku:"ws16178", price:299, oldPrice:187, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/76144116_images_11348326884.jpg"},
-  {title:"Электроплита DOMOTEC MS-5811", sku:"ws49479", price:499, oldPrice:379, stock:"instock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/4refderwadfdsaads.jpg"},
-  {title:"Блендер DOMOTEC MS-5103 3в1", sku:"ws88774", price:749, oldPrice:606, stock:"instock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/kucfkcfvyukcv.jpg"},
-  {title:"Бриджи для похудения HOT SHAPERS", sku:"ws35235", price:199, oldPrice:132, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/155502747_images_20128984011.jpg"},
-  {title:"Триммер GEMEI GM-7113", sku:"ws72333", price:399, oldPrice:300, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/rwefdsvfedfasasdfew.jpg"},
-  {title:"Весы багажные MAGIO MG-146", sku:"ws79158", price:399, oldPrice:279, stock:"instock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/kucfvikcuvif.jpg"},
-  {title:"Фен-щетка 3в1 One step Hair Dryer", sku:"ws38113", price:349, oldPrice:239, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/11/232017925_images_19079126257.jpg"},
-  {title:"Беспроводной микрофон караоке WS-858", sku:"ws38518", price:344, oldPrice:185, stock:"outofstock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/11/70658078_images_10649380046.jpg"},
-  {title:"Пульсоксиметр Fingertip Oximeter", sku:"ws85953", price:399, oldPrice:229, stock:"outofstock", category:"Спорт, здоровье, отдых", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/11/IMG_4158.jpg"}
+  {title:"Массажная подушка Car and Home Massage Pillow", sku:"ws78472", price:529, stock:"instock", category:"Автотовары", img:"https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg"},
+  {title:"Настольный бокс для хранения косметики с выдвижными ящиками", sku:"ws30483", price:399, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg"},
+  {title:"Лампа для маникюра ZH-818, УФ лампа для сушки гель лака", sku:"ws87556", price:499, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/wdefqd.jpg"},
+  {title:"Точилка для ножей Bavarian Edge", sku:"ws53905", price:249, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd132.jpg"},
+  {title:"Расческа выпрямитель Fast Hair Straightener", sku:"ws33813", price:299, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/tgwesdgesae.jpg"},
+  {title:"Тканевый шкаф органайзер 105х45х170см", sku:"ws36558", price:629, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewx23.png"},
+  {title:"Пояс для похудения Neotex Hot Shapers", sku:"ws52037", price:149, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/1wqeds.jpg"},
+  {title:"Весы кухонные Domotec SF-400 белые", sku:"ws46146", price:249, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd.jpg"},
+  {title:"Беспроводная зарядка Awei W2", sku:"ws56917", price:298, stock:"outofstock", category:"Электроника", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/ewfdqedscd2.jpg"},
+  {title:"Тройное зеркало для макияжа с подсветкой", sku:"ws72465", price:399, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_2736.jpg"},
+  {title:"Автокомпрессор Air Compressor DC12V", sku:"ws71351", price:299, stock:"outofstock", category:"Автотовары", img:"https://www.websklad.biz.ua/wp-content/uploads/uaivukaifvvif.jpg"},
+  {title:"Машинка для удаления катышков Hengda HD-779", sku:"ws27255", price:229, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/81520725_images_11695556319.jpg"},
+  {title:"Домашний тренажер Revoflex Xtreme", sku:"ws53562", price:399, stock:"outofstock", category:"Спорт, здоровье, отдых", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/edfwfwe.jpg"},
+  {title:"Массажер для шеи с подогревом", sku:"ws25204", price:749, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/e4upaveucyvpkvyaav.jpg"},
+  {title:"Ланч бокс электрический Lunch Heater", sku:"ws88434", price:359, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/3kcvaypeuyavpvy.jpg"},
+  {title:"Обогреватель Rovus Handy Heater", sku:"ws50896", price:379, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/kcuvyfafavyf.jpg"},
+  {title:"Электрическая турка для кофе", sku:"ws78089", price:299, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/r3dsaferfasd.jpg"},
+  {title:"Лазерная указка Green Laser", sku:"ws78682", price:299, stock:"outofstock", category:"Фонари, лампы, зажигалки", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/c2rxf3e.jpg"},
+  {title:"Проектор звездное небо Star Master", sku:"ws78523", price:199, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4332.jpg"},
+  {title:"Алкотестер цифровой с мундштуками", sku:"ws34264", price:279, stock:"instock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/3rqwfdasgereafeds.jpg"},
+  {title:"Аппарат для сладкой ваты Cotton Candy", sku:"ws78125", price:769, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/kcfvaykucvy.jpg"},
+  {title:"Вафельница DOMOTEC MS-7710", sku:"ws64912", price:649, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/IMG_5490.jpg"},
+  {title:"Весы кухонные DOMOTEC MS-125 Plastic", sku:"ws93562", price:299, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/198653491_images_17528255887.jpg"},
+  {title:"Кольцевая лампа 16 см USB", sku:"ws49164", price:219, stock:"outofstock", category:"Фонари, лампы, зажигалки", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/e323rz2r32.jpg"},
+  {title:"Магнитный конструктор Buckyballs", sku:"ws75124", price:329, stock:"outofstock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/235322275_images_19262344711.jpg"},
+  {title:"Неокуб Золотой 216 шариков", sku:"ws22421", price:399, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/3753.jpg"},
+  {title:"Муляж камеры PT-1900", sku:"ws99566", price:249, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/163664684_images_15835715806.jpg"},
+  {title:"Набор блогера с кольцевой лампой", sku:"ws41182", price:299, stock:"instock", category:"Фонари, лампы, зажигалки", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/182568828_images_20256391481.jpg"},
+  {title:"Ночник Луна Moon Lamp", sku:"ws35123", price:299, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/236207929_images_19301561335.jpg"},
+  {title:"Ортопедическая подушка EGG SITTER", sku:"ws98546", price:349, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/133258885_images_14566998611.jpg"},
+  {title:"Отпариватель TOBI", sku:"ws17577", price:449, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/kcfyvafvfvy.jpg"},
+  {title:"Разноцветный магнитный конструктор 64 детали", sku:"ws21228", price:339, stock:"instock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/189790427_images_17103663452.jpg"},
+  {title:"Слуховой аппарат XM 909T", sku:"ws68486", price:299, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/81189411_images_11682804237.jpg"},
+  {title:"Сушилка для ногтей UV LAMP CCF+LED", sku:"ws17165", price:599, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/IMG_2828.jpg"},
+  {title:"Терка Nicer Dicer PLUS", sku:"ws13559", price:399, stock:"outofstock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/101108557_images_12892882422.jpg"},
+  {title:"Трещотка универсальная 7-19 мм", sku:"ws18436", price:249, stock:"instock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/wqz.jpg"},
+  {title:"Триммер GEMEI GM-3112 2в1", sku:"ws19242", price:249, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/kciavakafivif.jpg"},
+  {title:"Швабра Titan Twist Mop", sku:"ws58887", price:439, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/223982377_images_18700259629.jpg"},
+  {title:"Швейная машинка 4в1 портативная", sku:"ws13635", price:499, stock:"instock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/cfyauyfavyfvyf.jpg"},
+  {title:"Штатив Tripod 3110 PRO", sku:"ws16178", price:299, stock:"outofstock", category:"Товары для дома и сада", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/76144116_images_11348326884.jpg"},
+  {title:"Электроплита DOMOTEC MS-5811", sku:"ws49479", price:499, stock:"instock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/4refderwadfdsaads.jpg"},
+  {title:"Блендер DOMOTEC MS-5103 3в1", sku:"ws88774", price:749, stock:"instock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/kucfkcfvyukcv.jpg"},
+  {title:"Бриджи для похудения HOT SHAPERS", sku:"ws35235", price:199, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/10/155502747_images_20128984011.jpg"},
+  {title:"Триммер GEMEI GM-7113", sku:"ws72333", price:399, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/rwefdsvfedfasasdfew.jpg"},
+  {title:"Весы багажные MAGIO MG-146", sku:"ws79158", price:399, stock:"instock", category:"Все для кухни", img:"https://www.websklad.biz.ua/wp-content/uploads/kucfvikcuvif.jpg"},
+  {title:"Фен-щетка 3в1 One step Hair Dryer", sku:"ws38113", price:349, stock:"instock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/11/232017925_images_19079126257.jpg"},
+  {title:"Беспроводной микрофон караоке WS-858", sku:"ws38518", price:344, stock:"outofstock", category:"Товары для детей", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/11/70658078_images_10649380046.jpg"},
+  {title:"Пульсоксиметр Fingertip Oximeter", sku:"ws85953", price:399, stock:"outofstock", category:"Спорт, здоровье, отдых", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/11/IMG_4158.jpg"}
     ];
 
     // Корзина (localStorage)
@@ -321,6 +337,10 @@
     }
 
     function addToCart(product) {
+        if (product.stock !== 'instock') {
+            alert("Товар временно отсутствует");
+            return;
+        }
         const existing = cart.find(item => item.sku === product.sku);
         if (existing) {
             existing.quantity++;
@@ -365,7 +385,7 @@
                 <div class="product-info">
                     <span class="product-category">${p.category}</span>
                     <div class="product-title">${p.title}</div>
-                    <div class="price-row"><span class="price">${p.price} ₴</span>${p.oldPrice ? `<span class="old-price">${p.oldPrice} ₴</span>` : ''}</div>
+                    <div class="price">${p.price} ₴</div>
                     <div class="stock ${p.stock === 'instock' ? 'instock' : 'outofstock'}">${p.stock === 'instock' ? '✅ В наличии' : '❌ Нет в наличии'}</div>
                     <button class="btn-cart" ${p.stock !== 'instock' ? 'disabled style="opacity:0.5;"' : ''} onclick="addToCart(${JSON.stringify(p).replace(/"/g, '&quot;')})">🛒 В корзину</button>
                 </div>
@@ -375,7 +395,7 @@
         document.getElementById('stats').innerText = `${filtered.length} товаров`;
     }
 
-    // рендер корзины
+    // рендер корзины с выбором доставки и оплаты
     function renderCartView() {
         if (cart.length === 0) {
             document.getElementById('mainContent').innerHTML = `
@@ -404,6 +424,8 @@
                 </div>
             `;
         }).join('');
+
+        // Форма с выбором доставки и оплаты
         const formHtml = `
             <div class="order-form">
                 <h3>Оформление заказа</h3>
@@ -414,12 +436,23 @@
                     <input type="text" name="Имя" placeholder="Ваше имя *" required>
                     <input type="tel" name="Телефон" placeholder="Номер телефона *" required>
                     <input type="email" name="Email" placeholder="Email для подтверждения">
-                    <textarea name="Комментарий" rows="3" placeholder="Дополнительная информация"></textarea>
-                    <input type="hidden" name="Товары" value="${cart.map(i => `${i.title} (${i.quantity} шт.) - ${i.price* i.quantity}₴`).join('; ')}">
+                    <select name="Доставка" required>
+                        <option value="">Выберите службу доставки</option>
+                        <option value="Новая почта">Новая почта (отделение / адресная)</option>
+                        <option value="Укрпочта">Укрпочта</option>
+                    </select>
+                    <select name="Оплата" required>
+                        <option value="">Выберите способ оплаты</option>
+                        <option value="Наложенный платеж (оплата при получении)">Наложенный платеж (при получении)</option>
+                        <option value="Онлайн-карта (Visa/Mastercard)">Оплата картой онлайн (ссылка в письме)</option>
+                        <option value="Наличные при получении">Наличные при получении</option>
+                    </select>
+                    <textarea name="Комментарий" rows="3" placeholder="Дополнительная информация (город, отделение, примечания)"></textarea>
+                    <input type="hidden" name="Товары" value="${cart.map(i => `${i.title} (${i.quantity} шт.) - ${i.price*i.quantity}₴`).join('; ')}">
                     <input type="hidden" name="Сумма" value="${total} ₴">
                     <button type="submit">📦 Оформить заказ</button>
                 </form>
-                <p style="font-size:0.7rem; margin-top:8px;">После отправки заказа с вами свяжется менеджер.</p>
+                <p style="font-size:0.7rem; margin-top:8px;">После отправки менеджер свяжется с вами для подтверждения.</p>
             </div>
         `;
         const cartHtml = `
@@ -433,11 +466,10 @@
         `;
         document.getElementById('mainContent').innerHTML = cartHtml;
         document.getElementById('backToCatalogBtn')?.addEventListener('click', () => showCatalog());
-        // перехват отправки формы (добавим alert)
         const form = document.getElementById('orderForm');
         if(form) {
             form.addEventListener('submit', (e) => {
-                if(confirm('Подтверждаете заказ? После отправки данные будут переданы менеджеру.')) {
+                if(confirm('Подтверждаете заказ? После отправки с вами свяжется менеджер.')) {
                     cart = [];
                     saveCart();
                     setTimeout(() => { showCatalog(); }, 500);
@@ -451,7 +483,6 @@
     function showCatalog() {
         document.getElementById('filtersPanel').style.display = 'flex';
         renderCatalog();
-        // привязка событий фильтров
         const search = document.getElementById('searchInput');
         const catSelect = document.getElementById('categorySelect');
         const filterHandler = () => renderCatalog();
@@ -466,25 +497,24 @@
         renderCartView();
     }
 
-    // инициализация категорий
     function initCategories() {
         const cats = [...new Set(catalogData.map(p => p.category))];
         const select = document.getElementById('categorySelect');
         select.innerHTML = '<option value="all">📂 Все категории</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
     }
 
-    // обработчики переключения
-    document.getElementById('cartIcon').addEventListener('click', showCart);
-    document.getElementById('logoBtn').addEventListener('click', showCatalog);
-    initCategories();
-    showCatalog();
-    updateCartUI();
-    // делаем функции глобальными для onclick
+    // Глобальные функции для onclick
     window.addToCart = addToCart;
     window.removeFromCart = removeFromCart;
     window.updateQuantity = updateQuantity;
     window.showCatalog = showCatalog;
     window.showCart = showCart;
+
+    document.getElementById('cartIcon').addEventListener('click', showCart);
+    document.getElementById('logoBtn').addEventListener('click', showCatalog);
+    initCategories();
+    showCatalog();
+    updateCartUI();
 </script>
 </body>
 </html>
