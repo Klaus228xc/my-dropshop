@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Websklad Dropship | Каталог + Корзина</title>
+    <title>ua drop | Каталог + Корзина</title>
     <style>
         * {
             margin: 0;
@@ -239,8 +239,8 @@
 <div class="container">
     <div class="shop-header">
         <div class="logo-area" id="logoBtn">
-            <h1>🛍️ Websklad Dropship</h1>
-            <p style="font-size: 0.8rem;">Оригинальные товары</p>
+            <h1>🇺🇦 ua drop</h1>
+            <p style="font-size: 0.8rem;">Оригинальные товары с доставкой по Украине</p>
         </div>
         <div class="cart-icon" id="cartIcon">
             🛒 Корзина <span id="cartCount" class="cart-count">0</span>
@@ -264,13 +264,13 @@
     <div id="mainContent"></div>
 
     <footer>
-        <p>© Websklad Dropship — интернет-витрина. Для заказа заполните форму в корзине.</p>
+        <p>© ua drop — интернет-витрина. Для заказа заполните форму в корзине.</p>
     </footer>
 </div>
 
 <script>
     // --------------------------------------------------------------
-    // ПОЛНЫЙ КАТАЛОГ ТОВАРОВ (основные позиции из CSV, убраны старые цены)
+    // ПОЛНЫЙ КАТАЛОГ ТОВАРОВ (без зачёркнутых цен)
     // --------------------------------------------------------------
     const catalogData = [
   {title:"Массажная подушка Car and Home Massage Pillow", sku:"ws78472", price:529, stock:"instock", category:"Автотовары", img:"https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg"},
@@ -324,10 +324,10 @@
     ];
 
     // Корзина (localStorage)
-    let cart = JSON.parse(localStorage.getItem('websklad_cart')) || [];
+    let cart = JSON.parse(localStorage.getItem('ua_drop_cart')) || [];
 
     function saveCart() {
-        localStorage.setItem('websklad_cart', JSON.stringify(cart));
+        localStorage.setItem('ua_drop_cart', JSON.stringify(cart));
         updateCartUI();
     }
 
@@ -425,12 +425,12 @@
             `;
         }).join('');
 
-        // Форма с выбором доставки и оплаты
+        // ВАЖНО: замените your-email@example.com на реальный email для получения заказов
         const formHtml = `
             <div class="order-form">
                 <h3>Оформление заказа</h3>
-                <form id="orderForm" action="https://formsubmit.co/websklad.orders@example.com" method="POST">
-                    <input type="hidden" name="_subject" value="Новый заказ с Websklad Dropship">
+                <form id="orderForm" action="https://formsubmit.co/your-email@example.com" method="POST">
+                    <input type="hidden" name="_subject" value="Новый заказ с ua drop">
                     <input type="hidden" name="_captcha" value="false">
                     <input type="hidden" name="_next" value="https://klaus228xc.github.io/my-dropshop/#">
                     <input type="text" name="Имя" placeholder="Ваше имя *" required>
