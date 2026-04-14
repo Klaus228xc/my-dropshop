@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Websklad | Магазин качественных товаров</title>
+    <title>UA Drop | Магазин якісних товарів</title>
     <style>
         * {
             margin: 0;
@@ -17,7 +17,6 @@
             color: #1a1e2b;
         }
 
-        /* Шапка */
         .header {
             background: rgba(255,255,255,0.92);
             backdrop-filter: blur(12px);
@@ -76,7 +75,6 @@
             font-weight: bold;
         }
 
-        /* Основной контент */
         .container {
             max-width: 1400px;
             margin: 2rem auto;
@@ -98,7 +96,6 @@
             gap: 2rem;
         }
 
-        /* Карточка товара */
         .product-card {
             background: #ffffff;
             border-radius: 28px;
@@ -139,11 +136,6 @@
             color: #1f2b4e;
             margin: 0.5rem 0;
         }
-        .product-price small {
-            font-size: 0.85rem;
-            font-weight: 400;
-            color: #6c7a8e;
-        }
         .stock-badge {
             font-size: 0.75rem;
             display: inline-block;
@@ -183,7 +175,7 @@
             cursor: not-allowed;
         }
 
-        /* Модалка корзины */
+        /* Модалка корзини */
         .modal {
             display: none;
             position: fixed;
@@ -211,7 +203,7 @@
             to { opacity: 1; transform: translateY(0);}
         }
         .cart-items-list {
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
             margin: 1rem 0;
         }
@@ -252,6 +244,27 @@
             border-top: 2px solid #eef2f8;
             padding-top: 1rem;
         }
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            justify-content: center;
+        }
+        .payment-methods label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8fafd;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+        }
+        .payment-methods input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
         .pay-btn {
             background: #2c6e2f;
             width: 100%;
@@ -281,6 +294,21 @@
             color: #6c7a8e;
             font-size: 0.8rem;
         }
+        .order-info {
+            background: #f1f5f9;
+            border-radius: 24px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .order-info input, .order-info textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
         @media (max-width: 680px) {
             .container { padding: 0 1rem; }
             .product-title { font-size: 1rem; }
@@ -290,7 +318,7 @@
 <body>
 <div class="header">
     <div class="header-container">
-        <div class="logo">✦ WEBSKLAD</div>
+        <div class="logo">🇺🇦 UA DROP</div>
         <div class="cart-icon" id="cartIcon">
             <span>🛒</span>
             <span class="cart-count" id="cartCount">0</span>
@@ -299,48 +327,62 @@
 </div>
 
 <div class="container">
-    <div class="catalog-title">✨ Популярные товары</div>
+    <div class="catalog-title">✨ Топ пропозиції</div>
     <div class="products-grid" id="productsGrid"></div>
 </div>
 
-<!-- Модалка корзины -->
+<!-- Модалка корзини -->
 <div id="cartModal" class="modal">
     <div class="modal-content">
         <button class="close-modal" id="closeModalBtn">&times;</button>
-        <h2>Корзина</h2>
+        <h2>Кошик</h2>
         <div id="cartItemsList" class="cart-items-list"></div>
-        <div id="cartTotal" class="cart-total">Итого: 0 ₴</div>
-        <button id="checkoutButton" class="pay-btn">💳 Оплатить онлайн</button>
+        <div id="cartTotal" class="cart-total">Всього: 0 ₴</div>
+
+        <div class="payment-methods">
+            <label>
+                <input type="radio" name="paymentMethod" value="online" checked> 💳 Онлайн-оплата
+            </label>
+            <label>
+                <input type="radio" name="paymentMethod" value="cod"> 📦 Накладений платіж
+            </label>
+        </div>
+
+        <div id="codFields" style="display: none;" class="order-info">
+            <input type="text" id="customerName" placeholder="Ваше ім'я та прізвище" autocomplete="name">
+            <input type="tel" id="customerPhone" placeholder="Номер телефону" autocomplete="tel">
+            <textarea id="customerAddress" rows="2" placeholder="Адреса доставки (місто, відділення Нової Пошти / адреса)"></textarea>
+        </div>
+
+        <button id="checkoutButton" class="pay-btn">💳 Оформити замовлення</button>
     </div>
 </div>
 
-<footer>© Websklad — качественные товары с доставкой</footer>
+<footer>© UA Drop — якісні товари з доставкою по всій Україні</footer>
 
 <script>
-    // ----- ДАННЫЕ ТОВАРОВ (первые 30 из вашего CSV, для красоты и демонстрации) -----
-    // В реальном проекте загружайте через fetch('products.csv'), здесь я встроил образец
+    // Товари (перші 15 з вашого CSV)
     const productsData = [
-        { sku: "ws78472", name: "Массажная подушка Car and Home", price: 529, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg" },
-        { sku: "ws30483", name: "Бокс для хранения косметики с зеркалом", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg" },
-        { sku: "ws87556", name: "УФ лампа для маникюра ZH-818", price: 499, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wdefqd.jpg" },
+        { sku: "ws78472", name: "Масажна подушка Car and Home", price: 529, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg" },
+        { sku: "ws30483", name: "Бокс для зберігання косметики з дзеркалом", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg" },
+        { sku: "ws87556", name: "УФ лампа для манікюру ZH-818", price: 499, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wdefqd.jpg" },
         { sku: "ws53905", name: "Точилка Bavarian Edge Knife Sharpener", price: 249, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd132.jpg" },
-        { sku: "ws33813", name: "Расческа-выпрямитель Fast Hair Straightener", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/tgwesdgesae.jpg" },
-        { sku: "ws36558", name: "Тканевый шкаф-органайзер 105x45x170 см", price: 629, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewx23.png" },
-        { sku: "ws52037", name: "Пояс для похудения Neotex Hot Shapers", price: 149, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/1wqeds.jpg" },
-        { sku: "ws46146", name: "Весы кухонные Domotec SF-400 до 10 кг", price: 249, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd.jpg" },
-        { sku: "ws56917", name: "Беспроводная зарядка Awei W2", price: 298, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/ewfdqedscd2.jpg" },
-        { sku: "ws72465", name: "Тройное зеркало для макияжа с подсветкой", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_2736.jpg" },
-        { sku: "ws71351", name: "Автомобильный компрессор Air Compressor", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/uaivukaifvvif.jpg" },
-        { sku: "ws27255", name: "Машинка для удаления катышков Hengda HD-779", price: 229, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/81520725_images_11695556319.jpg" },
-        { sku: "ws53562", name: "Домашний тренажер Revoflex Xtreme", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/edfwfwe.jpg" },
-        { sku: "ws25204", name: "Электрический массажёр с инфракрасным излучением", price: 749, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/e4upaveucyvpkvyaav.jpg" },
-        { sku: "ws88434", name: "Ланч бокс электрический с подогревом", price: 359, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/3kcvaypeuyavpvy.jpg" }
+        { sku: "ws33813", name: "Гребінець-випрямляч Fast Hair Straightener", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/tgwesdgesae.jpg" },
+        { sku: "ws36558", name: "Тканинна шафа-органайзер 105x45x170 см", price: 629, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewx23.png" },
+        { sku: "ws52037", name: "Пояс для схуднення Neotex Hot Shapers", price: 149, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/1wqeds.jpg" },
+        { sku: "ws46146", name: "Кухонні ваги Domotec SF-400 до 10 кг", price: 249, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd.jpg" },
+        { sku: "ws56917", name: "Бездротова зарядка Awei W2", price: 298, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/ewfdqedscd2.jpg" },
+        { sku: "ws72465", name: "Потрійне дзеркало для макіяжу з підсвіткою", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_2736.jpg" },
+        { sku: "ws71351", name: "Автомобільний компресор Air Compressor", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/uaivukaifvvif.jpg" },
+        { sku: "ws27255", name: "Машинка для видалення катишків Hengda HD-779", price: 229, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/81520725_images_11695556319.jpg" },
+        { sku: "ws53562", name: "Домашній тренажер Revoflex Xtreme", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/edfwfwe.jpg" },
+        { sku: "ws25204", name: "Електричний масажер з інфрачервоним випромінюванням", price: 749, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/e4upaveucyvpkvyaav.jpg" },
+        { sku: "ws88434", name: "Ланч бокс електричний з підігрівом", price: 359, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/3kcvaypeuyavpvy.jpg" }
     ];
 
-    // Корзина: объект { sku: количество }
     let cart = {};
+    let selectedPayment = "online";
 
-    // Отображение товаров
     function renderProducts() {
         const grid = document.getElementById('productsGrid');
         if (!grid) return;
@@ -353,15 +395,13 @@
                 <img class="product-img" src="${prod.img}" alt="${prod.name}" loading="lazy" onerror="this.src='https://placehold.co/400x400?text=No+Image'">
                 <div class="product-info">
                     <div class="product-title">${prod.name}</div>
-                    <div class="product-price">${prod.price} ₴ <small></small></div>
-                    <span class="stock-badge ${!inStock ? 'outofstock' : ''}">${inStock ? '✓ В наличии' : '✗ Нет в наличии'}</span>
-                    <button class="add-to-cart" data-sku="${prod.sku}" ${!inStock ? 'disabled' : ''}>${inStock ? '➕ В корзину' : '❌ Недоступен'}</button>
+                    <div class="product-price">${prod.price} ₴</div>
+                    <span class="stock-badge ${!inStock ? 'outofstock' : ''}">${inStock ? '✓ В наявності' : '✗ Немає'}</span>
+                    <button class="add-to-cart" data-sku="${prod.sku}" ${!inStock ? 'disabled' : ''}>${inStock ? '➕ В кошик' : '❌ Недоступний'}</button>
                 </div>
             `;
             grid.appendChild(card);
         });
-
-        // Обработчики кнопок
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const sku = btn.dataset.sku;
@@ -370,30 +410,25 @@
         });
     }
 
-    // Добавление в корзину
     function addToCart(sku) {
-        if (cart[sku]) {
-            cart[sku]++;
-        } else {
-            cart[sku] = 1;
-        }
+        if (cart[sku]) cart[sku]++;
+        else cart[sku] = 1;
         updateCartUI();
-        showTemporaryNotification('Товар добавлен в корзину', '#1f2b4e');
+        showToast('Товар додано до кошика', '#1f2b4e');
     }
 
-    // Обновить интерфейс корзины (иконка и модалка)
     function updateCartUI() {
         const totalItems = Object.values(cart).reduce((a,b) => a+b, 0);
         const cartCountSpan = document.getElementById('cartCount');
         if (cartCountSpan) cartCountSpan.innerText = totalItems;
 
-        // Перерисовываем содержимое модалки
         const cartContainer = document.getElementById('cartItemsList');
         const totalSpan = document.getElementById('cartTotal');
         if (!cartContainer) return;
+
         if (totalItems === 0) {
-            cartContainer.innerHTML = '<div style="text-align:center; padding:2rem;">Корзина пуста 🛒</div>';
-            totalSpan.innerText = 'Итого: 0 ₴';
+            cartContainer.innerHTML = '<div style="text-align:center; padding:2rem;">Кошик порожній 🛒</div>';
+            totalSpan.innerText = 'Всього: 0 ₴';
             return;
         }
 
@@ -418,9 +453,8 @@
             `;
         }
         cartContainer.innerHTML = html;
-        totalSpan.innerText = `Итого: ${totalPrice} ₴`;
+        totalSpan.innerText = `Всього: ${totalPrice} ₴`;
 
-        // Обработчики изменения количества
         document.querySelectorAll('.cart-item-qty button').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const sku = btn.dataset.sku;
@@ -438,8 +472,7 @@
         });
     }
 
-    // Всплывающее уведомление
-    function showTemporaryNotification(msg, bgColor) {
+    function showToast(msg, bgColor) {
         const toast = document.createElement('div');
         toast.innerText = msg;
         toast.style.position = 'fixed';
@@ -457,58 +490,73 @@
         setTimeout(() => toast.remove(), 2000);
     }
 
-    // Модалка корзины
     const modal = document.getElementById('cartModal');
     const cartIcon = document.getElementById('cartIcon');
     const closeModalBtn = document.getElementById('closeModalBtn');
 
     cartIcon?.addEventListener('click', () => {
-        updateCartUI(); // обновляем перед показом
+        updateCartUI();
         modal.style.display = 'flex';
     });
     closeModalBtn?.addEventListener('click', () => modal.style.display = 'none');
     window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
 
-    // Онлайн-оплата (имитация + инструкция по замене)
+    const radioOnline = document.querySelector('input[value="online"]');
+    const radioCod = document.querySelector('input[value="cod"]');
+    const codFieldsDiv = document.getElementById('codFields');
+
+    radioOnline?.addEventListener('change', () => {
+        selectedPayment = 'online';
+        codFieldsDiv.style.display = 'none';
+    });
+    radioCod?.addEventListener('change', () => {
+        selectedPayment = 'cod';
+        codFieldsDiv.style.display = 'block';
+    });
+
     const checkoutBtn = document.getElementById('checkoutButton');
     checkoutBtn?.addEventListener('click', async () => {
         const items = Object.entries(cart);
         if (items.length === 0) {
-            showTemporaryNotification('Корзина пуста, добавьте товары', '#b91c1c');
+            showToast('Кошик порожній, додайте товари', '#b91c1c');
             return;
         }
+
         const total = Object.entries(cart).reduce((sum, [sku, qty]) => {
             const prod = productsData.find(p => p.sku === sku);
             return sum + (prod ? prod.price * qty : 0);
         }, 0);
 
-        // ---- ЗДЕСЬ ИНТЕГРАЦИЯ С ПЛАТЕЖНОЙ СИСТЕМОЙ (LiqPay / Fondy) ----
-        // Пример: отправка данных на ваш сервер, который создает платеж
+        if (selectedPayment === 'cod') {
+            const name = document.getElementById('customerName')?.value.trim();
+            const phone = document.getElementById('customerPhone')?.value.trim();
+            const address = document.getElementById('customerAddress')?.value.trim();
+            if (!name || !phone || !address) {
+                showToast('Заповніть імʼя, телефон та адресу для накладеного платежу', '#b91c1c');
+                return;
+            }
+            showToast(`✅ Замовлення на суму ${total} грн оформлено (накладений платіж). Менеджер звʼяжеться з вами.`, '#2c6e2f');
+            console.log('Замовлення (нал. платіж):', { items, total, customer: { name, phone, address } });
+            cart = {};
+            updateCartUI();
+            modal.style.display = 'none';
+            return;
+        }
+
+        // Онлайн-оплата (демо)
         try {
-            // Временно имитируем запрос
-            showTemporaryNotification('Перенаправление на оплату...', '#2c6e2f');
-            // В реальности замените на вызов вашего бэкенда:
-            // const response = await fetch('/api/create-payment', {
-            //    method: 'POST',
-            //    headers: {'Content-Type':'application/json'},
-            //    body: JSON.stringify({ amount: total, items: cart })
-            // });
-            // const data = await response.json();
-            // if (data.payment_url) window.location.href = data.payment_url;
-            
-            // Для демонстрации откроем симуляцию успешной оплаты
+            showToast('Перенаправлення на оплату...', '#2c6e2f');
             setTimeout(() => {
-                alert(`✅ Оплата на сумму ${total} грн успешно завершена (демо-режим).\nВ реальном проекте здесь будет переход на платёжный шлюз.`);
+                alert(`✅ Онлайн-оплата на суму ${total} грн успішно завершена (демо-режим).\nУ реальному проєкті тут буде перехід на платіжний шлюз.`);
                 cart = {};
                 updateCartUI();
                 modal.style.display = 'none';
             }, 500);
         } catch (err) {
-            alert('Ошибка при инициализации оплаты. Попробуйте позже.');
+            alert('Помилка при ініціалізації оплати. Спробуйте пізніше.');
         }
     });
 
-    // Запуск
     renderProducts();
     updateCartUI();
 </script>
