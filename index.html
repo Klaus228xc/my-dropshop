@@ -1,485 +1,625 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Websklad Дропшип - Каталог товаров</title>
+    <title>UA Drop | Магазин якісних товарів</title>
     <style>
+        /* ... стилі залишаються без змін (ті самі, що в попередньому коді) ... */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
         }
+
         body {
-            background: #f4f6fa;
-            padding: 24px 20px;
+            background: linear-gradient(145deg, #f9fafc 0%, #f0f2f5 100%);
+            color: #1a1e2b;
         }
-        .container {
+
+        .header {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .header-container {
             max-width: 1400px;
             margin: 0 auto;
-        }
-        /* header */
-        .header {
-            background: white;
-            border-radius: 32px;
-            padding: 20px 28px;
-            margin-bottom: 28px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.05);
+            padding: 1rem 2rem;
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 18px;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        .logo h1 {
+        .logo {
             font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #1e2b3c, #2c4c6e);
-            background-clip: text;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1f2b4e, #2c3e66);
             -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+        .cart-icon {
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid #eef2f8;
+        }
+        .cart-icon:hover {
+            background: #fefefe;
+            box-shadow: 0 12px 22px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .cart-icon span {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        .cart-count {
+            background: #e63946;
+            color: white;
+            border-radius: 40px;
+            padding: 2px 10px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .catalog-title {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            letter-spacing: -0.3px;
+            background: linear-gradient(120deg, #1f2b4e, #3b4b72);
+            -webkit-background-clip: text;
+            background-clip: text;
             color: transparent;
         }
-        .logo p {
-            font-size: 0.8rem;
-            color: #5e6f8d;
-        }
-        .stats {
-            background: #eef2f9;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-weight: 500;
-            color: #1e2f3f;
-        }
-        /* controls */
-        .controls {
-            background: white;
-            border-radius: 28px;
-            padding: 16px 24px;
-            margin-bottom: 32px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-        }
-        .search-box {
-            flex: 2;
-            min-width: 200px;
-        }
-        .search-box input {
-            width: 100%;
-            padding: 12px 20px;
-            border: 1px solid #dce3ec;
-            border-radius: 48px;
-            font-size: 1rem;
-            background: #fff;
-            transition: 0.2s;
-            outline: none;
-        }
-        .search-box input:focus {
-            border-color: #2c6e9e;
-            box-shadow: 0 0 0 2px rgba(44,110,158,0.2);
-        }
-        .filter-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        select, .sort-btn {
-            padding: 10px 18px;
-            border-radius: 40px;
-            border: 1px solid #dce3ec;
-            background: white;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        select:hover, .sort-btn:hover {
-            background: #f0f4fa;
-        }
-        .reset-btn {
-            background: #f0f2f5;
-            border: none;
-            color: #2c4c6e;
-        }
-        /* product grid */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 26px;
+            gap: 2rem;
         }
+
         .product-card {
-            background: white;
-            border-radius: 24px;
+            background: #ffffff;
+            border-radius: 28px;
             overflow: hidden;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            box-shadow: 0 18px 30px -12px rgba(0,0,0,0.08);
+            transition: all 0.25s ease;
+            border: 1px solid rgba(0,0,0,0.03);
             display: flex;
             flex-direction: column;
         }
         .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 28px -12px rgba(0,0,0,0.12);
+            transform: translateY(-6px);
+            box-shadow: 0 28px 38px -14px rgba(0,0,0,0.15);
         }
-        .img-wrapper {
-            background: #fafcff;
-            padding: 16px;
+        .product-img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background: #f7f9fc;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .product-info {
+            padding: 1.3rem 1.2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .product-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+            color: #121826;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2b4e;
+            margin: 0.5rem 0;
+        }
+        .stock-badge {
+            font-size: 0.75rem;
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            background: #eef2ff;
+            color: #1f4f2b;
+            width: fit-content;
+            margin-bottom: 1rem;
+        }
+        .outofstock {
+            background: #ffe8e8;
+            color: #b91c1c;
+        }
+        .add-to-cart {
+            background: #1f2b4e;
+            border: none;
+            color: white;
+            padding: 0.8rem 0;
+            border-radius: 44px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 210px;
-            border-bottom: 1px solid #eff3f8;
+            gap: 8px;
         }
-        .product-img {
-            max-width: 100%;
-            max-height: 170px;
-            object-fit: contain;
-            transition: 0.2s;
+        .add-to-cart:hover {
+            background: #2c3e66;
+            transform: scale(0.98);
         }
-        .product-info {
-            padding: 18px 16px 20px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        .add-to-cart:disabled {
+            background: #b9c2d4;
+            cursor: not-allowed;
         }
-        .product-title {
-            font-size: 1rem;
-            font-weight: 600;
-            line-height: 1.4;
-            color: #1a2c3e;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
         }
-        .product-category {
-            font-size: 0.75rem;
-            color: #6c86a3;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-        .price-row {
-            display: flex;
-            align-items: baseline;
-            gap: 10px;
-            margin: 12px 0 10px;
-            flex-wrap: wrap;
-        }
-        .price {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #1f6392;
-        }
-        .old-price {
-            font-size: 0.85rem;
-            color: #8a99b0;
-            text-decoration: line-through;
-        }
-        .stock {
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 30px;
-            display: inline-block;
-            width: fit-content;
-            margin-top: 8px;
-        }
-        .in-stock {
-            background: #e0f3e8;
-            color: #1f7840;
-        }
-        .out-stock {
-            background: #ffe6e5;
-            color: #bc3f2e;
-        }
-        .btn-detail {
-            margin-top: 16px;
-            background: #f0f4fe;
-            border: none;
-            padding: 10px;
+        .modal-content {
+            background: white;
+            max-width: 550px;
+            width: 90%;
             border-radius: 40px;
+            padding: 2rem;
+            box-shadow: 0 40px 60px rgba(0,0,0,0.2);
+            animation: fadeInUp 0.25s ease;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .cart-items-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 1rem 0;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #ecf0f4;
+        }
+        .cart-item-name {
             font-weight: 500;
-            font-size: 0.85rem;
+            flex: 2;
+        }
+        .cart-item-price {
+            font-weight: 600;
+            margin: 0 1rem;
+        }
+        .cart-item-qty {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .cart-item-qty button {
+            background: #f0f2f5;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .cart-total {
+            font-size: 1.4rem;
+            font-weight: 800;
+            text-align: right;
+            margin: 1rem 0;
+            border-top: 2px solid #eef2f8;
+            padding-top: 1rem;
+        }
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            justify-content: center;
+        }
+        .payment-methods label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #f8fafd;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+        }
+        .payment-methods input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .pay-btn {
+            background: #2c6e2f;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border-radius: 60px;
             cursor: pointer;
             transition: 0.2s;
-            color: #2c6285;
         }
-        .btn-detail:hover {
-            background: #e2eaf9;
+        .pay-btn:hover {
+            background: #1e4a21;
+            transform: scale(0.98);
         }
-        .no-results {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 40px;
-            color: #5b6f8c;
+        .close-modal {
+            float: right;
+            font-size: 1.7rem;
+            cursor: pointer;
+            background: none;
+            border: none;
         }
         footer {
-            margin-top: 48px;
             text-align: center;
+            padding: 2rem;
+            color: #6c7a8e;
             font-size: 0.8rem;
-            color: #7c8ca8;
         }
-        @media (max-width: 640px) {
-            body { padding: 16px; }
-            .header { flex-direction: column; align-items: flex-start; }
-            .controls { flex-direction: column; align-items: stretch; }
-            .filter-group { justify-content: space-between; }
+        .order-info {
+            background: #f1f5f9;
+            border-radius: 24px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+        .order-info input, .order-info textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 680px) {
+            .container { padding: 0 1rem; }
+            .product-title { font-size: 1rem; }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <div class="logo">
-            <h1>📦 Websklad Dropship</h1>
-            <p>Оптовый каталог | Партнерские цены</p>
-        </div>
-        <div class="stats" id="stats-counter">Загрузка товаров...</div>
-    </div>
-
-    <div class="controls">
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 Поиск по названию, артикулу, категории...">
-        </div>
-        <div class="filter-group">
-            <select id="categoryFilter">
-                <option value="all">Все категории</option>
-            </select>
-            <select id="availabilityFilter">
-                <option value="all">Любая наличие</option>
-                <option value="instock">В наличии</option>
-                <option value="outofstock">Нет в наличии</option>
-            </select>
-            <button id="sortPriceBtn" class="sort-btn">💰 Сортировать по цене</button>
-            <button id="resetFiltersBtn" class="sort-btn reset-btn">♻️ Сбросить</button>
+<div class="header">
+    <div class="header-container">
+        <div class="logo"> UA DROP</div>
+        <div class="cart-icon" id="cartIcon">
+            <span>🛒</span>
+            <span class="cart-count" id="cartCount">0</span>
         </div>
     </div>
-
-    <div class="products-grid" id="productsGrid">
-        <div class="no-results">Загрузка ассортимента...</div>
-    </div>
-    <footer>Websklad партнерская программа — актуальные цены и остатки</footer>
 </div>
 
+<div class="container">
+    <div class="catalog-title">✨ Топ пропозиції</div>
+    <div class="products-grid" id="productsGrid"></div>
+</div>
+
+<!-- Модалка корзини -->
+<div id="cartModal" class="modal">
+    <div class="modal-content">
+        <button class="close-modal" id="closeModalBtn">&times;</button>
+        <h2>Кошик</h2>
+        <div id="cartItemsList" class="cart-items-list"></div>
+        <div id="cartTotal" class="cart-total">Всього: 0 ₴</div>
+
+        <div class="payment-methods">
+            <label>
+                <input type="radio" name="paymentMethod" value="online" checked> 💳 Онлайн-оплата
+            </label>
+            <label>
+                <input type="radio" name="paymentMethod" value="cod"> 📦 Накладений платіж
+            </label>
+        </div>
+
+        <!-- ПОЛЯ ДЛЯ КОНТАКТНИХ ДАНИХ - ПОКАЗУЮТЬСЯ ДЛЯ ОБОХ СПОСОБІВ ОПЛАТИ -->
+        <div id="contactFields" class="order-info">
+            <input type="text" id="customerName" placeholder="Ваше ім'я та прізвище" autocomplete="name">
+            <input type="tel" id="customerPhone" placeholder="Номер телефону" autocomplete="tel">
+            <textarea id="customerAddress" rows="2" placeholder="Адреса доставки (місто, відділення Нової Пошти / адреса)"></textarea>
+        </div>
+
+        <button id="checkoutButton" class="pay-btn">💳 Оформити замовлення</button>
+    </div>
+</div>
+
+<footer>© UA Drop — якісні товари з доставкою по всій Україні</footer>
+
 <script>
-    // ----- ВСТРОЕННЫЙ CSV-ФАЙЛ (полный дамп из предоставленного документа) -----
-    const csvRawData = `"Название товара",Артикул,"Описание товара","Дроп цена для партнера","Рекомендовання розничная цена",Наличие,Изображения,"Категории товара",Подкатегории,"Название товара (ua)","Описание товара (ua)","Категория товаров (ua)","Подкатегория товара (ua)"
-"Массажная подушка Car and Home Massage Pillow, массажер для шеи автомобильный",ws78472,"<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p>Эффект массажа известен с давних времен. С его помощью лечили и лечат повреждения мышц, нарушения опорно-двигательного аппарата, заболевания сосудов и так далее. Но массаж &ndash; процедура довольно длительная и доступная далеко не всегда, хотя бы потому, что сеансы массажа проводятся в определенное время, а не тогда, когда заболело плечо, протянуло шею или просто болит голова.</p>\r\n<p>Подушка массажер подойдет для офисных работников и всех, кто ведет сидячий образ жизни и испытывает усталость или различные мышечные боли. Ортопедический массаж &ndash; отличная профилактика многих заболеваний.Массажная подушка создана для снятия усталости, напряжения с шеи, спины. При длительном сидении за рулем, мышцы атрофируются, становятся мягкими и затекают из-за одного положения. Самое наибольшее напряжении ощущается в шее, а далее в пояснице.</p>\r\n<p>Использовать подушку можно для массажа не только шеи и плеч, но и спины, области таза, стоп или рук. В отличие от специализированного прибора, например, массажера-воротника, форма подушки делает ее универсальной. Устройство одинаково хорошо функционирует и в горизонтальном, и в вертикальном положении. Управляется аппарат пультом или при помощи кнопок, расположенных на его поверхности. Данный массажер имеет особенную анатомическую форму и изгибы, которые позволяют благотворно воздействовать на основные точки на шее, спине.<br/>Центральная нервная система расслабляется и снимает напряжение с основных точек.</p>\r\n<p><strong>Комплектация:</strong></p>\r\n<ul>\r\n<li>1 х Массажная подушка Car and Home Massage Pillow 8028;</li>\r\n<li>1 х Адаптер питания от сети;</li>\r\n<li>1 х Адаптер автомобильный;</li>\r\n<li>1 х Инструкция;</li>\r\n<li>1 х Упаковка</li>\r\n</ul>\r\n</div>\r\n</div>",356,529,instock,"https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/we232f.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wefcsweq.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/88844679_images_17746866565.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wx1z1z1z1.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/12ed12.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/e221z21.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4181.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4176.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4177.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4178.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4179.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4180.jpg,https://www.websklad.biz.ua/wp-content/uploads/3kjcfyavpkekcjfyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcfvaaekcfyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/k3jcfavpekcufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcapekcuucj.jpg,https://www.websklad.biz.ua/wp-content/uploads/kjcfapek3cjfyvau.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcufvyavapkekcfyvaacku.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfvyk3cfyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/k3jcfyvapkekcaecuk.jpg,https://www.websklad.biz.ua/wp-content/uploads/3jucfvykekcufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/ucfaekcjfyae3c.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcfyvavpkeuyav.jpg,https://www.websklad.biz.ua/wp-content/uploads/kjcfyvapk3jcufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/ucfyvvekcfyvuc.jpg,https://www.websklad.biz.ua/wp-content/uploads/3qewadsffgt43rwqasd.jpg,https://www.websklad.biz.ua/wp-content/uploads/rqwadsdr4wadsw.jpg,https://www.websklad.biz.ua/wp-content/uploads/rqewasdgtr3wasd.jpg,https://www.websklad.biz.ua/wp-content/uploads/rwasdfft4rwasfe.jpg,https://www.websklad.biz.ua/wp-content/uploads/kjcfivaape4k3cfia.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcfyvpe4kcufyvcju.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfyvaapkeuckauc.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfyvaae4kcuyvapecku.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcfapke4kcufyvaukc.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcfyvk3jcfyvaauck.jpg,https://www.websklad.biz.ua/wp-content/uploads/cvyvpe4kcyvaape3kc.jpg,https://www.websklad.biz.ua/wp-content/uploads/jucfvype4k3cfyvaauck.jpg,https://www.websklad.biz.ua/wp-content/uploads/2jufyvpke4ckufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfyvaape43kcfyvakj.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcckfk32jcuv.jpg,https://www.websklad.biz.ua/wp-content/uploads/k3jcfyvaap43jcfyvak3jc.jpg,https://www.websklad.biz.ua/wp-content/uploads/rwasr3qwdffr3qw.jpg,https://www.websklad.biz.ua/wp-content/uploads/rwadfgt43rwqasdfew.jpg,https://www.websklad.biz.ua/wp-content/uploads/3rqwasdfgt4rwasdfr3qw.jpg,https://www.websklad.biz.ua/wp-content/uploads/wadstr3qwasd.jpg,https://www.websklad.biz.ua/wp-content/uploads/wasdffgrt4wresafrwa.jpg,https://www.websklad.biz.ua/wp-content/uploads/wasdfgtrwasdfgtr3qwas.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewvdsc3.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wx1z1z1z1-1.jpg,https://www.websklad.biz.ua/wp-content/uploads/catalog_1771975913_350.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772341987_261.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342046_106.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342095_786.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342145_768.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342189_121.png",Автотовары,Массажеры,"Масажна подушка Car and Home Massage Pillow, масажер для шиї автомобільний","<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p>Ефект масажу відомий з давніх-давен. З його допомогою лікували та лікують ушкодження м'язів, порушення опорно-рухового апарату, захворювання судин тощо. Але масаж &ndash; процедура досить тривала і доступна далеко не завжди, хоча б тому, що сеанси масажу проводяться у певний час, а не тоді, коли захворіло плече, простягло шию або просто болить голова.</p>\r\n<p>Подушка масажер підійде для офісних працівників і всіх, хто веде сидячий спосіб життя та відчуває втому або різні м'язові болі. Ортопедичний масаж &ndash; відмінна профілактика багатьох захворювань. Масажна подушка створена для зняття втоми, напруги з шиї, спини. При тривалому сидінні за кермом м'язи атрофуються, стають м'якими і затікають через одне становище. Найбільша напруга відчувається в шиї, а далі в попереку.</p>\r\n<p>Використовувати подушку можна для масажу не лише шиї та плечей, а й спини, області тазу, стоп чи рук. На відміну від спеціалізованого приладу, наприклад масажера-коміра, форма подушки робить її універсальною. Пристрій однаково добре функціонує і горизонтальному, і вертикальному положенні. Керується апаратом пультом або за допомогою кнопок, розташованих на його поверхні. Даний масажер має особливу анатомічну форму та вигини, які дозволяють благотворно впливати на основні точки на шиї, спині. Центральна нервова система розслабляється і знімає напругу з основних точок.</p>\r\n<p><strong>Комплектація:</strong></p>\r\n<ul>\r\n<li>1 х Масажна подушка Car and Home Massage Pillow 8028;</li>\r\n<li>1 х Адаптер живлення від мережі;</li>\r\n<li>1 х Адаптер автомобільний;</li>\r\n<li>1 х Інструкція;</li>\r\n<li>1 х Упаковка</li>\r\n</ul>\r\n</div>\r\n</div>",Автотовари,Масажери
-"Настольный бокс для хранения косметики с выдвижными ящиками и зеркалом органайзер",ws30483,"<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p><strong>Бокс для хранения косметики с зеркалом UKC 7009</strong></p>\r\n<p>Женщина должна быть прекрасной! &ndash; это истина, которую знают все. Красота эта в значительной степени определяется множеством косметических средств. Помада, тушь для ресниц, лаки для ногтей, средства по уходу за зубами и волосами, духи, ватные шарики, лосьоны, разные украшения &mdash; всего не перечислить. Разумеется, всё это можно приобрести, но где хранить это богатство?</p>\r\n<p>Органайзеры помогут Вам не только сэкономить время на поиски нужных баночек, кисточек и тюбиков, но и сохранить порядок и чистоту на туалетном столике, на столешнице в ванной, на комоде, на подоконнике и на других открытых поверхностях.</p>\r\n<ul>\r\n<li>Пространство и экономия времени: Забудьте рыться в сумке для поиска нужного средства макияжа.</li>\r\n<li>Держите косметические продукты или ювелирные изделия всегда под рукой.</li>\r\n<li>Идеально подходит для отображения на вашем туалетном столике или в вашей ванной комнате.</li>\r\n<li>Прозрачный дизайн позволяет легко увидеть содержимое.</li>\r\n<li>Избавьтесь от беспорядка и беспорядка на вашем столе</li>\r\n</ul>\r\n<p><strong>Характеристики:</strong></p>\r\n<ul>\r\n<li>3 вместительные открытые ячейки;</li>\r\n<li>1 выдвижной ящичек;</li>\r\n<li>Размеры: 20.5 x 15.5 x 28.5 см;</li>\r\n<li>Вес 1 кг.</li>\r\n<li>Комплектация:</li>\r\n<li>Органайзер с зеркалом;</li>\r\n<li>Упаковка.</li>\r\n</ul>\r\n</div>\r\n</div>",291,399,outofstock,"https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/xed32.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/weqxe2.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/rx2zr32.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wcxzwd2.jpg","Красота и здоровье",Органайзеры,"Настільний бокс для зберігання косметики з висувними ящиками і дзеркалом органайзер","<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p><strong>Бокс для зберігання косметики із дзеркалом UKC 7009</strong></p>\r\n<p>Жінка має бути прекрасною! &ndash; це істина, яку знають усі. Краса ця значною мірою визначається безліччю косметичних засобів. Помада, туш для вій, лаки для нігтів, засоби для догляду за зубами та волоссям, парфуми, ватяні кульки, лосьйони, різні прикраси &mdash; всього не перерахувати. Зрозуміло, все це можна придбати, але де зберігати це багатство?</p>\r\n<p>Органайзери допоможуть Вам не тільки заощадити час на пошуки потрібних баночок, пензликів та тюбиків, але й зберегти порядок та чистоту на туалетному столику, на стільниці у ванній, на комоді, на підвіконні та на інших відкритих поверхнях.</p>\r\n<ul>\r\n<li>Простір та економія часу: Забудьте ритися у сумці для пошуку потрібного засобу макіяжу.</li>\r\n<li>Тримайте косметичні продукти або ювелірні вироби завжди під рукою.</li>\r\n<li>Ідеально підходить для відображення на вашому туалетному столику або у ванній кімнаті.</li>\r\n<li>Прозорий дизайн дозволяє легко побачити вміст.</li>\r\n<li>Позбавтеся безладу та безладдя на вашому столі</li>\r\n</ul>\r\n<p><strong>Характеристики:</strong></p>\r\n<ul>\r\n<li>3 місткі відкриті осередки;</li>\r\n<li>1 висувна скринька;</li>\r\n<li>Розміри: 20.5 x 15.5 x 28.5 см;</li>\r\n<li>Вага 1 кг.</li>\r\n<li>Комплектація:</li>\r\n<li>Органайзер із дзеркалом;</li>\r\n<li>Упаковка.</li>\r\n</ul>\r\n</div>\r\n</div>","Краса і здоров'я",Органайзери`;
-    
-    // --- парсинг CSV с учётом кавычек, переносов строк внутри полей ---
-    function parseCSV(csvText) {
-        const rows = [];
-        let currentRow = [];
-        let currentField = '';
-        let inQuotes = false;
-        let i = 0;
-        const len = csvText.length;
-        while (i < len) {
-            const ch = csvText[i];
-            if (ch === '"') {
-                if (inQuotes && csvText[i+1] === '"') {
-                    currentField += '"';
-                    i++;
-                } else {
-                    inQuotes = !inQuotes;
-                }
-            } else if (ch === ',' && !inQuotes) {
-                currentRow.push(currentField.trim());
-                currentField = '';
-            } else if ((ch === '\n' || (ch === '\r' && csvText[i+1] === '\n')) && !inQuotes) {
-                if (ch === '\r') i++;
-                currentRow.push(currentField.trim());
-                if (currentRow.length > 1 || currentRow[0] !== '') rows.push(currentRow);
-                currentRow = [];
-                currentField = '';
-            } else {
-                currentField += ch;
-            }
-            i++;
-        }
-        if (currentField || currentRow.length) {
-            currentRow.push(currentField.trim());
-            if (currentRow.length > 1 || currentRow[0] !== '') rows.push(currentRow);
-        }
-        if (rows.length === 0) return [];
-        const headers = rows[0].map(h => h.replace(/^"|"$/g, '').trim());
-        const products = [];
-        for (let i=1; i<rows.length; i++) {
-            const obj = {};
-            for (let j=0; j<headers.length; j++) {
-                let val = rows[i][j] || '';
-                val = val.replace(/^"|"$/g, '');
-                obj[headers[j]] = val;
-            }
-            if (obj["Название товара"] && obj["Артикул"]) products.push(obj);
-        }
-        return products;
+    // ================= НАЛАШТУВАННЯ =================
+    // Вкажіть номер WhatsApp адміністратора у міжнародному форматі (без + або з +)
+    const ADMIN_WHATSAPP = "380998261128";   // ЗМІНІТЬ НА СВІЙ НОМЕР
+    // ==============================================
+
+    // Товари (перші 15 з вашого CSV)
+    const productsData = [
+        { sku: "ws78472", name: "Масажна подушка Car and Home", price: 529, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg" },
+        { sku: "ws30483", name: "Бокс для зберігання косметики з дзеркалом", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg" },
+        { sku: "ws87556", name: "УФ лампа для манікюру ZH-818", price: 499, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wdefqd.jpg" },
+        { sku: "ws53905", name: "Точилка Bavarian Edge Knife Sharpener", price: 249, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd132.jpg" },
+        { sku: "ws33813", name: "Гребінець-випрямляч Fast Hair Straightener", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/tgwesdgesae.jpg" },
+        { sku: "ws36558", name: "Тканинна шафа-органайзер 105x45x170 см", price: 629, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewx23.png" },
+        { sku: "ws52037", name: "Пояс для схуднення Neotex Hot Shapers", price: 149, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/1wqeds.jpg" },
+        { sku: "ws46146", name: "Кухонні ваги Domotec SF-400 до 10 кг", price: 249, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd.jpg" },
+        { sku: "ws56917", name: "Бездротова зарядка Awei W2", price: 298, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/ewfdqedscd2.jpg" },
+        { sku: "ws72465", name: "Потрійне дзеркало для макіяжу з підсвіткою", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_2736.jpg" },
+        { sku: "ws71351", name: "Автомобільний компресор Air Compressor", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/uaivukaifvvif.jpg" },
+        { sku: "ws27255", name: "Машинка для видалення катишків Hengda HD-779", price: 229, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/81520725_images_11695556319.jpg" },
+        { sku: "ws53562", name: "Домашній тренажер Revoflex Xtreme", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/edfwfwe.jpg" },
+        { sku: "ws25204", name: "Електричний масажер з інфрачервоним випромінюванням", price: 749, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/e4upaveucyvpkvyaav.jpg" },
+        { sku: "ws88434", name: "Ланч бокс електричний з підігрівом", price: 359, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/3kcvaypeuyavpvy.jpg" }
+    ];
+
+    let cart = {};
+    let selectedPayment = "online";
+
+    function saveOrder(orderData) {
+        let orders = JSON.parse(localStorage.getItem('ua_drop_orders')) || [];
+        orderData.id = Date.now();
+        orderData.date = new Date().toLocaleString('uk-UA');
+        orderData.status = 'Нове';
+        orders.push(orderData);
+        localStorage.setItem('ua_drop_orders', JSON.stringify(orders));
+        return orderData.id;
     }
-    
-    let allProducts = [];
-    let currentProducts = [];
-    
-    // элементы DOM
-    const grid = document.getElementById('productsGrid');
-    const searchInput = document.getElementById('searchInput');
-    const categoryFilter = document.getElementById('categoryFilter');
-    const availabilityFilter = document.getElementById('availabilityFilter');
-    const sortPriceBtn = document.getElementById('sortPriceBtn');
-    const resetBtn = document.getElementById('resetFiltersBtn');
-    const statsSpan = document.getElementById('stats-counter');
-    
-    let sortAscending = true;
-    
-    function updateCategories(products) {
-        const cats = new Set();
-        products.forEach(p => {
-            if (p["Категории товара"]) cats.add(p["Категории товара"]);
-        });
-        const sorted = Array.from(cats).sort();
-        categoryFilter.innerHTML = '<option value="all">Все категории</option>';
-        sorted.forEach(c => {
-            categoryFilter.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`;
-        });
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-            return c;
-        });
-    }
-    
-    function renderProducts(productsArray) {
-        if (!productsArray.length) {
-            grid.innerHTML = '<div class="no-results">😕 Ничего не найдено. Попробуйте изменить фильтры.</div>';
-            statsSpan.innerText = `Товаров: 0`;
+
+    function sendOrderToWhatsApp(order) {
+        if (!ADMIN_WHATSAPP) {
+            console.warn('Номер WhatsApp не налаштовано');
             return;
         }
+        let message = `🛍 *НОВЕ ЗАМОВЛЕННЯ #${order.id}* 🛍\n`;
+        message += `📅 Дата: ${order.date}\n`;
+        message += `💳 Оплата: ${order.paymentMethod}\n`;
+        message += `💰 Сума: ${order.total.toFixed(2)} грн\n\n`;
+        message += `📦 *Товари:*\n`;
+        order.items.forEach(item => {
+            message += `• ${item.name} — ${item.quantity} шт. x ${item.price} грн = ${item.total} грн\n`;
+        });
+        if (order.customer) {
+            message += `\n👤 *Клієнт:*\n`;
+            message += `Ім'я: ${order.customer.name}\n`;
+            message += `Телефон: ${order.customer.phone}\n`;
+            message += `Адреса: ${order.customer.address}\n`;
+        }
+        message += `\n🔗 Статус: ${order.status}`;
+        const encodedMessage = encodeURIComponent(message);
+        let phone = ADMIN_WHATSAPP.replace(/[^0-9+]/g, '');
+        if (!phone.startsWith('+')) phone = '+' + phone;
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+        window.open(whatsappUrl, '_blank');
+    }
+
+    function renderProducts() {
+        const grid = document.getElementById('productsGrid');
+        if (!grid) return;
+        grid.innerHTML = '';
+        productsData.forEach(prod => {
+            const inStock = prod.stock === 'instock';
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img class="product-img" src="${prod.img}" alt="${prod.name}" loading="lazy" onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+                <div class="product-info">
+                    <div class="product-title">${prod.name}</div>
+                    <div class="product-price">${prod.price} ₴</div>
+                    <span class="stock-badge ${!inStock ? 'outofstock' : ''}">${inStock ? '✓ В наявності' : '✗ Немає'}</span>
+                    <button class="add-to-cart" data-sku="${prod.sku}" ${!inStock ? 'disabled' : ''}>${inStock ? '➕ В кошик' : '❌ Недоступний'}</button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const sku = btn.dataset.sku;
+                addToCart(sku);
+            });
+        });
+    }
+
+    function addToCart(sku) {
+        if (cart[sku]) cart[sku]++;
+        else cart[sku] = 1;
+        updateCartUI();
+        showToast('Товар додано до кошика', '#1f2b4e');
+    }
+
+    function updateCartUI() {
+        const totalItems = Object.values(cart).reduce((a,b) => a+b, 0);
+        const cartCountSpan = document.getElementById('cartCount');
+        if (cartCountSpan) cartCountSpan.innerText = totalItems;
+
+        const cartContainer = document.getElementById('cartItemsList');
+        const totalSpan = document.getElementById('cartTotal');
+        if (!cartContainer) return;
+
+        if (totalItems === 0) {
+            cartContainer.innerHTML = '<div style="text-align:center; padding:2rem;">Кошик порожній 🛒</div>';
+            totalSpan.innerText = 'Всього: 0 ₴';
+            return;
+        }
+
+        let totalPrice = 0;
         let html = '';
-        for (let p of productsArray) {
-            const title = p["Название товара"] || 'Без названия';
-            const art = p["Артикул"] || '';
-            const category = p["Категории товара"] || 'Разное';
-            const price = p["Рекомендовання розничная цена"] || '0';
-            const partnerPrice = p["Дроп цена для партнера"] || '0';
-            const stock = p["Наличие"] || 'outofstock';
-            const images = p["Изображения"] || '';
-            const firstImg = images.split(',')[0] || 'https://placehold.co/300x200?text=Нет+фото';
-            const stockText = stock === 'instock' ? 'В наличии' : 'Нет в наличии';
-            const stockClass = stock === 'instock' ? 'in-stock' : 'out-stock';
+        for (let [sku, qty] of Object.entries(cart)) {
+            const product = productsData.find(p => p.sku === sku);
+            if (!product) continue;
+            const itemTotal = product.price * qty;
+            totalPrice += itemTotal;
             html += `
-                <div class="product-card">
-                    <div class="img-wrapper">
-                        <img class="product-img" src="${escapeHtml(firstImg)}" loading="lazy" alt="${escapeHtml(title)}" onerror="this.src='https://placehold.co/300x200?text=Фото+недоступно'">
-                    </div>
-                    <div class="product-info">
-                        <div class="product-category">${escapeHtml(category)}</div>
-                        <div class="product-title">${escapeHtml(title)} <span style="font-weight:normal; color:#6c7a91;"> (${escapeHtml(art)})</span></div>
-                        <div class="price-row">
-                            <span class="price">${Number(price).toLocaleString()} ₴</span>
-                            <span class="old-price">Дроп: ${Number(partnerPrice).toLocaleString()} ₴</span>
-                        </div>
-                        <div class="stock ${stockClass}">${stockText}</div>
-                        <button class="btn-detail" data-art="${escapeHtml(art)}">📋 Подробнее</button>
+                <div class="cart-item">
+                    <div class="cart-item-name">${product.name}</div>
+                    <div class="cart-item-price">${product.price} ₴</div>
+                    <div class="cart-item-qty">
+                        <button data-sku="${sku}" data-delta="-1">−</button>
+                        <span>${qty}</span>
+                        <button data-sku="${sku}" data-delta="1">+</button>
+                        <button data-sku="${sku}" data-delta="-999" style="background:#ffe0e0;">🗑</button>
                     </div>
                 </div>
             `;
         }
-        grid.innerHTML = html;
-        statsSpan.innerText = `Товаров: ${productsArray.length}`;
-        document.querySelectorAll('.btn-detail').forEach(btn => {
+        cartContainer.innerHTML = html;
+        totalSpan.innerText = `Всього: ${totalPrice} ₴`;
+
+        document.querySelectorAll('.cart-item-qty button').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const artCode = btn.getAttribute('data-art');
-                const product = allProducts.find(p => p["Артикул"] === artCode);
-                if (product) {
-                    alert(`📦 ${product["Название товара"]}\nАртикул: ${product["Артикул"]}\nКатегория: ${product["Категории товара"]}\nЦена: ${product["Рекомендовання розничная цена"]} грн\nДроп-цена: ${product["Дроп цена для партнера"]} грн\nНаличие: ${product["Наличие"] === 'instock' ? 'В наличии' : 'Нет в наличии'}`);
+                const sku = btn.dataset.sku;
+                let delta = parseInt(btn.dataset.delta);
+                if (isNaN(delta)) return;
+                if (delta === -999) {
+                    delete cart[sku];
                 } else {
-                    alert("Информация временно недоступна");
+                    const newQty = (cart[sku] || 0) + delta;
+                    if (newQty <= 0) delete cart[sku];
+                    else cart[sku] = newQty;
                 }
+                updateCartUI();
             });
         });
     }
-    
-    function filterAndSort() {
-        let filtered = [...allProducts];
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        if (searchTerm) {
-            filtered = filtered.filter(p => {
-                return (p["Название товара"] || '').toLowerCase().includes(searchTerm) ||
-                       (p["Артикул"] || '').toLowerCase().includes(searchTerm) ||
-                       (p["Категории товара"] || '').toLowerCase().includes(searchTerm);
-            });
-        }
-        const catValue = categoryFilter.value;
-        if (catValue !== 'all') {
-            filtered = filtered.filter(p => (p["Категории товара"] || '') === catValue);
-        }
-        const avail = availabilityFilter.value;
-        if (avail !== 'all') {
-            filtered = filtered.filter(p => p["Наличие"] === avail);
-        }
-        if (sortPriceBtn.getAttribute('data-active') === 'true') {
-            filtered.sort((a,b) => {
-                const priceA = parseFloat(a["Рекомендовання розничная цена"] || 0);
-                const priceB = parseFloat(b["Рекомендовання розничная цена"] || 0);
-                return sortAscending ? priceA - priceB : priceB - priceA;
-            });
-        }
-        currentProducts = filtered;
-        renderProducts(currentProducts);
+
+    function showToast(msg, bgColor) {
+        const toast = document.createElement('div');
+        toast.innerText = msg;
+        toast.style.position = 'fixed';
+        toast.style.bottom = '30px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.backgroundColor = bgColor;
+        toast.style.color = 'white';
+        toast.style.padding = '10px 20px';
+        toast.style.borderRadius = '60px';
+        toast.style.fontWeight = '500';
+        toast.style.zIndex = '999';
+        toast.style.boxShadow = '0 10px 20px rgba(0,0,0,0.2)';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2000);
     }
-    
-    function resetFilters() {
-        searchInput.value = '';
-        categoryFilter.value = 'all';
-        availabilityFilter.value = 'all';
-        sortPriceBtn.setAttribute('data-active', 'false');
-        sortPriceBtn.style.background = '#f0f4fa';
-        sortAscending = true;
-        filterAndSort();
-    }
-    
-    sortPriceBtn.addEventListener('click', () => {
-        const isActive = sortPriceBtn.getAttribute('data-active') === 'true';
-        if (!isActive) {
-            sortPriceBtn.setAttribute('data-active', 'true');
-            sortAscending = true;
-            sortPriceBtn.style.background = '#e0eaff';
-        } else {
-            sortAscending = !sortAscending;
-        }
-        filterAndSort();
+
+    const modal = document.getElementById('cartModal');
+    const cartIcon = document.getElementById('cartIcon');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+
+    cartIcon?.addEventListener('click', () => {
+        updateCartUI();
+        modal.style.display = 'flex';
     });
-    
-    searchInput.addEventListener('input', filterAndSort);
-    categoryFilter.addEventListener('change', filterAndSort);
-    availabilityFilter.addEventListener('change', filterAndSort);
-    resetBtn.addEventListener('click', resetFilters);
-    
-    try {
-        allProducts = parseCSV(csvRawData);
-        if (allProducts.length === 0) throw new Error("Нет данных");
-        updateCategories(allProducts);
-        currentProducts = [...allProducts];
-        renderProducts(currentProducts);
-    } catch(e) {
-        console.error(e);
-        grid.innerHTML = '<div class="no-results">⚠️ Ошибка загрузки данных. Проверьте CSV.</div>';
-        statsSpan.innerText = 'Ошибка';
-    }
+    closeModalBtn?.addEventListener('click', () => modal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+
+    const radioOnline = document.querySelector('input[value="online"]');
+    const radioCod = document.querySelector('input[value="cod"]');
+    // Більше не ховаємо поля – вони завжди видимі
+    // При зміні способу оплати нічого не ховаємо
+    radioOnline?.addEventListener('change', () => {
+        selectedPayment = 'online';
+    });
+    radioCod?.addEventListener('change', () => {
+        selectedPayment = 'cod';
+    });
+
+    const checkoutBtn = document.getElementById('checkoutButton');
+    checkoutBtn?.addEventListener('click', async () => {
+        const items = Object.entries(cart);
+        if (items.length === 0) {
+            showToast('Кошик порожній, додайте товари', '#b91c1c');
+            return;
+        }
+
+        // Отримуємо контактні дані (обов'язкові для обох способів оплати)
+        const name = document.getElementById('customerName')?.value.trim();
+        const phone = document.getElementById('customerPhone')?.value.trim();
+        const address = document.getElementById('customerAddress')?.value.trim();
+        if (!name || !phone || !address) {
+            showToast('Будь ласка, заповніть всі контактні дані (імʼя, телефон, адреса)', '#b91c1c');
+            return;
+        }
+
+        const total = Object.entries(cart).reduce((sum, [sku, qty]) => {
+            const prod = productsData.find(p => p.sku === sku);
+            return sum + (prod ? prod.price * qty : 0);
+        }, 0);
+
+        const orderItems = items.map(([sku, qty]) => {
+            const prod = productsData.find(p => p.sku === sku);
+            return { name: prod.name, sku, price: prod.price, quantity: qty, total: prod.price * qty };
+        });
+
+        const orderDetails = {
+            items: orderItems,
+            total: total,
+            paymentMethod: selectedPayment === 'online' ? 'Онлайн-оплата' : 'Накладений платіж',
+            customer: { name, phone, address }
+        };
+
+        if (selectedPayment === 'cod') {
+            const orderId = saveOrder(orderDetails);
+            orderDetails.id = orderId;
+            sendOrderToWhatsApp(orderDetails);
+            showToast(`✅ Замовлення №${orderId} оформлено. Деталі надіслано адміністратору.`, '#2c6e2f');
+            cart = {};
+            updateCartUI();
+            modal.style.display = 'none';
+            return;
+        }
+
+        // Онлайн-оплата (демо) – також вимагає контактні дані
+        try {
+            showToast('Перенаправлення на оплату...', '#2c6e2f');
+            setTimeout(() => {
+                orderDetails.paymentStatus = 'Оплачено (демо)';
+                const orderId = saveOrder(orderDetails);
+                orderDetails.id = orderId;
+                sendOrderToWhatsApp(orderDetails);
+                alert(`✅ Онлайн-оплата на суму ${total} грн успішно завершена (демо-режим).\nЗамовлення №${orderId} збережено та надіслано адміністратору.`);
+                cart = {};
+                updateCartUI();
+                modal.style.display = 'none';
+            }, 500);
+        } catch (err) {
+            alert('Помилка при ініціалізації оплати. Спробуйте пізніше.');
+        }
+    });
+
+    renderProducts();
+    updateCartUI();
 </script>
 </body>
 </html>
