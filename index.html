@@ -3,309 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дропшоп – Товари (XML / CSV)</title>
+    <title>Товари у CSV форматі</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
         body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            font-family: system-ui, sans-serif;
             background: #f5f7fb;
             padding: 20px;
         }
         .container {
-            max-width: 1300px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         h1 {
             text-align: center;
-            margin: 20px 0 10px;
-            font-size: 2rem;
-            color: #1e293b;
-        }
-        .toolbar {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px 0 30px;
-            flex-wrap: wrap;
-        }
-        .toolbar button {
-            background: white;
-            border: 1px solid #cbd5e1;
-            padding: 10px 24px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            font-size: 1rem;
-        }
-        .toolbar button.active {
-            background: #2c7da0;
-            border-color: #2c7da0;
-            color: white;
-        }
-        .toolbar button:hover:not(.active) {
-            background: #e2e8f0;
-        }
-        #export-csv {
-            background: #10b981;
-            border-color: #10b981;
-            color: white;
-        }
-        #export-csv:hover {
-            background: #059669;
-        }
-        /* Стилі для карток */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 24px;
-        }
-        .product-card {
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            transition: transform 0.2s;
-        }
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.1);
-        }
-        .product-card img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-        .product-card h3 {
-            font-size: 1.1rem;
-            margin: 16px 16px 8px;
-            color: #0f172a;
-        }
-        .product-card .price {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #2c7da0;
-            margin: 8px 16px;
-        }
-        .product-card button {
-            background: #2c7da0;
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 12px;
-            margin: 8px 16px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            width: calc(100% - 32px);
-        }
-        /* Стилі для CSV (таблиці) */
-        .csv-table-wrapper {
-            background: white;
-            border-radius: 20px;
-            overflow-x: auto;
-            padding: 16px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
         .csv-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.9rem;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .csv-table th, .csv-table td {
-            border: 1px solid #e2e8f0;
-            padding: 12px 8px;
+            border: 1px solid #ddd;
+            padding: 10px;
             text-align: left;
-            vertical-align: top;
         }
         .csv-table th {
-            background: #f1f5f9;
-            font-weight: 600;
+            background: #2c7da0;
+            color: white;
         }
-        .csv-table tr:hover {
-            background: #f8fafc;
+        .csv-table tr:nth-child(even) {
+            background: #f9f9f9;
         }
-        .loading, .error, .no-products {
+        .loading, .error {
             text-align: center;
             padding: 40px;
             background: white;
-            border-radius: 24px;
-            margin-top: 20px;
+            border-radius: 16px;
         }
         .error {
-            color: #b91c1c;
-            background: #fee2e2;
+            color: red;
         }
-        footer {
+        .export-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background: #10b981;
+            color: white;
             text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            color: #64748b;
-            font-size: 0.85rem;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: bold;
         }
-        .view-hint {
-            text-align: center;
-            font-size: 0.8rem;
-            color: #475569;
-            margin-bottom: 10px;
+        .export-btn:hover {
+            background: #059669;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>📦 Всі товари</h1>
-    <div class="toolbar">
-        <button id="view-grid" class="active">🖼 Картки</button>
-        <button id="view-csv">📊 CSV (таблиця)</button>
-        <button id="export-csv">⬇ Завантажити CSV</button>
-    </div>
+    <h1>📋 Товари (CSV формат)</h1>
     <div id="products-container">
-        <div class="loading">⏳ Завантаження товарів...</div>
+        <div class="loading">Завантаження...</div>
     </div>
-    <footer>⚡ Дані з XML-файлу (оновлюються автоматично) | Режим CSV показує таблицю, сумісну з Excel</footer>
+    <button id="exportBtn" class="export-btn">⬇ Завантажити CSV файл</button>
 </div>
 
 <script>
-    // ============================================================
-    // ВАРІАНТ 1 (рекомендований): використовуйте ЛОКАЛЬНИЙ ФАЙЛ
-    // 1. Завантажте XML за посиланням https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml
-    // 2. Збережіть як "products.xml" у ту саму папку, де index.html
-    // 3. Розкоментуйте рядок нижче і закоментуйте ВАРІАНТ 2
-    // ============================================================
+    // === ВИБЕРІТЬ ОДИН З ВАРІАНТІВ URL ===
+    // Варіант 1 (стабільний): покладіть products.xml поряд з index.html
     // const XML_URL = "products.xml";
-
-    // ============================================================
-    // ВАРІАНТ 2 (тимчасовий, через CORS-проксі)
-    // ============================================================
+    // Варіант 2 (тимчасовий через проксі):
     const XML_URL = "https://cors-anywhere.herokuapp.com/https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml";
 
-    let currentProducts = [];      // зберігаємо масив товарів {name, price, image}
-    let currentView = "grid";      // 'grid' або 'csv'
+    let productsArray = [];
 
-    // Функція завантаження XML і парсингу в масив
-    async function loadProductsData() {
+    async function loadAndShowCSV() {
+        const container = document.getElementById("products-container");
         try {
             const response = await fetch(XML_URL);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const xmlText = await response.text();
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, "application/xml");
-            
+
             const parseError = xmlDoc.querySelector("parsererror");
-            if (parseError) throw new Error("Помилка парсингу XML");
-            
+            if (parseError) throw new Error("Помилка XML");
+
             let items = xmlDoc.querySelectorAll("offer");
             if (items.length === 0) items = xmlDoc.querySelectorAll("product");
             if (items.length === 0) throw new Error("Товарів не знайдено");
-            
-            const products = [];
+
+            productsArray = [];
             for (let item of items) {
-                const nameElem = item.querySelector("name");
-                const name = nameElem ? nameElem.textContent.trim() : "Без назви";
-                
-                let priceElem = item.querySelector("price");
-                if (!priceElem) priceElem = item.querySelector("purchasePrice");
-                let priceRaw = priceElem ? priceElem.textContent.trim() : "0";
-                let priceNumber = parseFloat(priceRaw.replace(",", "."));
-                if (isNaN(priceNumber)) priceNumber = 0;
-                const priceFormatted = priceNumber.toFixed(2) + " ₴";
-                const priceRawNumber = priceNumber;
-                
-                let imgElem = item.querySelector("picture");
-                if (!imgElem) imgElem = item.querySelector("image");
-                if (!imgElem) imgElem = item.querySelector("url");
+                const name = item.querySelector("name")?.textContent.trim() || "Без назви";
+                let priceElem = item.querySelector("price") || item.querySelector("purchasePrice");
+                let price = priceElem ? parseFloat(priceElem.textContent.trim().replace(",", ".")) : 0;
+                if (isNaN(price)) price = 0;
+
+                let imgElem = item.querySelector("picture") || item.querySelector("image") || item.querySelector("url");
                 let imgUrl = imgElem ? imgElem.textContent.trim() : "";
-                if (imgUrl && !imgUrl.startsWith("http")) {
-                    imgUrl = "https://www.websklad.biz.ua" + imgUrl;
-                }
-                if (!imgUrl) imgUrl = "https://via.placeholder.com/300x200?text=Немає+фото";
-                
-                products.push({
-                    name: name,
-                    priceRaw: priceRawNumber,
-                    priceFormatted: priceFormatted,
-                    image: imgUrl
-                });
+                if (imgUrl && !imgUrl.startsWith("http")) imgUrl = "https://www.websklad.biz.ua" + imgUrl;
+
+                productsArray.push({ name, price, imgUrl });
             }
-            currentProducts = products;
-            return true;
-        } catch (error) {
-            console.error(error);
-            return false;
+
+            // Побудувати HTML-таблицю (CSV-подання)
+            let html = `<table class="csv-table">
+                            <thead>
+                                <tr><th>Назва товару</th><th>Ціна (грн)</th><th>URL зображення</th></tr>
+                            </thead>
+                            <tbody>`;
+            for (let p of productsArray) {
+                html += `<tr>
+                            <td>${escapeHtml(p.name)}</td>
+                            <td>${p.price.toFixed(2)}</td>
+                            <td style="word-break:break-all">${escapeHtml(p.imgUrl || "—")}</td>
+                         </tr>`;
+            }
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        } catch (err) {
+            container.innerHTML = `<div class="error">❌ Помилка: ${err.message}<br><br>
+                🔧 Якщо це помилка CORS, завантажте XML вручну: 
+                <a href="https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml" target="_blank">завантажити</a>
+                і збережіть як <strong>products.xml</strong> у папку з сайтом. Потім змініть XML_URL на "products.xml".</div>`;
         }
     }
 
-    // Відображення у вигляді карток
-    function renderGridView() {
-        const container = document.getElementById("products-container");
-        if (currentProducts.length === 0) {
-            container.innerHTML = '<div class="no-products">❌ Немає товарів для відображення</div>';
-            return;
-        }
-        let html = '<div class="products-grid">';
-        for (let p of currentProducts) {
-            html += `
-                <div class="product-card">
-                    <img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x200?text=Фото+недоступне'">
-                    <h3>${escapeHtml(p.name)}</h3>
-                    <div class="price">${escapeHtml(p.priceFormatted)}</div>
-                    <button onclick="alert('Товар «${escapeHtml(p.name)}» додано у кошик (демо)')">🛒 Купити</button>
-                </div>
-            `;
-        }
-        html += '</div>';
-        container.innerHTML = html;
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
     }
 
-    // Відображення у вигляді CSV-таблиці (HTML-таблиця, імітація CSV)
-    function renderCSVTableView() {
-        const container = document.getElementById("products-container");
-        if (currentProducts.length === 0) {
-            container.innerHTML = '<div class="no-products">❌ Немає товарів для відображення</div>';
-            return;
-        }
-        let html = `
-            <div class="csv-table-wrapper">
-                <table class="csv-table">
-                    <thead>
-                        <tr><th>Назва товару</th><th>Ціна (грн)</th><th>URL зображення</th></tr>
-                    </thead>
-                    <tbody>
-        `;
-        for (let p of currentProducts) {
-            html += `
-                <tr>
-                    <td>${escapeHtml(p.name)}</td>
-                    <td>${p.priceRaw.toFixed(2)}</td>
-                    <td style="word-break:break-all">${escapeHtml(p.image)}</td>
-                </tr>
-            `;
-        }
-        html += `</tbody></table></div><div class="view-hint">📋 Це табличне подання. Натисніть "Завантажити CSV", щоб отримати файл .csv</div>`;
-        container.innerHTML = html;
-    }
-
-    // Експорт у справжній CSV-файл
     function exportToCSV() {
-        if (currentProducts.length === 0) {
-            alert("Немає даних для експорту.");
+        if (productsArray.length === 0) {
+            alert("Немає даних для експорту");
             return;
         }
-        // Заголовки
         let csvRows = [["Назва товару", "Ціна (грн)", "URL зображення"]];
-        for (let p of currentProducts) {
+        for (let p of productsArray) {
             csvRows.push([
-                `"${p.name.replace(/"/g, '""')}"`,   // екранування лапок
-                p.priceRaw.toFixed(2),
-                `"${p.image.replace(/"/g, '""')}"`
+                `"${p.name.replace(/"/g, '""')}"`,
+                p.price.toFixed(2),
+                `"${p.imgUrl.replace(/"/g, '""')}"`
             ]);
         }
-        const csvString = csvRows.map(row => row.join(",")).join("\n");
-        const blob = new Blob(["\uFEFF" + csvString], { type: "text/csv;charset=utf-8;" }); // BOM для Excel
+        const csvString = "\uFEFF" + csvRows.map(row => row.join(",")).join("\n");
+        const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.href = url;
@@ -316,65 +166,9 @@
         URL.revokeObjectURL(url);
     }
 
-    function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-
-    // Основний рендер залежно від currentView
-    function renderCurrentView() {
-        if (currentView === "grid") {
-            renderGridView();
-        } else {
-            renderCSVTableView();
-        }
-    }
-
-    // Завантаження даних і рендер
-    async function init() {
-        const container = document.getElementById("products-container");
-        container.innerHTML = '<div class="loading">⏳ Завантаження товарів...</div>';
-        const success = await loadProductsData();
-        if (!success || currentProducts.length === 0) {
-            container.innerHTML = `<div class="error">
-                ⚠️ Не вдалося завантажити товари.<br>
-                💡 Рішення: <strong>завантажте XML вручну</strong> за посиланням нижче, збережіть як <code>products.xml</code> у папку з сайтом і змініть <code>XML_URL</code> на <code>'products.xml'</code>.<br><br>
-                <a href="https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml" target="_blank">📥 Завантажити XML вручну</a>
-                </div>`;
-            return;
-        }
-        renderCurrentView();
-    }
-
-    // Налаштування перемикачів
-    function setupUI() {
-        const btnGrid = document.getElementById("view-grid");
-        const btnCsv = document.getElementById("view-csv");
-        const btnExport = document.getElementById("export-csv");
-        
-        btnGrid.addEventListener("click", () => {
-            currentView = "grid";
-            btnGrid.classList.add("active");
-            btnCsv.classList.remove("active");
-            renderCurrentView();
-        });
-        btnCsv.addEventListener("click", () => {
-            currentView = "csv";
-            btnCsv.classList.add("active");
-            btnGrid.classList.remove("active");
-            renderCurrentView();
-        });
-        btnExport.addEventListener("click", exportToCSV);
-    }
-
     document.addEventListener("DOMContentLoaded", () => {
-        setupUI();
-        init();
+        loadAndShowCSV();
+        document.getElementById("exportBtn").addEventListener("click", exportToCSV);
     });
 </script>
 </body>
