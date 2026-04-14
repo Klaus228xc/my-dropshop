@@ -361,6 +361,11 @@
 <footer>© UA Drop — якісні товари з доставкою по всій Україні</footer>
 
 <script>
+    // ================= НАЛАШТУВАННЯ =================
+    // Вкажіть номер WhatsApp адміністратора у міжнародному форматі (без + або з +)
+    const ADMIN_WHATSAPP = "380123456789";   // ЗМІНІТЬ НА СВІЙ НОМЕР
+    // ==============================================
+
     // Товари (перші 15 з вашого CSV)
     const productsData = [
         { sku: "ws78472", name: "Масажна подушка Car and Home", price: 529, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg" },
@@ -386,11 +391,45 @@
     // Функція збереження замовлення в localStorage
     function saveOrder(orderData) {
         let orders = JSON.parse(localStorage.getItem('ua_drop_orders')) || [];
-        orderData.id = Date.now(); // унікальний ID
+        orderData.id = Date.now();
         orderData.date = new Date().toLocaleString('uk-UA');
         orderData.status = 'Нове';
         orders.push(orderData);
         localStorage.setItem('ua_drop_orders', JSON.stringify(orders));
+        return orderData.id;
+    }
+
+    // Функція надсилання повідомлення в WhatsApp
+    function sendOrderToWhatsApp(order) {
+        if (!ADMIN_WHATSAPP) {
+            console.warn('Номер WhatsApp не налаштовано');
+            return;
+        }
+        // Формуємо текст повідомлення
+        let message = `🛍 *НОВЕ ЗАМОВЛЕННЯ #${order.id}* 🛍\n`;
+        message += `📅 Дата: ${order.date}\n`;
+        message += `💳 Оплата: ${order.paymentMethod}\n`;
+        message += `💰 Сума: ${order.total.toFixed(2)} грн\n\n`;
+        message += `📦 *Товари:*\n`;
+        order.items.forEach(item => {
+            message += `• ${item.name} — ${item.quantity} шт. x ${item.price} грн = ${item.total} грн\n`;
+        });
+        if (order.customer) {
+            message += `\n👤 *Клієнт:*\n`;
+            message += `Ім'я: ${order.customer.name}\n`;
+            message += `Телефон: ${order.customer.phone}\n`;
+            message += `Адреса: ${order.customer.address}\n`;
+        }
+        message += `\n🔗 Статус: ${order.status}`;
+
+        // Кодуємо текст для URL
+        const encodedMessage = encodeURIComponent(message);
+        // Очищаємо номер від зайвих символів
+        let phone = ADMIN_WHATSAPP.replace(/[^0-9+]/g, '');
+        if (!phone.startsWith('+')) phone = '+' + phone;
+        const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+        // Відкриваємо WhatsApp у новому вікні/вкладці
+        window.open(whatsappUrl, '_blank');
     }
 
     function renderProducts() {
@@ -537,12 +576,13 @@
             return sum + (prod ? prod.price * qty : 0);
         }, 0);
 
-        // Збираємо деталі замовлення
+        const orderItems = items.map(([sku, qty]) => {
+            const prod = productsData.find(p => p.sku === sku);
+            return { name: prod.name, sku, price: prod.price, quantity: qty, total: prod.price * qty };
+        });
+
         const orderDetails = {
-            items: items.map(([sku, qty]) => {
-                const prod = productsData.find(p => p.sku === sku);
-                return { name: prod.name, sku, price: prod.price, quantity: qty, total: prod.price * qty };
-            }),
+            items: orderItems,
             total: total,
             paymentMethod: selectedPayment === 'online' ? 'Онлайн-оплата' : 'Накладений платіж'
         };
@@ -556,10 +596,11 @@
                 return;
             }
             orderDetails.customer = { name, phone, address };
-            // Зберігаємо замовлення
-            saveOrder(orderDetails);
-            showToast(`✅ Замовлення №${orderDetails.id} на суму ${total} грн оформлено (накладений платіж). Менеджер звʼяжеться з вами.`, '#2c6e2f');
-            console.log('Замовлення збережено:', orderDetails);
+            const orderId = saveOrder(orderDetails);
+            orderDetails.id = orderId;
+            // Відправляємо в WhatsApp
+            sendOrderToWhatsApp(orderDetails);
+            showToast(`✅ Замовлення №${orderId} оформлено. Деталі надіслано адміністратору.`, '#2c6e2f');
             cart = {};
             updateCartUI();
             modal.style.display = 'none';
@@ -569,12 +610,13 @@
         // Онлайн-оплата (демо)
         try {
             showToast('Перенаправлення на оплату...', '#2c6e2f');
-            // Імітуємо успішну оплату через 1 секунду
             setTimeout(() => {
-                // Після успішної оплати теж зберігаємо замовлення
+                // Після "успішної" оплати зберігаємо замовлення
                 orderDetails.paymentStatus = 'Оплачено (демо)';
-                saveOrder(orderDetails);
-                alert(`✅ Онлайн-оплата на суму ${total} грн успішно завершена (демо-режим).\nВаше замовлення №${orderDetails.id} збережено.`);
+                const orderId = saveOrder(orderDetails);
+                orderDetails.id = orderId;
+                sendOrderToWhatsApp(orderDetails);
+                alert(`✅ Онлайн-оплата на суму ${total} грн успішно завершена (демо-режим).\nЗамовлення №${orderId} збережено та надіслано адміністратору.`);
                 cart = {};
                 updateCartUI();
                 modal.style.display = 'none';
