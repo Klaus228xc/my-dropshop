@@ -317,7 +317,7 @@
     // ---------- КОНФІГУРАЦІЯ (можна змінити твій номер) ----------
     const XML_URL = "https://websklad.biz.ua";
     const PROXY = "https://api.allorigins.win/raw?url=";   // кращий варіант для отримання сирого тексту
-    const MY_PHONE = "380XXXXXXXXX";   // 🔁 ЗАМІНІТЬ НА СВІЙ НОМЕР (без плюса)
+    const MY_PHONE = "380998261128";   // 🔁 ЗАМІНІТЬ НА СВІЙ НОМЕР (без плюса)
     const MARGIN = 1.2;
     
     // глобальні змінні
