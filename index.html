@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>UA Drop | Сучасний магазин</title>
+    <title>UA Drop | Магазин якісних товарів</title>
     <style>
         * {
             margin: 0;
@@ -17,7 +17,6 @@
             color: #1a1e2b;
         }
 
-        /* Шапка */
         .header {
             background: #ffffff;
             box-shadow: 0 2px 20px rgba(0,0,0,0.03);
@@ -69,7 +68,6 @@
             font-weight: 600;
         }
 
-        /* Основний контент */
         .container {
             max-width: 1280px;
             margin: 2rem auto;
@@ -87,7 +85,6 @@
             gap: 2rem;
         }
 
-        /* Карточка товару */
         .product-card {
             background: #ffffff;
             border-radius: 20px;
@@ -164,7 +161,6 @@
             cursor: not-allowed;
         }
 
-        /* Модалка корзини */
         .modal {
             display: none;
             position: fixed;
@@ -253,10 +249,6 @@
             border: 1px solid #e2e8f0;
             font-size: 0.9rem;
         }
-        .payment-methods input {
-            width: 16px;
-            height: 16px;
-        }
         .order-info {
             background: #f8fafc;
             border-radius: 24px;
@@ -270,7 +262,6 @@
             margin: 8px 0;
             border: 1px solid #e2e8f0;
             border-radius: 20px;
-            font-size: 0.9rem;
             background: white;
         }
         .pay-btn {
@@ -303,6 +294,19 @@
             border-top: 1px solid #ecf0f4;
             margin-top: 3rem;
         }
+        .loader {
+            text-align: center;
+            padding: 3rem;
+            font-size: 1.2rem;
+            color: #2563eb;
+        }
+        .error {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 1rem;
+            border-radius: 20px;
+            text-align: center;
+        }
         @media (max-width: 680px) {
             .container { padding: 0 1rem; }
             .header-container { padding: 1rem; }
@@ -321,8 +325,10 @@
 </div>
 
 <div class="container">
-    <div class="catalog-title">✨ Популярні товари</div>
-    <div class="products-grid" id="productsGrid"></div>
+    <div class="catalog-title">✨ Всі товари</div>
+    <div id="productsGrid" class="products-grid">
+        <div class="loader">🔄 Завантаження товарів...</div>
+    </div>
 </div>
 
 <!-- Модалка корзини -->
@@ -334,19 +340,14 @@
         <div id="cartTotal" class="cart-total">Всього: 0 ₴</div>
 
         <div class="payment-methods">
-            <label>
-                <input type="radio" name="paymentMethod" value="online" checked> 💳 Онлайн-оплата
-            </label>
-            <label>
-                <input type="radio" name="paymentMethod" value="cod"> 📦 Накладений платіж
-            </label>
+            <label><input type="radio" name="paymentMethod" value="online" checked> 💳 Онлайн-оплата</label>
+            <label><input type="radio" name="paymentMethod" value="cod"> 📦 Накладений платіж</label>
         </div>
 
-        <!-- ПОЛЯ ДЛЯ КОНТАКТНИХ ДАНИХ (обов'язкові для обох способів оплати) -->
-        <div class="order-info" id="customerFields">
-            <input type="text" id="customerName" placeholder="Ваше ім'я та прізвище" autocomplete="name">
-            <input type="tel" id="customerPhone" placeholder="Номер телефону" autocomplete="tel">
-            <textarea id="customerAddress" rows="2" placeholder="Адреса доставки (місто, відділення Нової Пошти / адреса)"></textarea>
+        <div class="order-info">
+            <input type="text" id="customerName" placeholder="Ваше ім'я та прізвище">
+            <input type="tel" id="customerPhone" placeholder="Номер телефону">
+            <textarea id="customerAddress" rows="2" placeholder="Адреса доставки (місто, відділення Нової Пошти)"></textarea>
         </div>
 
         <button id="checkoutButton" class="pay-btn">💳 Оформити замовлення</button>
@@ -358,67 +359,82 @@
 <script>
     // ================= НАЛАШТУВАННЯ =================
     const ADMIN_WHATSAPP = "380123456789";   // ЗМІНІТЬ НА СВІЙ НОМЕР
+    const XML_URL = "https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml";
+    // Якщо виникають проблеми з CORS, скачайте XML та покладіть поруч з index.html,
+    // а потім змініть URL на "products.xml"
     // ==============================================
 
-    // Товари (перші 15)
-    const productsData = [
-        { sku: "ws78472", name: "Масажна подушка Car and Home", price: 529, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg" },
-        { sku: "ws30483", name: "Бокс для зберігання косметики з дзеркалом", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg" },
-        { sku: "ws87556", name: "УФ лампа для манікюру ZH-818", price: 499, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wdefqd.jpg" },
-        { sku: "ws53905", name: "Точилка Bavarian Edge Knife Sharpener", price: 249, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd132.jpg" },
-        { sku: "ws33813", name: "Гребінець-випрямляч Fast Hair Straightener", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/tgwesdgesae.jpg" },
-        { sku: "ws36558", name: "Тканинна шафа-органайзер 105x45x170 см", price: 629, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewx23.png" },
-        { sku: "ws52037", name: "Пояс для схуднення Neotex Hot Shapers", price: 149, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/1wqeds.jpg" },
-        { sku: "ws46146", name: "Кухонні ваги Domotec SF-400 до 10 кг", price: 249, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd.jpg" },
-        { sku: "ws56917", name: "Бездротова зарядка Awei W2", price: 298, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/ewfdqedscd2.jpg" },
-        { sku: "ws72465", name: "Потрійне дзеркало для макіяжу з підсвіткою", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_2736.jpg" },
-        { sku: "ws71351", name: "Автомобільний компресор Air Compressor", price: 299, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/uaivukaifvvif.jpg" },
-        { sku: "ws27255", name: "Машинка для видалення катишків Hengda HD-779", price: 229, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/81520725_images_11695556319.jpg" },
-        { sku: "ws53562", name: "Домашній тренажер Revoflex Xtreme", price: 399, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/edfwfwe.jpg" },
-        { sku: "ws25204", name: "Електричний масажер з інфрачервоним випромінюванням", price: 749, stock: "instock", img: "https://www.websklad.biz.ua/wp-content/uploads/e4upaveucyvpkvyaav.jpg" },
-        { sku: "ws88434", name: "Ланч бокс електричний з підігрівом", price: 359, stock: "outofstock", img: "https://www.websklad.biz.ua/wp-content/uploads/3kcvaypeuyavpvy.jpg" }
-    ];
-
+    let products = [];     // масив товарів { sku, name, price, stock, img }
     let cart = {};
     let selectedPayment = "online";
 
-    function saveOrder(orderData) {
-        let orders = JSON.parse(localStorage.getItem('ua_drop_orders')) || [];
-        orderData.id = Date.now();
-        orderData.date = new Date().toLocaleString('uk-UA');
-        orderData.status = 'Нове';
-        orders.push(orderData);
-        localStorage.setItem('ua_drop_orders', JSON.stringify(orders));
-        return orderData.id;
-    }
-
-    function sendOrderToWhatsApp(order) {
-        if (!ADMIN_WHATSAPP) return;
-        let message = `🛍 *НОВЕ ЗАМОВЛЕННЯ #${order.id}*\n`;
-        message += `📅 Дата: ${order.date}\n`;
-        message += `💳 Оплата: ${order.paymentMethod}\n`;
-        message += `💰 Сума: ${order.total.toFixed(2)} грн\n\n`;
-        message += `📦 *Товари:*\n`;
-        order.items.forEach(item => {
-            message += `• ${item.name} — ${item.quantity} шт. x ${item.price} грн = ${item.total} грн\n`;
-        });
-        if (order.customer) {
-            message += `\n👤 *Клієнт:*\n`;
-            message += `Ім'я: ${order.customer.name}\n`;
-            message += `Телефон: ${order.customer.phone}\n`;
-            message += `Адреса: ${order.customer.address}\n`;
+    // Завантаження та парсинг XML
+    async function loadProductsFromXML() {
+        const grid = document.getElementById('productsGrid');
+        try {
+            const response = await fetch(XML_URL);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+            
+            const items = xmlDoc.querySelectorAll("item");
+            if (items.length === 0) throw new Error("У XML немає товарів");
+            
+            products = [];
+            items.forEach(item => {
+                // Отримуємо SKU (може бути в тегу sku або id)
+                let sku = item.querySelector("sku")?.textContent || item.querySelector("id")?.textContent || "";
+                // Назва товару
+                let name = item.querySelector("name")?.textContent || item.querySelector("title")?.textContent || "Без назви";
+                // Ціна роздрібна (беремо rrc, якщо є, інакше price)
+                let priceElem = item.querySelector("rrc");
+                if (!priceElem) priceElem = item.querySelector("price");
+                let price = priceElem ? parseFloat(priceElem.textContent) : 0;
+                // Наявність (stock / in_stock)
+                let stockElem = item.querySelector("stock");
+                let stock = "outofstock";
+                if (stockElem) {
+                    let stockVal = stockElem.textContent.toLowerCase();
+                    if (stockVal === "instock" || stockVal === "true" || stockVal === "1" || stockVal === "в наличии") stock = "instock";
+                }
+                // Зображення (перше з picture або image)
+                let imgElem = item.querySelector("picture") || item.querySelector("image");
+                let img = imgElem ? imgElem.textContent : "";
+                if (img && !img.startsWith("http")) img = "https://www.websklad.biz.ua" + img;
+                if (!img) img = "https://placehold.co/400x400?text=No+Image";
+                
+                if (sku && name && price > 0) {
+                    products.push({ sku, name, price, stock, img });
+                }
+            });
+            
+            if (products.length === 0) throw new Error("Не вдалося знайти жодного товару з ціною");
+            
+            // Відображаємо товари
+            renderProducts();
+        } catch (err) {
+            console.error(err);
+            grid.innerHTML = `<div class="error">
+                ❌ Помилка завантаження товарів: ${err.message}<br><br>
+                🔧 Можливе рішення:<br>
+                1. Завантажте XML-файл вручну за посиланням <a href="${XML_URL}" target="_blank">${XML_URL}</a><br>
+                2. Збережіть його в папку з сайтом під назвою <strong>products.xml</strong><br>
+                3. Змініть у коді змінну XML_URL на <strong>"products.xml"</strong><br>
+                4. Оновіть сторінку.
+            </div>`;
         }
-        const encoded = encodeURIComponent(message);
-        let phone = ADMIN_WHATSAPP.replace(/[^0-9+]/g, '');
-        if (!phone.startsWith('+')) phone = '+' + phone;
-        window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
     }
 
     function renderProducts() {
         const grid = document.getElementById('productsGrid');
         if (!grid) return;
+        if (products.length === 0) {
+            grid.innerHTML = '<div class="error">Немає товарів для відображення</div>';
+            return;
+        }
         grid.innerHTML = '';
-        productsData.forEach(prod => {
+        products.forEach(prod => {
             const inStock = prod.stock === 'instock';
             const card = document.createElement('div');
             card.className = 'product-card';
@@ -460,7 +476,7 @@
         let totalPrice = 0;
         let html = '';
         for (let [sku, qty] of Object.entries(cart)) {
-            const prod = productsData.find(p => p.sku === sku);
+            const prod = products.find(p => p.sku === sku);
             if (!prod) continue;
             const itemTotal = prod.price * qty;
             totalPrice += itemTotal;
@@ -504,6 +520,40 @@
         setTimeout(() => toast.remove(), 2000);
     }
 
+    // Збереження замовлення в localStorage
+    function saveOrder(orderData) {
+        let orders = JSON.parse(localStorage.getItem('ua_drop_orders')) || [];
+        orderData.id = Date.now();
+        orderData.date = new Date().toLocaleString('uk-UA');
+        orderData.status = 'Нове';
+        orders.push(orderData);
+        localStorage.setItem('ua_drop_orders', JSON.stringify(orders));
+        return orderData.id;
+    }
+
+    function sendOrderToWhatsApp(order) {
+        if (!ADMIN_WHATSAPP) return;
+        let message = `🛍 *НОВЕ ЗАМОВЛЕННЯ #${order.id}*\n`;
+        message += `📅 Дата: ${order.date}\n`;
+        message += `💳 Оплата: ${order.paymentMethod}\n`;
+        message += `💰 Сума: ${order.total.toFixed(2)} грн\n\n`;
+        message += `📦 *Товари:*\n`;
+        order.items.forEach(item => {
+            message += `• ${item.name} — ${item.quantity} шт. x ${item.price} грн = ${item.total} грн\n`;
+        });
+        if (order.customer) {
+            message += `\n👤 *Клієнт:*\n`;
+            message += `Ім'я: ${order.customer.name}\n`;
+            message += `Телефон: ${order.customer.phone}\n`;
+            message += `Адреса: ${order.customer.address}\n`;
+        }
+        const encoded = encodeURIComponent(message);
+        let phone = ADMIN_WHATSAPP.replace(/[^0-9+]/g, '');
+        if (!phone.startsWith('+')) phone = '+' + phone;
+        window.open(`https://wa.me/${phone}?text=${encoded}`, '_blank');
+    }
+
+    // Модалка корзини
     const modal = document.getElementById('cartModal');
     document.getElementById('cartIcon').onclick = () => { updateCartUI(); modal.style.display = 'flex'; };
     document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
@@ -520,7 +570,6 @@
             return;
         }
 
-        // Отримуємо контактні дані (обов'язкові для обох способів оплати)
         const name = document.getElementById('customerName').value.trim();
         const phone = document.getElementById('customerPhone').value.trim();
         const address = document.getElementById('customerAddress').value.trim();
@@ -530,12 +579,12 @@
         }
 
         const total = Object.entries(cart).reduce((sum, [sku, qty]) => {
-            const prod = productsData.find(p => p.sku === sku);
+            const prod = products.find(p => p.sku === sku);
             return sum + (prod ? prod.price * qty : 0);
         }, 0);
 
         const orderItems = items.map(([sku, qty]) => {
-            const prod = productsData.find(p => p.sku === sku);
+            const prod = products.find(p => p.sku === sku);
             return { name: prod.name, sku, price: prod.price, quantity: qty, total: prod.price * qty };
         });
 
@@ -574,8 +623,8 @@
         }
     });
 
-    renderProducts();
-    updateCartUI();
+    // Запускаємо завантаження товарів
+    loadProductsFromXML();
 </script>
 </body>
 </html>
