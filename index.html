@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>UA Drop | Магазин якісних товарів</title>
     <style>
+        /* ... стилі залишаються без змін (ті самі, що в попередньому коді) ... */
         * {
             margin: 0;
             padding: 0;
@@ -175,7 +176,6 @@
             cursor: not-allowed;
         }
 
-        /* Модалка корзини */
         .modal {
             display: none;
             position: fixed;
@@ -318,7 +318,7 @@
 <body>
 <div class="header">
     <div class="header-container">
-        <div class="logo"> UA DROP</div>
+        <div class="logo">🇺🇦 UA DROP</div>
         <div class="cart-icon" id="cartIcon">
             <span>🛒</span>
             <span class="cart-count" id="cartCount">0</span>
@@ -348,7 +348,8 @@
             </label>
         </div>
 
-        <div id="codFields" style="display: none;" class="order-info">
+        <!-- ПОЛЯ ДЛЯ КОНТАКТНИХ ДАНИХ - ПОКАЗУЮТЬСЯ ДЛЯ ОБОХ СПОСОБІВ ОПЛАТИ -->
+        <div id="contactFields" class="order-info">
             <input type="text" id="customerName" placeholder="Ваше ім'я та прізвище" autocomplete="name">
             <input type="tel" id="customerPhone" placeholder="Номер телефону" autocomplete="tel">
             <textarea id="customerAddress" rows="2" placeholder="Адреса доставки (місто, відділення Нової Пошти / адреса)"></textarea>
@@ -363,7 +364,7 @@
 <script>
     // ================= НАЛАШТУВАННЯ =================
     // Вкажіть номер WhatsApp адміністратора у міжнародному форматі (без + або з +)
-    const ADMIN_WHATSAPP = "380123456789";   // ЗМІНІТЬ НА СВІЙ НОМЕР
+    const ADMIN_WHATSAPP = "380991234567";   // ЗМІНІТЬ НА СВІЙ НОМЕР
     // ==============================================
 
     // Товари (перші 15 з вашого CSV)
@@ -388,7 +389,6 @@
     let cart = {};
     let selectedPayment = "online";
 
-    // Функція збереження замовлення в localStorage
     function saveOrder(orderData) {
         let orders = JSON.parse(localStorage.getItem('ua_drop_orders')) || [];
         orderData.id = Date.now();
@@ -399,13 +399,11 @@
         return orderData.id;
     }
 
-    // Функція надсилання повідомлення в WhatsApp
     function sendOrderToWhatsApp(order) {
         if (!ADMIN_WHATSAPP) {
-            console.warn(380998261128');
+            console.warn('Номер WhatsApp не налаштовано');
             return;
         }
-        // Формуємо текст повідомлення
         let message = `🛍 *НОВЕ ЗАМОВЛЕННЯ #${order.id}* 🛍\n`;
         message += `📅 Дата: ${order.date}\n`;
         message += `💳 Оплата: ${order.paymentMethod}\n`;
@@ -421,14 +419,10 @@
             message += `Адреса: ${order.customer.address}\n`;
         }
         message += `\n🔗 Статус: ${order.status}`;
-
-        // Кодуємо текст для URL
         const encodedMessage = encodeURIComponent(message);
-        // Очищаємо номер від зайвих символів
         let phone = ADMIN_WHATSAPP.replace(/[^0-9+]/g, '');
         if (!phone.startsWith('+')) phone = '+' + phone;
         const whatsappUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
-        // Відкриваємо WhatsApp у новому вікні/вкладці
         window.open(whatsappUrl, '_blank');
     }
 
@@ -552,15 +546,13 @@
 
     const radioOnline = document.querySelector('input[value="online"]');
     const radioCod = document.querySelector('input[value="cod"]');
-    const codFieldsDiv = document.getElementById('codFields');
-
+    // Більше не ховаємо поля – вони завжди видимі
+    // При зміні способу оплати нічого не ховаємо
     radioOnline?.addEventListener('change', () => {
         selectedPayment = 'online';
-        codFieldsDiv.style.display = 'none';
     });
     radioCod?.addEventListener('change', () => {
         selectedPayment = 'cod';
-        codFieldsDiv.style.display = 'block';
     });
 
     const checkoutBtn = document.getElementById('checkoutButton');
@@ -568,6 +560,15 @@
         const items = Object.entries(cart);
         if (items.length === 0) {
             showToast('Кошик порожній, додайте товари', '#b91c1c');
+            return;
+        }
+
+        // Отримуємо контактні дані (обов'язкові для обох способів оплати)
+        const name = document.getElementById('customerName')?.value.trim();
+        const phone = document.getElementById('customerPhone')?.value.trim();
+        const address = document.getElementById('customerAddress')?.value.trim();
+        if (!name || !phone || !address) {
+            showToast('Будь ласка, заповніть всі контактні дані (імʼя, телефон, адреса)', '#b91c1c');
             return;
         }
 
@@ -584,21 +585,13 @@
         const orderDetails = {
             items: orderItems,
             total: total,
-            paymentMethod: selectedPayment === 'online' ? 'Онлайн-оплата' : 'Накладений платіж'
+            paymentMethod: selectedPayment === 'online' ? 'Онлайн-оплата' : 'Накладений платіж',
+            customer: { name, phone, address }
         };
 
         if (selectedPayment === 'cod') {
-            const name = document.getElementById('customerName')?.value.trim();
-            const phone = document.getElementById('customerPhone')?.value.trim();
-            const address = document.getElementById('customerAddress')?.value.trim();
-            if (!name || !phone || !address) {
-                showToast('Заповніть імʼя, телефон та адресу для накладеного платежу', '#b91c1c');
-                return;
-            }
-            orderDetails.customer = { name, phone, address };
             const orderId = saveOrder(orderDetails);
             orderDetails.id = orderId;
-            // Відправляємо в WhatsApp
             sendOrderToWhatsApp(orderDetails);
             showToast(`✅ Замовлення №${orderId} оформлено. Деталі надіслано адміністратору.`, '#2c6e2f');
             cart = {};
@@ -607,11 +600,10 @@
             return;
         }
 
-        // Онлайн-оплата (демо)
+        // Онлайн-оплата (демо) – також вимагає контактні дані
         try {
             showToast('Перенаправлення на оплату...', '#2c6e2f');
             setTimeout(() => {
-                // Після "успішної" оплати зберігаємо замовлення
                 orderDetails.paymentStatus = 'Оплачено (демо)';
                 const orderId = saveOrder(orderDetails);
                 orderDetails.id = orderId;
