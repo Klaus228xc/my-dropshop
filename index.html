@@ -403,16 +403,17 @@
 <script>
     // ================= НАЛАШТУВАННЯ =================
     const ADMIN_WHATSAPP = "380998261128";   // ЗМІНІТЬ НА СВІЙ НОМЕР
-    // Джерело даних: або локальний products.xml, або XML через CORS-проксі
-    // const XML_URL = "products.xml";  // Розкоментуйте для локального файлу
+    // Виберіть джерело даних:
+    // 1. Для роботи через проксі (може блокуватись) – залиште так:
     const XML_URL = "https://cors-anywhere.herokuapp.com/https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml";
+    // 2. Для стабільної роботи: завантажте XML вручну, збережіть як "products.xml" і розкоментуйте наступний рядок:
+    // const XML_URL = "products.xml";
     // ================================================
 
-    let productsData = [];      // тут будуть товари після завантаження
+    let productsData = [];
     let cart = {};
     let selectedPayment = "online";
 
-    // Функція завантаження XML та парсингу в масив productsData
     async function loadProductsFromXML() {
         const gridContainer = document.getElementById('productsGrid');
         try {
@@ -449,17 +450,13 @@
                 }
                 if (!imgUrl) imgUrl = "https://placehold.co/400x400?text=No+Image";
                 
-                // SKU – беремо з атрибута id або code, якщо немає – генеруємо
                 let sku = item.getAttribute("id") || item.querySelector("vendorCode")?.textContent || `prod_${i}`;
-                
-                // Статус наявності: якщо є тег <stock> з значенням 0 або outofstock
                 let stockElem = item.querySelector("stock");
                 let stock = "instock";
                 if (stockElem) {
                     let stockVal = stockElem.textContent.trim();
                     if (stockVal === "0" || stockVal === "outofstock") stock = "outofstock";
                 }
-                
                 products.push({ sku, name, price, img: imgUrl, stock });
             }
             return products;
@@ -469,7 +466,6 @@
         }
     }
 
-    // Відображення карток товарів
     function renderProducts() {
         const grid = document.getElementById('productsGrid');
         if (!grid) return;
@@ -483,7 +479,7 @@
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
-                <img class="product-img" src="${prod.img}" alt="${prod.name}" loading="lazy" onerror="this.src='https://placehold.co/400x400?text=No+Image'">
+                <img class="product-img" src="${prod.img}" alt="${escapeHtml(prod.name)}" loading="lazy" onerror="this.src='https://placehold.co/400x400?text=No+Image'">
                 <div class="product-info">
                     <div class="product-title">${escapeHtml(prod.name)}</div>
                     <div class="product-price">${prod.price} ₴</div>
@@ -586,7 +582,6 @@
         setTimeout(() => toast.remove(), 2000);
     }
 
-    // Експорт у CSV
     function exportToCSV() {
         if (!productsData.length) {
             showToast('Немає даних для експорту', '#b91c1c');
@@ -613,7 +608,6 @@
         showToast('CSV файл завантажено', '#10b981');
     }
 
-    // Ініціалізація сторінки: завантаження товарів, налаштування обробників
     async function init() {
         const gridContainer = document.getElementById('productsGrid');
         try {
@@ -630,7 +624,7 @@
         }
     }
 
-    // Обробники модалки, оплати, WhatsApp
+    // ---- Модалка та оформлення замовлення ----
     const modal = document.getElementById('cartModal');
     const cartIcon = document.getElementById('cartIcon');
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -714,7 +708,6 @@
             return;
         }
 
-        // Онлайн-оплата (демо)
         try {
             showToast('Перенаправлення на оплату...', '#2c6e2f');
             setTimeout(() => {
