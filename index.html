@@ -2,52 +2,675 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StoreX | Твій Магазин</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://googleapis.com" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>WebSklad Вітрина</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            background: #0f172a;
+            color: white;
+            margin: 0;
+            padding-bottom: 100px;
+        }
+
+        header {
+            background: #1e293b;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #38bdf8;
+            flex-wrap: wrap;
+            gap: 15px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logo span {
+            color: #38bdf8;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #searchInput {
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            width: 250px;
+            font-size: 14px;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+            background: #38bdf8;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #0f172a;
+            transition: 0.2s;
+        }
+
+        .search-box button:hover {
+            background: #0ea5e9;
+        }
+
+        .cart-header {
+            background: #38bdf8;
+            color: #0f172a;
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .cart-header:hover {
+            background: #0ea5e9;
+            transform: scale(1.05);
+        }
+
+        .cart-count {
+            background: #0f172a;
+            color: #38bdf8;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #334155;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: contain;
+            background: white;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            margin: 12px 0 8px 0;
+            line-height: 1.3;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .price {
+            color: #38bdf8;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .buy-btn {
+            background: #38bdf8;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #0f172a;
+            transition: 0.2s;
+            font-size: 14px;
+        }
+
+        .buy-btn:hover {
+            background: #0ea5e9;
+            transform: scale(1.02);
+        }
+
+        #cartToggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #38bdf8;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 100;
+            color: #0f172a;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+
+        #cartToggle:hover {
+            transform: scale(1.1);
+            background: #0ea5e9;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 25px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .order-form input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .order-form input:focus {
+            outline: none;
+            border-color: #38bdf8;
+        }
+
+        .checkout-btn {
+            background: #25d366;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .checkout-btn:hover {
+            background: #128C7E;
+        }
+
+        .close-btn {
+            background: #475569;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .close-btn:hover {
+            background: #334155;
+        }
+
+        .cart-items {
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 15px 0;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #334155;
+            gap: 10px;
+        }
+
+        .cart-item-info {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .cart-item-price {
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
+        .remove-item {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .remove-item:hover {
+            background: #b91c1c;
+        }
+
+        .total {
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-align: right;
+            padding: 15px 0;
+            border-top: 2px solid #38bdf8;
+            margin-top: 10px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2rem;
+            color: #38bdf8;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #ef4444;
+        }
+
+        @media (max-width: 640px) {
+            .grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 12px;
+                padding: 12px;
+            }
+            
+            header {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            #searchInput {
+                flex: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <div class="logo">Store<span>X</span></div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Пошук товарів..." oninput="searchProducts(this.value)">
-            </div>
-            <div class="cart-icon" onclick="toggleCartModal()">
-                🛒 <span id="cartCountGlobal">0</span>
-            </div>
-        </div>
-    </header>
 
-    <section class="hero">
-        <h1>Найкращі гаджети 2026</h1>
-        <p>Прямі поставки • Найкраща ціна • Гарантія</p>
-    </section>
-
-    <div class="container">
-        <main id="products" class="grid"></main>
+<header>
+    <div class="logo">
+        📦 WebSklad <span>Вітрина</span>
     </div>
-
-    <!-- Модальне вікно кошика -->
-    <div id="cartModal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Твоє замовлення</h2>
-            <div id="cartItemsList"></div>
-            <div class="total-line">Разом: <span id="cartTotalSum">0</span> грн</div>
-            
-            <div class="order-fields">
-                <input type="text" id="orderName" placeholder="Прізвище та Ім'я">
-                <input type="tel" id="orderPhone" placeholder="Номер телефону">
-                <input type="text" id="orderCity" placeholder="Місто">
-                <input type="text" id="orderPost" placeholder="Відділення Нової Пошти">
-            </div>
-            
-            <button onclick="checkoutOrder()" class="btn-checkout">Оформити замовлення</button>
-            <button onclick="toggleCartModal()" class="btn-close">Повернутись</button>
-        </div>
+    <div class="search-box">
+        <input type="text" id="searchInput" placeholder="🔍 Пошук товару..." onkeyup="searchWithDelay(event)">
+        <button onclick="searchProducts()">Знайти</button>
     </div>
+    <div class="cart-header" onclick="toggleCartModal()">
+        🛒 Кошик <span class="cart-count" id="cartCountGlobal">0</span>
+    </div>
+</header>
 
-    <script src="script.js"></script>
+<div class="grid" id="products">
+    <div class="loading">⏳ Завантаження товарів...</div>
+</div>
+
+<div id="cartToggle" onclick="toggleCartModal()">
+    🛒
+    <span style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center;" id="floatingCount">0</span>
+</div>
+
+<div id="cartModal" class="modal hidden">
+    <div class="modal-content">
+        <h2 style="margin-bottom: 15px;">🛒 Ваш кошик</h2>
+        <div id="cartItemsList" class="cart-items">
+            <div class="empty-cart">Кошик порожній</div>
+        </div>
+        <div class="order-form">
+            <input type="text" id="orderName" placeholder="👤 Ваше ім'я" autocomplete="off">
+            <input type="tel" id="orderPhone" placeholder="📞 Телефон (0501234567)" autocomplete="off">
+            <input type="text" id="orderCity" placeholder="🏙️ Місто" autocomplete="off">
+            <input type="text" id="orderPost" placeholder="📮 Номер відділення Нової Пошти" autocomplete="off">
+        </div>
+        <div class="total">
+            Загалом: <span id="cartTotalSum">0</span> грн
+        </div>
+        <button class="checkout-btn" onclick="checkoutOrder()">📲 Підтвердити замовлення (WhatsApp)</button>
+        <button class="close-btn" onclick="toggleCartModal()">✖ Закрити</button>
+    </div>
+</div>
+
+<script>
+    // ========== НАЛАШТУВАННЯ ==========
+    const XML_URL = "https://websklad.biz.ua";
+    const PROXY = "https://api.allorigins.win/raw?url=";
+    const MY_PHONE = "380XXXXXXXXX";  // ⚠️ ЗМІНІТЬ НА СВІЙ НОМЕР (без плюса)
+    const MARGIN = 1.2;  // Націнка 20%
+    
+    // Глобальні змінні
+    let allProducts = [];
+    let cart = [];
+    let searchTimeout = null;
+    
+    // ========== ЗАВАНТАЖЕННЯ ДАНИХ ==========
+    async function loadData() {
+        const grid = document.getElementById('products');
+        grid.innerHTML = '<div class="loading">🔄 Оновлення вітрини...</div>';
+        
+        try {
+            const response = await fetch(PROXY + encodeURIComponent(XML_URL));
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(xmlText, "text/xml");
+            
+            // Перевірка на помилки парсингу
+            const parseError = xml.querySelector("parsererror");
+            if (parseError) throw new Error("Помилка формату XML");
+            
+            const offers = xml.querySelectorAll("offer");
+            if (offers.length === 0) throw new Error("Немає товарів у прайсі");
+            
+            allProducts = Array.from(offers).map(offer => {
+                let rawPrice = parseFloat(offer.querySelector("price")?.textContent || "0");
+                if (isNaN(rawPrice)) rawPrice = 0;
+                
+                let nameRaw = offer.querySelector("name")?.textContent || "Без назви";
+                nameRaw = nameRaw.replace(/['"`«»]/g, "").trim();
+                
+                let pictureUrl = offer.querySelector("picture")?.textContent || "";
+                if (pictureUrl && !pictureUrl.startsWith("http")) {
+                    pictureUrl = "https://websklad.biz.ua" + (pictureUrl.startsWith("/") ? pictureUrl : "/" + pictureUrl);
+                }
+                
+                return {
+                    id: offer.getAttribute("id") || Math.random().toString(36),
+                    name: nameRaw,
+                    price: Math.round(rawPrice * MARGIN),
+                    picture: pictureUrl || "https://via.placeholder.com/300x300?text=Немає+фото"
+                };
+            });
+            
+            renderProducts(allProducts);
+            
+        } catch (err) {
+            console.error("Помилка:", err);
+            grid.innerHTML = `<div class="error">
+                ❌ Помилка завантаження!<br>
+                Натисніть <strong>CTRL + F5</strong><br>
+                <small>${err.message}</small>
+            </div>`;
+        }
+    }
+    
+    // ========== ВІДОБРАЖЕННЯ ТОВАРІВ ==========
+    function renderProducts(products) {
+        const grid = document.getElementById('products');
+        
+        if (!products.length) {
+            grid.innerHTML = '<div class="empty-cart" style="grid-column:1/-1;">😞 Товарів не знайдено</div>';
+            return;
+        }
+        
+        grid.innerHTML = '';
+        products.slice(0, 100).forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <img src="${product.picture}" alt="${escapeHtml(product.name)}" onerror="this.src='https://via.placeholder.com/300x300?text=Фото+немає'">
+                <h3>${escapeHtml(product.name)}</h3>
+                <div class="price">${product.price.toLocaleString()} грн</div>
+                <button class="buy-btn" data-id="${product.id}">➕ В кошик</button>
+            `;
+            
+            const btn = card.querySelector('.buy-btn');
+            btn.addEventListener('click', () => addToCart(product.id));
+            
+            grid.appendChild(card);
+        });
+    }
+    
+    // ========== ДОДАВАННЯ В КОШИК ==========
+    function addToCart(productId) {
+        const product = allProducts.find(p => p.id == productId);
+        if (product) {
+            cart.push(product);
+            updateCartUI();
+            showNotification(`✓ ${product.name.substring(0, 40)} додано`);
+        }
+    }
+    
+    function removeFromCart(index) {
+        const removed = cart.splice(index, 1)[0];
+        updateCartUI();
+        showNotification(`✖ ${removed.name.substring(0, 40)} видалено`);
+    }
+    
+    function updateCartUI() {
+        const countSpan = document.getElementById('cartCountGlobal');
+        const floatingCount = document.getElementById('floatingCount');
+        const count = cart.length;
+        
+        if (countSpan) countSpan.innerText = count;
+        if (floatingCount) floatingCount.innerText = count;
+        
+        // Оновлюємо модалку, якщо вона відкрита
+        const modal = document.getElementById('cartModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            updateCartModal();
+        }
+    }
+    
+    function updateCartModal() {
+        const listDiv = document.getElementById('cartItemsList');
+        let total = 0;
+        
+        if (!cart.length) {
+            listDiv.innerHTML = '<div class="empty-cart">🛒 Кошик порожній</div>';
+            document.getElementById('cartTotalSum').innerText = "0";
+            return;
+        }
+        
+        listDiv.innerHTML = cart.map((item, idx) => {
+            total += item.price;
+            return `
+                <div class="cart-item">
+                    <div class="cart-item-info">${escapeHtml(item.name)}</div>
+                    <div class="cart-item-price">${item.price} грн</div>
+                    <button class="remove-item" onclick="removeFromCart(${idx})">🗑</button>
+                </div>
+            `;
+        }).join('');
+        
+        document.getElementById('cartTotalSum').innerText = total;
+    }
+    
+    // ========== МОДАЛЬНЕ ВІКНО ==========
+    function toggleCartModal() {
+        const modal = document.getElementById('cartModal');
+        const isHidden = modal.classList.contains('hidden');
+        
+        if (isHidden) {
+            updateCartModal();
+            modal.classList.remove('hidden');
+        } else {
+            modal.classList.add('hidden');
+        }
+    }
+    
+    // ========== ОФОРМЛЕННЯ ЗАМОВЛЕННЯ ==========
+    function checkoutOrder() {
+        const name = document.getElementById('orderName')?.value.trim();
+        const phone = document.getElementById('orderPhone')?.value.trim();
+        const city = document.getElementById('orderCity')?.value.trim();
+        const post = document.getElementById('orderPost')?.value.trim();
+        
+        if (!name) return alert("❌ Вкажіть ваше ім'я");
+        if (!phone) return alert("❌ Вкажіть номер телефону");
+        if (!city) return alert("❌ Вкажіть місто");
+        if (!post) return alert("❌ Вкажіть номер відділення Нової Пошти");
+        if (cart.length === 0) return alert("❌ Кошик порожній! Додайте товари.");
+        
+        let totalSum = 0;
+        let itemsText = "";
+        
+        cart.forEach((item, i) => {
+            totalSum += item.price;
+            itemsText += `${i+1}. ${item.name.substring(0, 50)} - ${item.price} грн\n`;
+        });
+        
+        const message = `📦 *НОВЕ ЗАМОВЛЕННЯ* 📦\n\n` +
+                       `👤 *Ім'я:* ${name}\n` +
+                       `📞 *Телефон:* ${phone}\n` +
+                       `🏙️ *Місто:* ${city}\n` +
+                       `🏢 *Відділення НП:* ${post}\n\n` +
+                       `🛒 *Товари:*\n${itemsText}\n` +
+                       `💰 *Сума:* ${totalSum} грн\n\n` +
+                       `_Дякуємо за покупку!_`;
+        
+        const whatsappUrl = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+    }
+    
+    // ========== ПОШУК ==========
+    function searchWithDelay(event) {
+        if (searchTimeout) clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            searchProducts();
+        }, 400);
+    }
+    
+    function searchProducts() {
+        const query = document.getElementById('searchInput')?.value.toLowerCase().trim();
+        
+        if (!query) {
+            renderProducts(allProducts);
+            return;
+        }
+        
+        const filtered = allProducts.filter(product => 
+            product.name.toLowerCase().includes(query)
+        );
+        renderProducts(filtered);
+    }
+    
+    // ========== ДОПОМІЖНІ ФУНКЦІЇ ==========
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function showNotification(msg) {
+        let toast = document.getElementById('custom-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'custom-toast';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #38bdf8;
+                color: #0f172a;
+                padding: 12px 24px;
+                border-radius: 50px;
+                font-weight: bold;
+                z-index: 2000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                animation: fadeInOut 2s ease;
+            `;
+            document.body.appendChild(toast);
+        }
+        
+        toast.textContent = msg;
+        toast.style.display = 'block';
+        
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 2000);
+    }
+    
+    // Додаємо CSS анімацію
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // ========== ЗАПУСК ==========
+    loadData();
+</script>
 </body>
 </html>
