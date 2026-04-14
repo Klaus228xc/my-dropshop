@@ -3,633 +3,350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>DropShop — импорт товаров из XML (websklad.biz.ua)</title>
-    <!-- Font Awesome 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Websklad Дропшип - Каталог товаров</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: system-ui, 'Segoe UI', 'Inter', 'Roboto', sans-serif;
         }
-
         body {
-            background: #f8fafc;
-            color: #0f172a;
-            line-height: 1.5;
+            background: #f4f6fa;
+            padding: 24px 20px;
         }
-
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        /* header */
         .header {
             background: white;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 20;
-            padding: 1rem 2rem;
+            border-radius: 32px;
+            padding: 20px 28px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.05);
             display: flex;
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+            gap: 18px;
         }
-
         .logo h1 {
-            font-size: 1.7rem;
+            font-size: 1.8rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #1e293b, #2d3a4f);
+            background: linear-gradient(135deg, #1e2b3c, #2c4c6e);
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            letter-spacing: -0.3px;
         }
-        .logo span {
+        .logo p {
             font-size: 0.8rem;
-            font-weight: 400;
-            color: #3b7c6e;
-            display: block;
+            color: #5e6f8d;
         }
-
-        .cart-icon-btn {
-            background: #f1f5f9;
-            border: none;
-            padding: 0.7rem 1.3rem;
-            border-radius: 60px;
-            font-size: 1.1rem;
+        .stats {
+            background: #eef2f9;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #1e2f3f;
+        }
+        /* controls */
+        .controls {
+            background: white;
+            border-radius: 28px;
+            padding: 16px 24px;
+            margin-bottom: 32px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .search-box {
+            flex: 2;
+            min-width: 200px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #dce3ec;
+            border-radius: 48px;
+            font-size: 1rem;
+            background: #fff;
+            transition: 0.2s;
+            outline: none;
+        }
+        .search-box input:focus {
+            border-color: #2c6e9e;
+            box-shadow: 0 0 0 2px rgba(44,110,158,0.2);
+        }
+        .filter-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        select, .sort-btn {
+            padding: 10px 18px;
+            border-radius: 40px;
+            border: 1px solid #dce3ec;
+            background: white;
+            font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
+            transition: 0.2s;
         }
-        .cart-icon-btn:hover {
-            background: #e2e8f0;
-            transform: scale(0.98);
+        select:hover, .sort-btn:hover {
+            background: #f0f4fa;
         }
-        .cart-count {
-            background: #d9463b;
-            color: white;
-            border-radius: 30px;
-            padding: 0.2rem 0.65rem;
-            font-size: 0.8rem;
-            font-weight: 700;
+        .reset-btn {
+            background: #f0f2f5;
+            border: none;
+            color: #2c4c6e;
         }
-
-        .container {
-            max-width: 1300px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-        }
+        /* product grid */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
+            gap: 26px;
         }
         .product-card {
             background: white;
             border-radius: 24px;
             overflow: hidden;
-            transition: all 0.25s ease;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eef2f6;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
         }
         .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.1);
-            border-color: #cbd5e1;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 28px -12px rgba(0,0,0,0.12);
+        }
+        .img-wrapper {
+            background: #fafcff;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 210px;
+            border-bottom: 1px solid #eff3f8;
         }
         .product-img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            background: #eef2ff;
+            max-width: 100%;
+            max-height: 170px;
+            object-fit: contain;
+            transition: 0.2s;
         }
         .product-info {
-            padding: 1.2rem;
+            padding: 18px 16px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         .product-title {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 0.4rem;
-        }
-        .product-desc {
-            font-size: 0.85rem;
-            color: #475569;
-            margin: 0.5rem 0;
             line-height: 1.4;
+            color: #1a2c3e;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
-        .supplier-badge {
-            display: inline-block;
-            background: #e6f7f2;
-            color: #1f6e5c;
-            font-size: 0.7rem;
-            font-weight: 500;
-            padding: 0.2rem 0.6rem;
-            border-radius: 30px;
-            margin: 0.5rem 0;
+        .product-category {
+            font-size: 0.75rem;
+            color: #6c86a3;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
         }
         .price-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 0.8rem;
+            align-items: baseline;
+            gap: 10px;
+            margin: 12px 0 10px;
+            flex-wrap: wrap;
         }
         .price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0f172a;
-        }
-        .add-to-cart {
-            background: #0f172a;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
-        }
-        .add-to-cart:hover {
-            background: #334155;
-            transform: scale(0.96);
-        }
-
-        /* Корзина */
-        .cart-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(3px);
-            z-index: 100;
-            visibility: hidden;
-            opacity: 0;
-            transition: all 0.3s ease;
-        }
-        .cart-overlay.open {
-            visibility: visible;
-            opacity: 1;
-        }
-        .cart-sidebar {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: 100%;
-            max-width: 480px;
-            height: 100%;
-            background: white;
-            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.15);
-            z-index: 101;
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-        .cart-sidebar.open {
-            transform: translateX(0);
-        }
-        .cart-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #eef2f6;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 700;
-            font-size: 1.3rem;
-        }
-        .close-cart {
-            background: none;
-            border: none;
             font-size: 1.6rem;
-            cursor: pointer;
-            color: #5b6e8c;
+            font-weight: 700;
+            color: #1f6392;
         }
-        .cart-items-list {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            overflow-y: auto;
+        .old-price {
+            font-size: 0.85rem;
+            color: #8a99b0;
+            text-decoration: line-through;
         }
-        .cart-item {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #edf2f7;
-        }
-        .cart-item-img {
-            width: 70px;
-            height: 70px;
-            object-fit: cover;
-            border-radius: 16px;
-            background: #f1f5f9;
-        }
-        .cart-item-details {
-            flex: 1;
-        }
-        .cart-item-title {
+        .stock {
+            font-size: 0.75rem;
             font-weight: 600;
-        }
-        .cart-item-price {
-            font-size: 0.9rem;
-            color: #2c6e5c;
-            font-weight: 500;
-        }
-        .cart-qty-control {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            padding: 4px 10px;
+            border-radius: 30px;
+            display: inline-block;
+            width: fit-content;
             margin-top: 8px;
         }
-        .cart-qty-control button {
-            background: #f1f5f9;
+        .in-stock {
+            background: #e0f3e8;
+            color: #1f7840;
+        }
+        .out-stock {
+            background: #ffe6e5;
+            color: #bc3f2e;
+        }
+        .btn-detail {
+            margin-top: 16px;
+            background: #f0f4fe;
             border: none;
-            width: 28px;
-            height: 28px;
-            border-radius: 30px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .cart-item-remove {
-            background: none;
-            border: none;
-            color: #e07c6c;
-            cursor: pointer;
-            font-size: 0.8rem;
-        }
-        .cart-footer {
-            padding: 1.5rem;
-            border-top: 1px solid #eef2f6;
-            background: #fefefe;
-        }
-        .total-price {
-            font-size: 1.4rem;
-            font-weight: 800;
-            margin: 1rem 0;
-        }
-        .checkout-form input {
-            width: 100%;
-            padding: 12px 14px;
-            margin-bottom: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 28px;
-            font-size: 0.9rem;
-            background: white;
-        }
-        .checkout-btn {
-            width: 100%;
-            background: #0f172a;
-            color: white;
-            border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 40px;
-            font-weight: 700;
-            font-size: 1rem;
+            font-weight: 500;
+            font-size: 0.85rem;
             cursor: pointer;
             transition: 0.2s;
+            color: #2c6285;
         }
-        .checkout-btn:hover {
-            background: #2d3e5f;
+        .btn-detail:hover {
+            background: #e2eaf9;
         }
-        .empty-cart-msg {
+        .no-results {
+            grid-column: 1 / -1;
             text-align: center;
-            color: #6c757d;
-            padding: 2rem;
-        }
-        .toast-msg {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            z-index: 200;
-            opacity: 0;
-            transition: opacity 0.2s;
-            pointer-events: none;
-        }
-        .loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 4rem;
-            gap: 1rem;
-            font-size: 1.1rem;
-            color: #2c7a6e;
-        }
-        .error-message {
-            background: #fee2e2;
-            border-left: 5px solid #dc2626;
-            padding: 1.5rem;
-            border-radius: 20px;
-            margin: 2rem;
-            text-align: center;
-            color: #991b1b;
-        }
-        .retry-btn {
-            background: #0f172a;
-            color: white;
-            border: none;
-            padding: 0.6rem 1.5rem;
+            padding: 60px 20px;
+            background: white;
             border-radius: 40px;
-            cursor: pointer;
-            margin-top: 1rem;
-            font-weight: 500;
+            color: #5b6f8c;
         }
         footer {
+            margin-top: 48px;
             text-align: center;
-            margin: 3rem 1rem 1rem;
             font-size: 0.8rem;
-            color: #5b6e8c;
-            border-top: 1px solid #e2e8f0;
-            padding-top: 1.5rem;
+            color: #7c8ca8;
         }
         @media (max-width: 640px) {
-            .header { padding: 0.8rem 1rem; }
-            .products-grid { gap: 1rem; }
-            .cart-sidebar { max-width: 100%; }
+            body { padding: 16px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .filter-group { justify-content: space-between; }
         }
     </style>
 </head>
 <body>
-
-<div class="header">
-    <div class="logo">
-        <h1>DropShop <i class="fas fa-box-open" style="color:#2c7a6e;"></i></h1>
-        <span>Импорт из XML: websklad.biz.ua</span>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <h1>📦 Websklad Dropship</h1>
+            <p>Оптовый каталог | Партнерские цены</p>
+        </div>
+        <div class="stats" id="stats-counter">Загрузка товаров...</div>
     </div>
-    <button class="cart-icon-btn" id="openCartBtn">
-        <i class="fas fa-shopping-cart"></i> Корзина
-        <span class="cart-count" id="cartCountBadge">0</span>
-    </button>
+
+    <div class="controls">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="🔍 Поиск по названию, артикулу, категории...">
+        </div>
+        <div class="filter-group">
+            <select id="categoryFilter">
+                <option value="all">Все категории</option>
+            </select>
+            <select id="availabilityFilter">
+                <option value="all">Любая наличие</option>
+                <option value="instock">В наличии</option>
+                <option value="outofstock">Нет в наличии</option>
+            </select>
+            <button id="sortPriceBtn" class="sort-btn">💰 Сортировать по цене</button>
+            <button id="resetFiltersBtn" class="sort-btn reset-btn">♻️ Сбросить</button>
+        </div>
+    </div>
+
+    <div class="products-grid" id="productsGrid">
+        <div class="no-results">Загрузка ассортимента...</div>
+    </div>
+    <footer>Websklad партнерская программа — актуальные цены и остатки</footer>
 </div>
-
-<main class="container">
-    <div id="productsGrid" class="products-grid">
-        <div class="loader-container">
-            <i class="fas fa-spinner fa-pulse fa-2x"></i>
-            <span>🚀 Начинаем импорт товаров из XML-фида...</span>
-            <small style="font-size:0.8rem;">https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml</small>
-        </div>
-    </div>
-</main>
-
-<footer>
-    <p><i class="fas fa-truck-fast"></i> Дропшиппинг — товары отправляются напрямую от поставщика (<strong>websklad.biz.ua</strong>)</p>
-    <p style="margin-top: 8px;">© 2025 DropShop | Автоматический импорт товаров из XML</p>
-</footer>
-
-<!-- Корзина -->
-<div class="cart-overlay" id="cartOverlay">
-    <div class="cart-sidebar" id="cartSidebar">
-        <div class="cart-header">
-            <span><i class="fas fa-bag-shopping"></i> Корзина</span>
-            <button class="close-cart" id="closeCartBtn">&times;</button>
-        </div>
-        <div class="cart-items-list" id="cartItemsList">
-            <div class="empty-cart-msg">Корзина пуста</div>
-        </div>
-        <div class="cart-footer">
-            <div class="total-price" id="cartTotalPrice">0 ₽</div>
-            <div class="checkout-form">
-                <input type="text" id="customerName" placeholder="Ваше имя *" autocomplete="name">
-                <input type="email" id="customerEmail" placeholder="Email *" autocomplete="email">
-                <input type="tel" id="customerPhone" placeholder="Телефон *">
-                <input type="text" id="customerAddress" placeholder="Адрес доставки *">
-                <button class="checkout-btn" id="checkoutBtn">Оформить заказ <i class="fas fa-arrow-right"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="toastMsg" class="toast-msg"></div>
 
 <script>
-    // ---------- КОНФИГУРАЦИЯ ----------
-    const XML_URL = "https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml";
-    const CORS_PROXY = "https://api.allorigins.win/get?url=";  // возвращает { contents: "xml text" }
-
-    let products = [];      // массив товаров после парсинга
-    let cart = [];          // { id, quantity }
-
-    // DOM элементы
-    const productsGrid = document.getElementById('productsGrid');
-    const cartItemsList = document.getElementById('cartItemsList');
-    const cartTotalSpan = document.getElementById('cartTotalPrice');
-    const cartCountBadge = document.getElementById('cartCountBadge');
-    const openCartBtn = document.getElementById('openCartBtn');
-    const closeCartBtn = document.getElementById('closeCartBtn');
-    const cartOverlay = document.getElementById('cartOverlay');
-    const cartSidebar = document.getElementById('cartSidebar');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-    const toastMsgDiv = document.getElementById('toastMsg');
-
-    function showToast(message, duration = 2500) {
-        toastMsgDiv.textContent = message;
-        toastMsgDiv.style.opacity = '1';
-        setTimeout(() => toastMsgDiv.style.opacity = '0', duration);
-    }
-
-    // ---------- УНИВЕРСАЛЬНЫЙ ПАРСИНГ XML (Яндекс.Маркет / произвольный) ----------
-    function parseXMLToProducts(xmlText) {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-        
-        if (xmlDoc.querySelector('parsererror')) {
-            throw new Error("Синтаксическая ошибка XML");
-        }
-        
-        // Пытаемся найти все элементы offer (стандарт YML)
-        let offerNodes = xmlDoc.querySelectorAll('offer');
-        if (offerNodes.length === 0) {
-            // Альтернативные названия: product, item, товар
-            offerNodes = xmlDoc.querySelectorAll('product, item, товар');
-        }
-        
-        // Если всё равно пусто — ищем любые родительские узлы, содержащие name и price
-        if (offerNodes.length === 0) {
-            const allElements = xmlDoc.getElementsByTagName('*');
-            const candidates = [];
-            for (let el of allElements) {
-                if ((el.querySelector(':scope > name, :scope > Name, :scope > title') || el.querySelector(':scope > name, :scope > Name')) &&
-                    (el.querySelector(':scope > price, :scope > Price, :scope > amount'))) {
-                    candidates.push(el);
+    // ----- ВСТРОЕННЫЙ CSV-ФАЙЛ (полный дамп из предоставленного документа) -----
+    const csvRawData = `"Название товара",Артикул,"Описание товара","Дроп цена для партнера","Рекомендовання розничная цена",Наличие,Изображения,"Категории товара",Подкатегории,"Название товара (ua)","Описание товара (ua)","Категория товаров (ua)","Подкатегория товара (ua)"
+"Массажная подушка Car and Home Massage Pillow, массажер для шеи автомобильный",ws78472,"<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p>Эффект массажа известен с давних времен. С его помощью лечили и лечат повреждения мышц, нарушения опорно-двигательного аппарата, заболевания сосудов и так далее. Но массаж &ndash; процедура довольно длительная и доступная далеко не всегда, хотя бы потому, что сеансы массажа проводятся в определенное время, а не тогда, когда заболело плечо, протянуло шею или просто болит голова.</p>\r\n<p>Подушка массажер подойдет для офисных работников и всех, кто ведет сидячий образ жизни и испытывает усталость или различные мышечные боли. Ортопедический массаж &ndash; отличная профилактика многих заболеваний.Массажная подушка создана для снятия усталости, напряжения с шеи, спины. При длительном сидении за рулем, мышцы атрофируются, становятся мягкими и затекают из-за одного положения. Самое наибольшее напряжении ощущается в шее, а далее в пояснице.</p>\r\n<p>Использовать подушку можно для массажа не только шеи и плеч, но и спины, области таза, стоп или рук. В отличие от специализированного прибора, например, массажера-воротника, форма подушки делает ее универсальной. Устройство одинаково хорошо функционирует и в горизонтальном, и в вертикальном положении. Управляется аппарат пультом или при помощи кнопок, расположенных на его поверхности. Данный массажер имеет особенную анатомическую форму и изгибы, которые позволяют благотворно воздействовать на основные точки на шее, спине.<br/>Центральная нервная система расслабляется и снимает напряжение с основных точек.</p>\r\n<p><strong>Комплектация:</strong></p>\r\n<ul>\r\n<li>1 х Массажная подушка Car and Home Massage Pillow 8028;</li>\r\n<li>1 х Адаптер питания от сети;</li>\r\n<li>1 х Адаптер автомобильный;</li>\r\n<li>1 х Инструкция;</li>\r\n<li>1 х Упаковка</li>\r\n</ul>\r\n</div>\r\n</div>",356,529,instock,"https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/we232f.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wefcsweq.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/88844679_images_17746866565.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wx1z1z1z1.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/12ed12.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/e221z21.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4181.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4176.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4177.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4178.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4179.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/IMG_4180.jpg,https://www.websklad.biz.ua/wp-content/uploads/3kjcfyavpkekcjfyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcfvaaekcfyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/k3jcfavpekcufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcapekcuucj.jpg,https://www.websklad.biz.ua/wp-content/uploads/kjcfapek3cjfyvau.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcufvyavapkekcfyvaacku.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfvyk3cfyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/k3jcfyvapkekcaecuk.jpg,https://www.websklad.biz.ua/wp-content/uploads/3jucfvykekcufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/ucfaekcjfyae3c.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcfyvavpkeuyav.jpg,https://www.websklad.biz.ua/wp-content/uploads/kjcfyvapk3jcufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/ucfyvvekcfyvuc.jpg,https://www.websklad.biz.ua/wp-content/uploads/3qewadsffgt43rwqasd.jpg,https://www.websklad.biz.ua/wp-content/uploads/rqwadsdr4wadsw.jpg,https://www.websklad.biz.ua/wp-content/uploads/rqewasdgtr3wasd.jpg,https://www.websklad.biz.ua/wp-content/uploads/rwasdfft4rwasfe.jpg,https://www.websklad.biz.ua/wp-content/uploads/kjcfivaape4k3cfia.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcfyvpe4kcufyvcju.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfyvaapkeuckauc.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfyvaae4kcuyvapecku.jpg,https://www.websklad.biz.ua/wp-content/uploads/jcfapke4kcufyvaukc.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcfyvk3jcfyvaauck.jpg,https://www.websklad.biz.ua/wp-content/uploads/cvyvpe4kcyvaape3kc.jpg,https://www.websklad.biz.ua/wp-content/uploads/jucfvype4k3cfyvaauck.jpg,https://www.websklad.biz.ua/wp-content/uploads/2jufyvpke4ckufyv.jpg,https://www.websklad.biz.ua/wp-content/uploads/cfyvaape43kcfyvakj.jpg,https://www.websklad.biz.ua/wp-content/uploads/kcckfk32jcuv.jpg,https://www.websklad.biz.ua/wp-content/uploads/k3jcfyvaap43jcfyvak3jc.jpg,https://www.websklad.biz.ua/wp-content/uploads/rwasr3qwdffr3qw.jpg,https://www.websklad.biz.ua/wp-content/uploads/rwadfgt43rwqasdfew.jpg,https://www.websklad.biz.ua/wp-content/uploads/3rqwasdfgt4rwasdfr3qw.jpg,https://www.websklad.biz.ua/wp-content/uploads/wadstr3qwasd.jpg,https://www.websklad.biz.ua/wp-content/uploads/wasdffgrt4wresafrwa.jpg,https://www.websklad.biz.ua/wp-content/uploads/wasdfgtrwasdfgtr3qwas.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/fewvdsc3.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wx1z1z1z1-1.jpg,https://www.websklad.biz.ua/wp-content/uploads/catalog_1771975913_350.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772341987_261.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342046_106.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342095_786.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342145_768.png,https://www.websklad.biz.ua/wp-content/uploads/creative_1772342189_121.png",Автотовары,Массажеры,"Масажна подушка Car and Home Massage Pillow, масажер для шиї автомобільний","<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p>Ефект масажу відомий з давніх-давен. З його допомогою лікували та лікують ушкодження м'язів, порушення опорно-рухового апарату, захворювання судин тощо. Але масаж &ndash; процедура досить тривала і доступна далеко не завжди, хоча б тому, що сеанси масажу проводяться у певний час, а не тоді, коли захворіло плече, простягло шию або просто болить голова.</p>\r\n<p>Подушка масажер підійде для офісних працівників і всіх, хто веде сидячий спосіб життя та відчуває втому або різні м'язові болі. Ортопедичний масаж &ndash; відмінна профілактика багатьох захворювань. Масажна подушка створена для зняття втоми, напруги з шиї, спини. При тривалому сидінні за кермом м'язи атрофуються, стають м'якими і затікають через одне становище. Найбільша напруга відчувається в шиї, а далі в попереку.</p>\r\n<p>Використовувати подушку можна для масажу не лише шиї та плечей, а й спини, області тазу, стоп чи рук. На відміну від спеціалізованого приладу, наприклад масажера-коміра, форма подушки робить її універсальною. Пристрій однаково добре функціонує і горизонтальному, і вертикальному положенні. Керується апаратом пультом або за допомогою кнопок, розташованих на його поверхні. Даний масажер має особливу анатомічну форму та вигини, які дозволяють благотворно впливати на основні точки на шиї, спині. Центральна нервова система розслабляється і знімає напругу з основних точок.</p>\r\n<p><strong>Комплектація:</strong></p>\r\n<ul>\r\n<li>1 х Масажна подушка Car and Home Massage Pillow 8028;</li>\r\n<li>1 х Адаптер живлення від мережі;</li>\r\n<li>1 х Адаптер автомобільний;</li>\r\n<li>1 х Інструкція;</li>\r\n<li>1 х Упаковка</li>\r\n</ul>\r\n</div>\r\n</div>",Автотовари,Масажери
+"Настольный бокс для хранения косметики с выдвижными ящиками и зеркалом органайзер",ws30483,"<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p><strong>Бокс для хранения косметики с зеркалом UKC 7009</strong></p>\r\n<p>Женщина должна быть прекрасной! &ndash; это истина, которую знают все. Красота эта в значительной степени определяется множеством косметических средств. Помада, тушь для ресниц, лаки для ногтей, средства по уходу за зубами и волосами, духи, ватные шарики, лосьоны, разные украшения &mdash; всего не перечислить. Разумеется, всё это можно приобрести, но где хранить это богатство?</p>\r\n<p>Органайзеры помогут Вам не только сэкономить время на поиски нужных баночек, кисточек и тюбиков, но и сохранить порядок и чистоту на туалетном столике, на столешнице в ванной, на комоде, на подоконнике и на других открытых поверхностях.</p>\r\n<ul>\r\n<li>Пространство и экономия времени: Забудьте рыться в сумке для поиска нужного средства макияжа.</li>\r\n<li>Держите косметические продукты или ювелирные изделия всегда под рукой.</li>\r\n<li>Идеально подходит для отображения на вашем туалетном столике или в вашей ванной комнате.</li>\r\n<li>Прозрачный дизайн позволяет легко увидеть содержимое.</li>\r\n<li>Избавьтесь от беспорядка и беспорядка на вашем столе</li>\r\n</ul>\r\n<p><strong>Характеристики:</strong></p>\r\n<ul>\r\n<li>3 вместительные открытые ячейки;</li>\r\n<li>1 выдвижной ящичек;</li>\r\n<li>Размеры: 20.5 x 15.5 x 28.5 см;</li>\r\n<li>Вес 1 кг.</li>\r\n<li>Комплектация:</li>\r\n<li>Органайзер с зеркалом;</li>\r\n<li>Упаковка.</li>\r\n</ul>\r\n</div>\r\n</div>",291,399,outofstock,"https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/xed32.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/weqxe2.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/rx2zr32.jpg,https://www.websklad.biz.ua/wp-content/uploads/2020/09/wcxzwd2.jpg","Красота и здоровье",Органайзеры,"Настільний бокс для зберігання косметики з висувними ящиками і дзеркалом органайзер","<div class=""n2-header"">\r\n<div class=""n2-pol-top"">\r\n<p><strong>Бокс для зберігання косметики із дзеркалом UKC 7009</strong></p>\r\n<p>Жінка має бути прекрасною! &ndash; це істина, яку знають усі. Краса ця значною мірою визначається безліччю косметичних засобів. Помада, туш для вій, лаки для нігтів, засоби для догляду за зубами та волоссям, парфуми, ватяні кульки, лосьйони, різні прикраси &mdash; всього не перерахувати. Зрозуміло, все це можна придбати, але де зберігати це багатство?</p>\r\n<p>Органайзери допоможуть Вам не тільки заощадити час на пошуки потрібних баночок, пензликів та тюбиків, але й зберегти порядок та чистоту на туалетному столику, на стільниці у ванній, на комоді, на підвіконні та на інших відкритих поверхнях.</p>\r\n<ul>\r\n<li>Простір та економія часу: Забудьте ритися у сумці для пошуку потрібного засобу макіяжу.</li>\r\n<li>Тримайте косметичні продукти або ювелірні вироби завжди під рукою.</li>\r\n<li>Ідеально підходить для відображення на вашому туалетному столику або у ванній кімнаті.</li>\r\n<li>Прозорий дизайн дозволяє легко побачити вміст.</li>\r\n<li>Позбавтеся безладу та безладдя на вашому столі</li>\r\n</ul>\r\n<p><strong>Характеристики:</strong></p>\r\n<ul>\r\n<li>3 місткі відкриті осередки;</li>\r\n<li>1 висувна скринька;</li>\r\n<li>Розміри: 20.5 x 15.5 x 28.5 см;</li>\r\n<li>Вага 1 кг.</li>\r\n<li>Комплектація:</li>\r\n<li>Органайзер із дзеркалом;</li>\r\n<li>Упаковка.</li>\r\n</ul>\r\n</div>\r\n</div>","Краса і здоров'я",Органайзери`;
+    
+    // --- парсинг CSV с учётом кавычек, переносов строк внутри полей ---
+    function parseCSV(csvText) {
+        const rows = [];
+        let currentRow = [];
+        let currentField = '';
+        let inQuotes = false;
+        let i = 0;
+        const len = csvText.length;
+        while (i < len) {
+            const ch = csvText[i];
+            if (ch === '"') {
+                if (inQuotes && csvText[i+1] === '"') {
+                    currentField += '"';
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
                 }
+            } else if (ch === ',' && !inQuotes) {
+                currentRow.push(currentField.trim());
+                currentField = '';
+            } else if ((ch === '\n' || (ch === '\r' && csvText[i+1] === '\n')) && !inQuotes) {
+                if (ch === '\r') i++;
+                currentRow.push(currentField.trim());
+                if (currentRow.length > 1 || currentRow[0] !== '') rows.push(currentRow);
+                currentRow = [];
+                currentField = '';
+            } else {
+                currentField += ch;
             }
-            if (candidates.length) offerNodes = candidates;
+            i++;
         }
-        
-        const productList = [];
-        for (let i = 0; i < offerNodes.length; i++) {
-            const node = offerNodes[i];
-            // ID
-            let id = node.getAttribute('id');
-            if (!id) {
-                const idNode = node.querySelector('id, offerId, productId, article, vendorCode');
-                if (idNode) id = idNode.textContent.trim();
-                else id = `xml_${i + 1}_${Date.now()}_${Math.random()}`;
-            }
-            
-            // Название
-            let name = '';
-            const nameNode = node.querySelector('name, Name, title, productName, model, fullname');
-            if (nameNode) name = nameNode.textContent.trim();
-            else name = `Товар ${i+1}`;
-            
-            // Цена (ищем в разных местах)
-            let price = 0;
-            const priceNode = node.querySelector('price, Price, amount, retailPrice, purchasePrice');
-            if (priceNode) {
-                let raw = priceNode.textContent.trim().replace(/[^0-9.,]/g, '').replace(',', '.');
-                price = parseFloat(raw);
-                if (isNaN(price)) price = 0;
-            }
-            if (price === 0 && node.getAttribute('price')) price = parseFloat(node.getAttribute('price'));
-            
-            // Изображение
-            let image = '';
-            const imgNode = node.querySelector('picture, image, img, gallery img, mainImage, url');
-            if (imgNode) {
-                let imgUrl = imgNode.textContent.trim();
-                if (imgUrl && !imgUrl.startsWith('http')) imgUrl = 'https://via.placeholder.com/300x220?text=Фото+товара';
-                image = imgUrl;
-            }
-            if (!image) image = `https://picsum.photos/300/220?random=${i}`;
-            
-            // Описание
-            let desc = '';
-            const descNode = node.querySelector('description, desc, shortDescription, fullDescription, annotation');
-            if (descNode) desc = descNode.textContent.trim().substring(0, 140);
-            if (!desc) desc = 'Товар напрямую от поставщика. Уточняйте детали при заказе.';
-            
-            // Поставщик
-            let supplier = 'Поставщик: websklad.biz.ua';
-            const vendorNode = node.querySelector('vendor, brand, manufacturer, maker');
-            if (vendorNode) supplier = `Поставщик: ${vendorNode.textContent.trim()}`;
-            
-            if (price > 0 || productList.length === 0) { // добавляем даже если цена 0, но лучше фильтровать
-                productList.push({
-                    id: String(id),
-                    name: name,
-                    price: price,
-                    image: image,
-                    desc: desc,
-                    supplier: supplier
-                });
-            }
+        if (currentField || currentRow.length) {
+            currentRow.push(currentField.trim());
+            if (currentRow.length > 1 || currentRow[0] !== '') rows.push(currentRow);
         }
-        
-        // Если после парсинга нет товаров — выбросим ошибку
-        if (productList.length === 0) throw new Error('В XML не найдено ни одного товара с ценой и названием');
-        return productList;
+        if (rows.length === 0) return [];
+        const headers = rows[0].map(h => h.replace(/^"|"$/g, '').trim());
+        const products = [];
+        for (let i=1; i<rows.length; i++) {
+            const obj = {};
+            for (let j=0; j<headers.length; j++) {
+                let val = rows[i][j] || '';
+                val = val.replace(/^"|"$/g, '');
+                obj[headers[j]] = val;
+            }
+            if (obj["Название товара"] && obj["Артикул"]) products.push(obj);
+        }
+        return products;
     }
     
-    // ---------- ЗАГРУЗКА XML ЧЕРЕЗ ПРОКСИ ----------
-    async function loadAndImportXML() {
-        // Показываем индикатор загрузки с конкретным сообщением об импорте
-        productsGrid.innerHTML = `
-            <div class="loader-container">
-                <i class="fas fa-spinner fa-pulse fa-2x"></i>
-                <span>📡 Импорт данных из XML-фида...</span>
-                <small>${XML_URL}</small>
-            </div>
-        `;
-        
-        try {
-            const proxyUrl = CORS_PROXY + encodeURIComponent(XML_URL);
-            const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error(`HTTP ${response.status} — не удалось загрузить файл`);
-            const data = await response.json();
-            if (!data.contents) throw new Error('Прокси не вернул содержимое');
-            
-            const parsed = parseXMLToProducts(data.contents);
-            products = parsed;
-            
-            // Очищаем корзину, так как ID товаров могут измениться
-            if (cart.length > 0) {
-                cart = [];
-                saveCart();
-                updateCartUI();
-                updateCartBadge();
-            }
-            
-            renderProductsGrid();
-            showToast(`✅ Импорт завершён! Загружено ${products.length} товаров.`, 3000);
-        } catch (err) {
-            console.error('Ошибка импорта:', err);
-            productsGrid.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem;"></i>
-                    <p style="margin: 1rem 0;"><strong>Не удалось импортировать товары из XML.</strong><br>${err.message}</p>
-                    <p style="font-size: 0.85rem;">Возможные причины: недоступен источник, проблемы CORS или неверная структура XML.</p>
-                    <button class="retry-btn" id="retryImportBtn"><i class="fas fa-sync-alt"></i> Повторить импорт</button>
-                </div>
-            `;
-            const retryBtn = document.getElementById('retryImportBtn');
-            if (retryBtn) retryBtn.addEventListener('click', () => loadAndImportXML());
-            // Временно показываем демо-товары, чтобы магазин не пустовал (но с пометкой)
-            setFallbackDemoProducts();
-            renderProductsGrid();
-        }
-    }
+    let allProducts = [];
+    let currentProducts = [];
     
-    // Резервные товары на случай, если XML не загрузился (чтобы сайт не был пустым)
-    function setFallbackDemoProducts() {
-        if (products.length === 0) {
-            products = [
-                { id: "demo1", name: "📦 Демо-товар (XML временно недоступен)", price: 1990, image: "https://picsum.photos/id/13/300/220", desc: "Это демонстрационная карточка. Как только XML-фид станет доступен, товары обновятся автоматически.", supplier: "Резервный источник" },
-                { id: "demo2", name: "🔄 Повторите импорт", price: 0, image: "https://picsum.photos/id/26/300/220", desc: "Нажмите кнопку 'Повторить импорт' для загрузки реальных товаров из вашего XML-фида.", supplier: "Инструкция" }
-            ];
-        }
-    }
+    // элементы DOM
+    const grid = document.getElementById('productsGrid');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const availabilityFilter = document.getElementById('availabilityFilter');
+    const sortPriceBtn = document.getElementById('sortPriceBtn');
+    const resetBtn = document.getElementById('resetFiltersBtn');
+    const statsSpan = document.getElementById('stats-counter');
     
-    // ---------- ОТОБРАЖЕНИЕ ТОВАРОВ В СЕТКЕ ----------
-    function renderProductsGrid() {
-        if (!productsGrid) return;
-        if (products.length === 0) {
-            productsGrid.innerHTML = `<div class="loader-container">Товары не найдены. Попробуйте обновить страницу.</div>`;
-            return;
-        }
-        
-        productsGrid.innerHTML = '';
-        products.forEach(product => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <img class="product-img" src="${product.image}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.src='https://picsum.photos/300/220?random=fallback'">
-                <div class="product-info">
-                    <div class="product-title">${escapeHtml(product.name)}</div>
-                    <div class="product-desc">${escapeHtml(product.desc)}</div>
-                    <div class="supplier-badge"><i class="fas fa-shipping-fast"></i> ${escapeHtml(product.supplier)}</div>
-                    <div class="price-row">
-                        <span class="price">${Math.round(product.price).toLocaleString()} ₽</span>
-                        <button class="add-to-cart" data-id="${product.id}"><i class="fas fa-cart-plus"></i> В корзину</button>
-                    </div>
-                </div>
-            `;
-            productsGrid.appendChild(card);
+    let sortAscending = true;
+    
+    function updateCategories(products) {
+        const cats = new Set();
+        products.forEach(p => {
+            if (p["Категории товара"]) cats.add(p["Категории товара"]);
         });
-        
-        // Добавляем события на кнопки "В корзину"
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = btn.getAttribute('data-id');
-                addToCart(id, 1);
-            });
+        const sorted = Array.from(cats).sort();
+        categoryFilter.innerHTML = '<option value="all">Все категории</option>';
+        sorted.forEach(c => {
+            categoryFilter.innerHTML += `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`;
         });
     }
     
@@ -640,210 +357,129 @@
             if (m === '<') return '&lt;';
             if (m === '>') return '&gt;';
             return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
         });
     }
     
-    // ---------- КОРЗИНА (LOCALSTORAGE) ----------
-    function saveCart() {
-        localStorage.setItem('dropshop_cart_v2', JSON.stringify(cart));
-    }
-    
-    function loadCart() {
-        const saved = localStorage.getItem('dropshop_cart_v2');
-        if (saved) {
-            try {
-                cart = JSON.parse(saved);
-                cart = cart.filter(item => item.quantity > 0);
-            } catch(e) { cart = []; }
-        } else {
-            cart = [];
-        }
-        updateCartUI();
-        updateCartBadge();
-    }
-    
-    function getTotalItems() {
-        return cart.reduce((sum, item) => sum + item.quantity, 0);
-    }
-    
-    function updateCartBadge() {
-        cartCountBadge.textContent = getTotalItems();
-    }
-    
-    function getProductById(id) {
-        return products.find(p => p.id == id);
-    }
-    
-    function addToCart(productId, quantity = 1) {
-        const product = getProductById(productId);
-        if (!product) {
-            showToast('❌ Товар не найден в каталоге', 1500);
-            return;
-        }
-        const existing = cart.find(item => item.id == productId);
-        if (existing) {
-            existing.quantity += quantity;
-        } else {
-            cart.push({ id: productId, quantity: quantity });
-        }
-        saveCart();
-        updateCartUI();
-        updateCartBadge();
-        showToast(`➕ ${product.name} добавлен в корзину`, 1800);
-    }
-    
-    function updateQuantity(productId, newQuantity) {
-        if (newQuantity <= 0) {
-            cart = cart.filter(item => item.id != productId);
-        } else {
-            const item = cart.find(item => item.id == productId);
-            if (item) item.quantity = newQuantity;
-        }
-        saveCart();
-        updateCartUI();
-        updateCartBadge();
-    }
-    
-    function removeItem(productId) {
-        cart = cart.filter(item => item.id != productId);
-        saveCart();
-        updateCartUI();
-        updateCartBadge();
-        showToast('🗑 Товар удалён');
-    }
-    
-    function getCartTotal() {
-        return cart.reduce((sum, item) => {
-            const prod = getProductById(item.id);
-            return sum + (prod ? prod.price * item.quantity : 0);
-        }, 0);
-    }
-    
-    function renderCartItems() {
-        if (!cartItemsList) return;
-        if (cart.length === 0) {
-            cartItemsList.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-box-open"></i> Корзина пуста</div>`;
+    function renderProducts(productsArray) {
+        if (!productsArray.length) {
+            grid.innerHTML = '<div class="no-results">😕 Ничего не найдено. Попробуйте изменить фильтры.</div>';
+            statsSpan.innerText = `Товаров: 0`;
             return;
         }
         let html = '';
-        cart.forEach(item => {
-            const product = getProductById(item.id);
-            if (!product) return;
+        for (let p of productsArray) {
+            const title = p["Название товара"] || 'Без названия';
+            const art = p["Артикул"] || '';
+            const category = p["Категории товара"] || 'Разное';
+            const price = p["Рекомендовання розничная цена"] || '0';
+            const partnerPrice = p["Дроп цена для партнера"] || '0';
+            const stock = p["Наличие"] || 'outofstock';
+            const images = p["Изображения"] || '';
+            const firstImg = images.split(',')[0] || 'https://placehold.co/300x200?text=Нет+фото';
+            const stockText = stock === 'instock' ? 'В наличии' : 'Нет в наличии';
+            const stockClass = stock === 'instock' ? 'in-stock' : 'out-stock';
             html += `
-                <div class="cart-item" data-id="${item.id}">
-                    <img class="cart-item-img" src="${product.image}" alt="${product.name}">
-                    <div class="cart-item-details">
-                        <div class="cart-item-title">${escapeHtml(product.name)}</div>
-                        <div class="cart-item-price">${Math.round(product.price).toLocaleString()} ₽</div>
-                        <div class="cart-qty-control">
-                            <button class="cart-qty-dec" data-id="${item.id}">−</button>
-                            <span style="min-width:28px; text-align:center;">${item.quantity}</span>
-                            <button class="cart-qty-inc" data-id="${item.id}">+</button>
-                            <button class="cart-item-remove" data-id="${item.id}"><i class="fas fa-trash-alt"></i></button>
+                <div class="product-card">
+                    <div class="img-wrapper">
+                        <img class="product-img" src="${escapeHtml(firstImg)}" loading="lazy" alt="${escapeHtml(title)}" onerror="this.src='https://placehold.co/300x200?text=Фото+недоступно'">
+                    </div>
+                    <div class="product-info">
+                        <div class="product-category">${escapeHtml(category)}</div>
+                        <div class="product-title">${escapeHtml(title)} <span style="font-weight:normal; color:#6c7a91;"> (${escapeHtml(art)})</span></div>
+                        <div class="price-row">
+                            <span class="price">${Number(price).toLocaleString()} ₴</span>
+                            <span class="old-price">Дроп: ${Number(partnerPrice).toLocaleString()} ₴</span>
                         </div>
+                        <div class="stock ${stockClass}">${stockText}</div>
+                        <button class="btn-detail" data-art="${escapeHtml(art)}">📋 Подробнее</button>
                     </div>
                 </div>
             `;
-        });
-        cartItemsList.innerHTML = html;
-        
-        document.querySelectorAll('.cart-qty-dec').forEach(btn => {
-            btn.removeEventListener('click', handleDec);
-            btn.addEventListener('click', handleDec);
-        });
-        document.querySelectorAll('.cart-qty-inc').forEach(btn => {
-            btn.removeEventListener('click', handleInc);
-            btn.addEventListener('click', handleInc);
-        });
-        document.querySelectorAll('.cart-item-remove').forEach(btn => {
-            btn.removeEventListener('click', handleRemove);
-            btn.addEventListener('click', handleRemove);
-        });
-    }
-    
-    function handleDec(e) {
-        const id = e.currentTarget.getAttribute('data-id');
-        const item = cart.find(i => i.id == id);
-        if (item) updateQuantity(id, item.quantity - 1);
-    }
-    function handleInc(e) {
-        const id = e.currentTarget.getAttribute('data-id');
-        const item = cart.find(i => i.id == id);
-        if (item) updateQuantity(id, item.quantity + 1);
-    }
-    function handleRemove(e) {
-        const id = e.currentTarget.getAttribute('data-id');
-        removeItem(id);
-    }
-    
-    function updateCartTotalPrice() {
-        if (cartTotalSpan) cartTotalSpan.innerText = getCartTotal().toLocaleString() + ' ₽';
-    }
-    
-    function updateCartUI() {
-        renderCartItems();
-        updateCartTotalPrice();
-    }
-    
-    // ---------- ОФОРМЛЕНИЕ ЗАКАЗА (ДРОПШИППИНГ) ----------
-    async function onCheckout() {
-        const name = document.getElementById('customerName').value.trim();
-        const email = document.getElementById('customerEmail').value.trim();
-        const phone = document.getElementById('customerPhone').value.trim();
-        const address = document.getElementById('customerAddress').value.trim();
-        if (!name || !email || !phone || !address) {
-            showToast('❌ Заполните все поля для заказа', 2500);
-            return;
         }
-        if (!email.includes('@')) {
-            showToast('❌ Введите корректный email', 2000);
-            return;
-        }
-        if (cart.length === 0) {
-            showToast('🛒 Корзина пуста', 2000);
-            return;
-        }
-        showToast('⏳ Оформление заказа...', 1500);
-        // Имитация отправки заказа поставщикам (дропшиппинг)
-        setTimeout(() => {
-            const orderId = 'DS-' + Math.floor(Math.random() * 1000000);
-            cart = [];
-            saveCart();
-            updateCartUI();
-            updateCartBadge();
-            closeCartSidebar();
-            document.getElementById('customerName').value = '';
-            document.getElementById('customerEmail').value = '';
-            document.getElementById('customerPhone').value = '';
-            document.getElementById('customerAddress').value = '';
-            showToast(`🎉 Заказ №${orderId} оформлен! Товары будут отправлены напрямую от поставщиков (дропшиппинг).`, 5000);
-        }, 600);
-    }
-    
-    function openCartSidebar() {
-        cartOverlay.classList.add('open');
-        cartSidebar.classList.add('open');
-        updateCartUI();
-    }
-    function closeCartSidebar() {
-        cartOverlay.classList.remove('open');
-        cartSidebar.classList.remove('open');
-    }
-    
-    // ---------- ИНИЦИАЛИЗАЦИЯ ----------
-    function init() {
-        loadCart();
-        openCartBtn.addEventListener('click', openCartSidebar);
-        closeCartBtn.addEventListener('click', closeCartSidebar);
-        cartOverlay.addEventListener('click', (e) => {
-            if (e.target === cartOverlay) closeCartSidebar();
+        grid.innerHTML = html;
+        statsSpan.innerText = `Товаров: ${productsArray.length}`;
+        document.querySelectorAll('.btn-detail').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const artCode = btn.getAttribute('data-art');
+                const product = allProducts.find(p => p["Артикул"] === artCode);
+                if (product) {
+                    alert(`📦 ${product["Название товара"]}\nАртикул: ${product["Артикул"]}\nКатегория: ${product["Категории товара"]}\nЦена: ${product["Рекомендовання розничная цена"]} грн\nДроп-цена: ${product["Дроп цена для партнера"]} грн\nНаличие: ${product["Наличие"] === 'instock' ? 'В наличии' : 'Нет в наличии'}`);
+                } else {
+                    alert("Информация временно недоступна");
+                }
+            });
         });
-        checkoutBtn.addEventListener('click', onCheckout);
-        // ЗАПУСКАЕМ ИМПОРТ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
-        loadAndImportXML();
     }
     
-    init();
+    function filterAndSort() {
+        let filtered = [...allProducts];
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        if (searchTerm) {
+            filtered = filtered.filter(p => {
+                return (p["Название товара"] || '').toLowerCase().includes(searchTerm) ||
+                       (p["Артикул"] || '').toLowerCase().includes(searchTerm) ||
+                       (p["Категории товара"] || '').toLowerCase().includes(searchTerm);
+            });
+        }
+        const catValue = categoryFilter.value;
+        if (catValue !== 'all') {
+            filtered = filtered.filter(p => (p["Категории товара"] || '') === catValue);
+        }
+        const avail = availabilityFilter.value;
+        if (avail !== 'all') {
+            filtered = filtered.filter(p => p["Наличие"] === avail);
+        }
+        if (sortPriceBtn.getAttribute('data-active') === 'true') {
+            filtered.sort((a,b) => {
+                const priceA = parseFloat(a["Рекомендовання розничная цена"] || 0);
+                const priceB = parseFloat(b["Рекомендовання розничная цена"] || 0);
+                return sortAscending ? priceA - priceB : priceB - priceA;
+            });
+        }
+        currentProducts = filtered;
+        renderProducts(currentProducts);
+    }
+    
+    function resetFilters() {
+        searchInput.value = '';
+        categoryFilter.value = 'all';
+        availabilityFilter.value = 'all';
+        sortPriceBtn.setAttribute('data-active', 'false');
+        sortPriceBtn.style.background = '#f0f4fa';
+        sortAscending = true;
+        filterAndSort();
+    }
+    
+    sortPriceBtn.addEventListener('click', () => {
+        const isActive = sortPriceBtn.getAttribute('data-active') === 'true';
+        if (!isActive) {
+            sortPriceBtn.setAttribute('data-active', 'true');
+            sortAscending = true;
+            sortPriceBtn.style.background = '#e0eaff';
+        } else {
+            sortAscending = !sortAscending;
+        }
+        filterAndSort();
+    });
+    
+    searchInput.addEventListener('input', filterAndSort);
+    categoryFilter.addEventListener('change', filterAndSort);
+    availabilityFilter.addEventListener('change', filterAndSort);
+    resetBtn.addEventListener('click', resetFilters);
+    
+    try {
+        allProducts = parseCSV(csvRawData);
+        if (allProducts.length === 0) throw new Error("Нет данных");
+        updateCategories(allProducts);
+        currentProducts = [...allProducts];
+        renderProducts(currentProducts);
+    } catch(e) {
+        console.error(e);
+        grid.innerHTML = '<div class="no-results">⚠️ Ошибка загрузки данных. Проверьте CSV.</div>';
+        statsSpan.innerText = 'Ошибка';
+    }
 </script>
 </body>
 </html>
