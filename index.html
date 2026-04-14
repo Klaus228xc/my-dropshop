@@ -2,658 +2,170 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>UADrop Store - Вітрина товарів</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UADrop Store</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-            background: #0f172a;
-            color: #f1f5f9;
-            padding-bottom: 90px;
-        }
-
-        header {
-            background: #1e293b;
-            padding: 18px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            border-bottom: 3px solid #38bdf8;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-        }
-
-        .logo span {
-            color: #38bdf8;
-            background: #0f172a;
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
-
-        #searchInput {
-            padding: 12px 18px;
-            border-radius: 40px;
-            border: none;
-            width: 280px;
-            font-size: 1rem;
-            background: #0f172a;
-            color: white;
-            border: 1px solid #334155;
-            transition: 0.2s;
-        }
-
-        #searchInput:focus {
-            outline: none;
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 2px rgba(56,189,248,0.3);
-        }
-
-        #searchInput::placeholder {
-            color: #94a3b8;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 24px;
-            padding: 28px 24px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .card {
-            background: #1e293b;
-            border-radius: 20px;
-            overflow: hidden;
-            transition: all 0.25s ease;
-            border: 1px solid #334155;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .card:hover {
-            transform: translateY(-6px);
-            border-color: #38bdf8;
-            box-shadow: 0 12px 24px rgba(56,189,248,0.15);
-        }
-
-        .card img {
-            width: 100%;
-            height: 220px;
-            object-fit: contain;
-            background: #ffffff;
-            padding: 12px;
-            transition: 0.2s;
-        }
-
-        .card h3 {
-            font-size: 1rem;
-            padding: 12px 14px 4px 14px;
-            font-weight: 600;
-            line-height: 1.4;
-            min-height: 64px;
-            color: #f1f5f9;
-        }
-
-        .price {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #38bdf8;
-            padding: 6px 14px;
-            margin: 6px 0;
-        }
-
-        .buy-btn {
-            background: #38bdf8;
-            border: none;
-            padding: 12px;
-            margin: 12px 14px 16px 14px;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 1rem;
-            cursor: pointer;
-            color: #0f172a;
-            transition: 0.2s;
-            margin-top: auto;
-        }
-
-        .buy-btn:hover {
-            background: #0ea5e9;
-            transform: scale(1.02);
-        }
-
-        #cartToggle {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: #38bdf8;
-            width: 68px;
-            height: 68px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            z-index: 200;
-            color: #0f172a;
-            font-size: 28px;
-            font-weight: bold;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-            transition: 0.2s;
-            gap: 6px;
-        }
-
-        #cartToggle:hover {
-            transform: scale(1.08);
-            background: #0ea5e9;
-        }
-
-        #cartCountGlobal {
-            background: #ef4444;
-            color: white;
-            border-radius: 30px;
-            padding: 2px 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            min-width: 26px;
-            text-align: center;
-        }
-
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(4px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal.hidden {
-            display: none;
-        }
-
-        .modal-content {
-            background: #1e293b;
-            padding: 24px;
-            border-radius: 28px;
-            width: 92%;
-            max-width: 480px;
-            max-height: 88vh;
-            overflow-y: auto;
-            border: 1px solid #38bdf8;
-        }
-
-        .modal-content h2 {
-            font-size: 1.8rem;
-            margin-bottom: 16px;
-            color: #38bdf8;
-        }
-
-        #cartItemsList {
-            max-height: 280px;
-            overflow-y: auto;
-            margin: 16px 0;
-            background: #0f172a;
-            border-radius: 20px;
-            padding: 8px;
-        }
-
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 8px;
-            border-bottom: 1px solid #334155;
-            gap: 12px;
-        }
-
-        .cart-item-name {
-            font-size: 0.85rem;
-            flex: 2;
-        }
-
-        .cart-item-price {
-            font-weight: bold;
-            color: #38bdf8;
-            min-width: 70px;
-            text-align: right;
-        }
-
-        .remove-item {
-            background: #dc2626;
-            border: none;
-            color: white;
-            border-radius: 30px;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.2s;
-        }
-
-        .remove-item:hover {
-            background: #b91c1c;
-        }
-
-        .total {
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: right;
-            margin: 16px 0;
-            padding-top: 12px;
-            border-top: 2px solid #38bdf8;
-        }
-
-        .order-form input {
-            width: 100%;
-            padding: 12px 14px;
-            margin: 8px 0;
-            border-radius: 40px;
-            border: 1px solid #334155;
-            background: #0f172a;
-            color: white;
-            font-size: 0.95rem;
-        }
-
-        .order-form input:focus {
-            outline: none;
-            border-color: #38bdf8;
-        }
-
-        .checkout-btn {
-            background: #25D366;
-            color: black;
-            font-weight: bold;
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 40px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            margin: 12px 0 8px;
-        }
-
-        .close-btn {
-            background: #475569;
-            color: white;
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 40px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .empty-cart {
-            text-align: center;
-            padding: 30px;
-            color: #94a3b8;
-        }
-
-        .loading {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px;
-            font-size: 1.3rem;
-            color: #38bdf8;
-        }
-
-        .error-msg {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 50px;
-            color: #f87171;
-            background: #1e293b;
-            border-radius: 32px;
-            margin: 20px;
-        }
-
-        @media (max-width: 640px) {
-            .grid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-                gap: 14px;
-                padding: 16px;
-            }
-            header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            #searchInput {
-                width: 100%;
-            }
-            .logo {
-                text-align: center;
-            }
-        }
-
-        .toast-msg {
-            position: fixed;
-            bottom: 110px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1e293b;
-            color: #38bdf8;
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-weight: bold;
-            z-index: 1100;
-            box-shadow: 0 4px 12px black;
-            border-left: 4px solid #38bdf8;
-            pointer-events: none;
-            animation: fadeSlide 2s ease forwards;
-        }
-
-        @keyframes fadeSlide {
-            0% { opacity: 0; bottom: 80px; }
-            15% { opacity: 1; bottom: 110px; }
-            85% { opacity: 1; bottom: 110px; }
-            100% { opacity: 0; bottom: 140px; visibility: hidden; }
-        }
+        /* Тут ваші стилі (як у попередніх повідомленнях) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0f172a; color: white; font-family: system-ui; padding-bottom: 90px; }
+        header { background: #1e293b; padding: 18px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; border-bottom: 3px solid #38bdf8; }
+        .logo { font-size: 1.8rem; font-weight: 800; }
+        .logo span { color: #38bdf8; }
+        #searchInput { padding: 12px 18px; border-radius: 40px; border: none; width: 280px; background: #0f172a; color: white; border: 1px solid #334155; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; padding: 28px 24px; max-width: 1400px; margin: 0 auto; }
+        .card { background: #1e293b; border-radius: 20px; border: 1px solid #334155; transition: 0.2s; }
+        .card:hover { transform: translateY(-6px); border-color: #38bdf8; }
+        .card img { width: 100%; height: 220px; object-fit: contain; background: white; padding: 12px; }
+        .card h3 { padding: 12px 14px 4px; font-size: 1rem; }
+        .price { font-size: 1.6rem; font-weight: 800; color: #38bdf8; padding: 6px 14px; }
+        .buy-btn { background: #38bdf8; border: none; padding: 12px; margin: 12px 14px 16px; border-radius: 40px; font-weight: bold; cursor: pointer; width: calc(100% - 28px); }
+        #cartToggle { position: fixed; bottom: 24px; right: 24px; background: #38bdf8; width: 68px; height: 68px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 200; gap: 6px; }
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        .modal.hidden { display: none; }
+        .modal-content { background: #1e293b; padding: 24px; border-radius: 28px; width: 92%; max-width: 480px; max-height: 88vh; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; padding: 12px 8px; border-bottom: 1px solid #334155; }
+        .remove-item { background: #dc2626; border: none; color: white; border-radius: 30px; width: 30px; height: 30px; cursor: pointer; }
+        .total { font-size: 1.5rem; text-align: right; margin: 16px 0; border-top: 2px solid #38bdf8; padding-top: 12px; }
+        .order-form input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 40px; border: 1px solid #334155; background: #0f172a; color: white; }
+        .checkout-btn { background: #25D366; color: black; width: 100%; padding: 14px; border-radius: 40px; margin: 12px 0 8px; font-weight: bold; cursor: pointer; }
+        .close-btn { background: #475569; color: white; width: 100%; padding: 12px; border-radius: 40px; cursor: pointer; }
+        .loading, .error-msg { text-align: center; padding: 60px; }
+        .error-msg { color: #f87171; }
+        @media (max-width: 640px) { .grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); } }
     </style>
 </head>
 <body>
     <header>
         <div class="logo">UA<span>Drop</span></div>
-        <input type="text" id="searchInput" placeholder="Пошук товарів..." autocomplete="off">
+        <input type="text" id="searchInput" placeholder="Пошук товарів...">
     </header>
-
-    <main id="products" class="grid">
-        <div class="loading">🔄 Завантаження вітрини...</div>
-    </main>
-
-    <div id="cartToggle">
-        🛒 <span id="cartCountGlobal">0</span>
-    </div>
-
+    <main id="products" class="grid"><div class="loading">Завантаження...</div></main>
+    <div id="cartToggle">🛒 <span id="cartCountGlobal">0</span></div>
     <div id="cartModal" class="modal hidden">
         <div class="modal-content">
-            <h2>🛍️ Твоє замовлення</h2>
-            <div id="cartItemsList" class="cart-items-list"></div>
-            <div class="total">💰 Разом: <span id="cartTotalSum">0</span> грн</div>
-            <hr style="border-color:#334155; margin: 8px 0;">
+            <h2>Кошик</h2>
+            <div id="cartItemsList"></div>
+            <div class="total">Разом: <span id="cartTotalSum">0</span> грн</div>
             <div class="order-form">
-                <input type="text" id="orderName" placeholder="Прізвище та Ім'я">
-                <input type="tel" id="orderPhone" placeholder="Номер телефону">
-                <input type="text" id="orderCity" placeholder="Місто доставки">
-                <input type="text" id="orderPost" placeholder="№ Відділення Нової Пошти">
+                <input type="text" id="orderName" placeholder="ПІБ">
+                <input type="tel" id="orderPhone" placeholder="Телефон">
+                <input type="text" id="orderCity" placeholder="Місто">
+                <input type="text" id="orderPost" placeholder="№ відділення НП">
             </div>
-            <button onclick="checkoutOrder()" class="checkout-btn">📲 Оформити замовлення (WhatsApp)</button>
-            <button onclick="toggleCartModal()" class="close-btn">🔙 Повернутись</button>
+            <button onclick="checkoutOrder()" class="checkout-btn">Оформити WhatsApp</button>
+            <button onclick="toggleCartModal()" class="close-btn">Закрити</button>
         </div>
     </div>
-
     <script>
-        // ---------- НАЛАШТУВАННЯ (ЗМІНІТЬ ТЕЛЕФОН) ----------
-        const XML_URL = "https://websklad.biz.ua";
-        // ВИКОРИСТОВУЄМО НАДІЙНИЙ ПРОКСІ
-        const PROXY = "https://corsproxy.io/?";
-        const MY_PHONE = "380998261128";   // ⚠️ ЗАМІНІТЬ НА ВАШ НОМЕР (без плюса)
-        const MARGIN = 1.2;                // націнка 20%
-        
+        // ========== КОНФІГ ==========
+        const MY_PHONE = "380XXXXXXXXX"; // ЗАМІНІТЬ НА СВІЙ НОМЕР
         let allProducts = [];
         let cart = [];
-        let searchTimeout = null;
-        
-        // ---------- ЗАВАНТАЖЕННЯ ТА ПАРСИНГ ----------
+
+        // ========== ЗАВАНТАЖЕННЯ ТОВАРІВ З ЛОКАЛЬНОГО JSON ==========
         async function loadProducts() {
-            const container = document.getElementById('products');
-            container.innerHTML = '<div class="loading">⏳ Завантаження асортименту...</div>';
-            
             try {
-                const fullUrl = PROXY + encodeURIComponent(XML_URL);
-                console.log("Запит до:", fullUrl);
-                
-                const response = await fetch(fullUrl);
-                if (!response.ok) throw new Error(`HTTP помилка: ${response.status}`);
-                
-                const rawXml = await response.text();
-                console.log("Отримано перші 300 символів:", rawXml.substring(0, 300));
-                
-                // Перевірка, чи це взагалі XML
-                if (!rawXml.trim().startsWith("<?xml") && !rawXml.includes("<offer")) {
-                    throw new Error("Відповідь не схожа на XML. Можливо, сайт заблоковано або проксі не працює.");
-                }
-                
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(rawXml, "text/xml");
-                
-                // Перевірка на помилку парсингу
-                const parseError = xmlDoc.querySelector("parsererror");
-                if (parseError) {
-                    throw new Error("Помилка розбору XML: " + parseError.textContent);
-                }
-                
-                const offers = xmlDoc.querySelectorAll("offer");
-                if (!offers.length) throw new Error("XML не містить жодного тегу <offer>");
-                
-                allProducts = Array.from(offers).map(offer => {
-                    let priceRaw = parseFloat(offer.querySelector("price")?.textContent || "0");
-                    if (isNaN(priceRaw)) priceRaw = 0;
-                    
-                    let nameRaw = offer.querySelector("name")?.textContent?.trim() || "Товар без назви";
-                    nameRaw = nameRaw.replace(/['"`«»]/g, "").substring(0, 80);
-                    
-                    let imgUrl = offer.querySelector("picture")?.textContent || "";
-                    if (imgUrl && !imgUrl.startsWith("http")) {
-                        imgUrl = "https://websklad.biz.ua" + (imgUrl.startsWith("/") ? imgUrl : "/" + imgUrl);
-                    }
-                    if (!imgUrl) imgUrl = "https://via.placeholder.com/300x300?text=UADrop";
-                    
-                    return {
-                        id: offer.getAttribute("id") || crypto.randomUUID(),
-                        name: nameRaw,
-                        price: Math.round(priceRaw * MARGIN),
-                        picture: imgUrl
-                    };
-                });
-                
-                // Відкидаємо товари з нульовою ціною
-                allProducts = allProducts.filter(p => p.price > 0);
-                console.log(`Завантажено товарів: ${allProducts.length}`);
-                
-                if (allProducts.length === 0) throw new Error("Після фільтрації не залишилось жодного товару.");
-                
+                // СПРОБУЙТЕ ЗАВАНТАЖИТИ JSON (ви маєте його створити)
+                const response = await fetch('products.json');
+                if (!response.ok) throw new Error('Файл products.json не знайдено');
+                const data = await response.json();
+                allProducts = data;
                 renderProducts(allProducts);
-                
-            } catch (error) {
-                console.error("Помилка loadProducts:", error);
-                container.innerHTML = `<div class="error-msg">
-                    ❌ Помилка завантаження вітрини<br>
-                    🔄 Спробуйте оновити сторінку (Ctrl+F5)<br>
-                    <span style="font-size:12px;">${error.message}</span>
+            } catch (err) {
+                document.getElementById('products').innerHTML = `<div class="error-msg">
+                    ❌ Не вдалося завантажити товари.<br>
+                    Переконайтеся, що файл <strong>products.json</strong> існує в корені сайту.
                 </div>`;
+                console.error(err);
             }
         }
-        
-        // ---------- ВІДОБРАЖЕННЯ ТОВАРІВ ----------
-        function renderProducts(productsArray) {
+
+        function renderProducts(products) {
             const container = document.getElementById('products');
-            if (!productsArray.length) {
-                container.innerHTML = '<div class="error-msg" style="color:#facc15;">😞 Нічого не знайдено. Спробуйте інший запит.</div>';
-                return;
-            }
-            
+            if (!products.length) { container.innerHTML = '<div class="error-msg">Товарів немає</div>'; return; }
             container.innerHTML = '';
-            const itemsToShow = productsArray.slice(0, 100);
-            itemsToShow.forEach(product => {
+            products.forEach(p => {
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <img src="${product.picture}" alt="${escapeHtml(product.name)}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=Фото+немає'">
-                    <h3>${escapeHtml(product.name)}</h3>
-                    <div class="price">${product.price.toLocaleString()} ₴</div>
-                    <button class="buy-btn" data-id="${product.id}">➕ В кошик</button>
+                    <img src="${p.picture}" onerror="this.src='https://via.placeholder.com/300'">
+                    <h3>${p.name}</h3>
+                    <div class="price">${p.price} ₴</div>
+                    <button class="buy-btn" data-id="${p.id}">В кошик</button>
                 `;
-                const btn = card.querySelector('.buy-btn');
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    addToCartById(product.id);
-                });
+                card.querySelector('.buy-btn').onclick = () => addToCart(p);
                 container.appendChild(card);
             });
         }
-        
-        // ---------- КОШИК ----------
-        function addToCartById(id) {
-            const product = allProducts.find(p => p.id == id);
-            if (product) {
-                cart.push(product);
-                updateCartBadge();
-                showToast(`✅ ${product.name.substring(0, 45)} додано`);
-            }
+
+        function addToCart(product) {
+            cart.push(product);
+            document.getElementById('cartCountGlobal').innerText = cart.length;
+            showToast(`✅ ${product.name.substring(0, 40)} додано`);
         }
-        
-        function removeCartItem(index) {
-            if (index >= 0 && index < cart.length) {
-                const removed = cart[index];
-                cart.splice(index, 1);
-                updateCartBadge();
-                showToast(`🗑️ ${removed.name.substring(0, 40)} видалено`);
-                if (!document.getElementById('cartModal').classList.contains('hidden')) {
-                    renderCartModalContent();
-                }
-            }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            document.getElementById('cartCountGlobal').innerText = cart.length;
+            if (!document.getElementById('cartModal').classList.contains('hidden')) renderCartModal();
+            showToast(`🗑 Видалено`);
         }
-        
-        function updateCartBadge() {
-            const badge = document.getElementById('cartCountGlobal');
-            if (badge) badge.innerText = cart.length;
-        }
-        
-        function renderCartModalContent() {
-            const listContainer = document.getElementById('cartItemsList');
+
+        function renderCartModal() {
+            const listDiv = document.getElementById('cartItemsList');
             let total = 0;
-            
-            if (cart.length === 0) {
-                listContainer.innerHTML = '<div class="empty-cart">🛒 Кошик порожній</div>';
-                document.getElementById('cartTotalSum').innerText = "0";
-                return;
-            }
-            
-            let html = '';
-            cart.forEach((item, idx) => {
-                total += item.price;
-                html += `
-                    <div class="cart-item">
-                        <span class="cart-item-name">${escapeHtml(item.name)}</span>
-                        <span class="cart-item-price">${item.price} ₴</span>
-                        <button class="remove-item" onclick="removeCartItem(${idx})">✖</button>
-                    </div>
-                `;
-            });
-            listContainer.innerHTML = html;
+            if (!cart.length) { listDiv.innerHTML = '<div class="empty-cart">Кошик порожній</div>'; document.getElementById('cartTotalSum').innerText = '0'; return; }
+            listDiv.innerHTML = cart.map((item, i) => `
+                <div class="cart-item">
+                    <span>${item.name}</span>
+                    <span>${item.price} ₴</span>
+                    <button class="remove-item" onclick="removeFromCart(${i})">✖</button>
+                </div>
+            `).join('');
+            total = cart.reduce((s, i) => s + i.price, 0);
             document.getElementById('cartTotalSum').innerText = total;
         }
-        
-        // ---------- МОДАЛЬНЕ ВІКНО ----------
-        window.toggleCartModal = function() {
+
+        window.toggleCartModal = () => {
             const modal = document.getElementById('cartModal');
-            const isHidden = modal.classList.contains('hidden');
-            if (isHidden) {
-                renderCartModalContent();
+            if (modal.classList.contains('hidden')) {
+                renderCartModal();
                 modal.classList.remove('hidden');
             } else {
                 modal.classList.add('hidden');
             }
         };
-        
-        // ---------- ОФОРМЛЕННЯ ----------
-        window.checkoutOrder = function() {
-            const name = document.getElementById('orderName')?.value.trim();
-            const phone = document.getElementById('orderPhone')?.value.trim();
-            const city = document.getElementById('orderCity')?.value.trim();
-            const post = document.getElementById('orderPost')?.value.trim();
-            
-            if (!name) { alert("Вкажіть прізвище та ім'я"); return; }
-            if (!phone) { alert("Вкажіть номер телефону"); return; }
-            if (!city) { alert("Вкажіть місто доставки"); return; }
-            if (!post) { alert("Вкажіть № відділення Нової Пошти"); return; }
-            if (cart.length === 0) { alert("Додайте товари в кошик"); return; }
-            
-            let totalSum = 0;
-            let itemsList = "";
-            cart.forEach((item, idx) => {
-                totalSum += item.price;
-                itemsList += `${idx+1}. ${item.name.substring(0, 55)} - ${item.price} грн\n`;
-            });
-            
-            const message = `📦 *UADrop НОВЕ ЗАМОВЛЕННЯ* 📦\n\n` +
-                           `👤 *Клієнт:* ${name}\n` +
-                           `📞 *Телефон:* ${phone}\n` +
-                           `🏙️ *Місто:* ${city}\n` +
-                           `🏢 *Відділення НП:* ${post}\n\n` +
-                           `🛒 *Склад замовлення:*\n${itemsList}\n` +
-                           `💵 *Загальна сума:* ${totalSum} грн\n\n` +
-                           `Дякуємо за покупку! 💙`;
-                           
-            const waLink = `https://wa.me/${MY_PHONE}?text=${encodeURIComponent(message)}`;
-            window.open(waLink, '_blank');
+
+        window.checkoutOrder = () => {
+            const name = document.getElementById('orderName').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const city = document.getElementById('orderCity').value.trim();
+            const post = document.getElementById('orderPost').value.trim();
+            if (!name || !phone || !city || !post) return alert('Заповніть всі поля');
+            if (!cart.length) return alert('Кошик порожній');
+            let msg = `📦 ЗАМОВЛЕННЯ\nІм'я: ${name}\nТел: ${phone}\nМісто: ${city}\nВідділення: ${post}\n\nТовари:\n`;
+            cart.forEach((item, i) => msg += `${i+1}. ${item.name} - ${item.price} грн\n`);
+            msg += `\nСума: ${cart.reduce((s,i)=>s+i.price,0)} грн`;
+            window.open(`https://wa.me/${MY_PHONE}?text=${encodeURIComponent(msg)}`, '_blank');
         };
-        
-        // ---------- ПОШУК ----------
-        const searchInput = document.getElementById('searchInput');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                if (searchTimeout) clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    const query = e.target.value.toLowerCase().trim();
-                    if (!query) {
-                        renderProducts(allProducts);
-                        return;
-                    }
-                    const filtered = allProducts.filter(p => p.name.toLowerCase().includes(query));
-                    renderProducts(filtered);
-                }, 350);
-            });
-        }
-        
-        // ---------- ДОПОМІЖНІ ФУНКЦІЇ ----------
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-        
+
+        // Пошук
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase();
+            if (!q) renderProducts(allProducts);
+            else renderProducts(allProducts.filter(p => p.name.toLowerCase().includes(q)));
+        });
+
         function showToast(msg) {
-            let toast = document.querySelector('.toast-msg');
-            if (toast) toast.remove();
-            const div = document.createElement('div');
-            div.className = 'toast-msg';
-            div.innerText = msg;
-            document.body.appendChild(div);
-            setTimeout(() => div.remove(), 2000);
+            let t = document.querySelector('.toast-msg');
+            if (t) t.remove();
+            t = document.createElement('div');
+            t.className = 'toast-msg';
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2000);
         }
-        
-        // Робимо функції глобальними для onclick
-        window.removeCartItem = removeCartItem;
-        window.addToCartById = addToCartById;
-        
-        // ЗАПУСК
+
         loadProducts();
     </script>
 </body>
