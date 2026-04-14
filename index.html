@@ -347,7 +347,6 @@
             }
         }
 
-        /* анімація тосту */
         .toast-msg {
             position: fixed;
             bottom: 110px;
@@ -405,36 +404,48 @@
     </div>
 
     <script>
-        // ---------- НАЛАШТУВАННЯ ----------
+        // ---------- НАЛАШТУВАННЯ (ЗМІНІТЬ ТЕЛЕФОН) ----------
         const XML_URL = "https://websklad.biz.ua";
-        const PROXY = "https://api.allorigins.win/raw?url=";
-        const MY_PHONE = "380XXXXXXXXX";   // ⚠️ ЗАМІНІТЬ НА ВАШ НОМЕР (без плюса)
+        // ВИКОРИСТОВУЄМО НАДІЙНИЙ ПРОКСІ
+        const PROXY = "https://corsproxy.io/?";
+        const MY_PHONE = "380998261128";   // ⚠️ ЗАМІНІТЬ НА ВАШ НОМЕР (без плюса)
         const MARGIN = 1.2;                // націнка 20%
         
         let allProducts = [];
         let cart = [];
         let searchTimeout = null;
         
-        // ---------- ЗАВАНТАЖЕННЯ XML ТА ПАРСИНГ ----------
+        // ---------- ЗАВАНТАЖЕННЯ ТА ПАРСИНГ ----------
         async function loadProducts() {
             const container = document.getElementById('products');
             container.innerHTML = '<div class="loading">⏳ Завантаження асортименту...</div>';
             
             try {
-                const response = await fetch(PROXY + encodeURIComponent(XML_URL));
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const fullUrl = PROXY + encodeURIComponent(XML_URL);
+                console.log("Запит до:", fullUrl);
+                
+                const response = await fetch(fullUrl);
+                if (!response.ok) throw new Error(`HTTP помилка: ${response.status}`);
                 
                 const rawXml = await response.text();
+                console.log("Отримано перші 300 символів:", rawXml.substring(0, 300));
+                
+                // Перевірка, чи це взагалі XML
+                if (!rawXml.trim().startsWith("<?xml") && !rawXml.includes("<offer")) {
+                    throw new Error("Відповідь не схожа на XML. Можливо, сайт заблоковано або проксі не працює.");
+                }
+                
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(rawXml, "text/xml");
                 
-                // перевірка на помилку парсингу
-                if (xmlDoc.querySelector("parsererror")) {
-                    throw new Error("Не вдалося розібрати XML");
+                // Перевірка на помилку парсингу
+                const parseError = xmlDoc.querySelector("parsererror");
+                if (parseError) {
+                    throw new Error("Помилка розбору XML: " + parseError.textContent);
                 }
                 
                 const offers = xmlDoc.querySelectorAll("offer");
-                if (!offers.length) throw new Error("XML не містить товарів");
+                if (!offers.length) throw new Error("XML не містить жодного тегу <offer>");
                 
                 allProducts = Array.from(offers).map(offer => {
                     let priceRaw = parseFloat(offer.querySelector("price")?.textContent || "0");
@@ -457,15 +468,19 @@
                     };
                 });
                 
-                // відфільтруємо нульові ціни (опціонально)
+                // Відкидаємо товари з нульовою ціною
                 allProducts = allProducts.filter(p => p.price > 0);
+                console.log(`Завантажено товарів: ${allProducts.length}`);
+                
+                if (allProducts.length === 0) throw new Error("Після фільтрації не залишилось жодного товару.");
+                
                 renderProducts(allProducts);
                 
             } catch (error) {
-                console.error(error);
+                console.error("Помилка loadProducts:", error);
                 container.innerHTML = `<div class="error-msg">
                     ❌ Помилка завантаження вітрини<br>
-                    🧹 Спробуйте оновити сторінку (Ctrl+F5)<br>
+                    🔄 Спробуйте оновити сторінку (Ctrl+F5)<br>
                     <span style="font-size:12px;">${error.message}</span>
                 </div>`;
             }
@@ -480,7 +495,6 @@
             }
             
             container.innerHTML = '';
-            // показуємо максимум 80 товарів для швидкості, але можна більше
             const itemsToShow = productsArray.slice(0, 100);
             itemsToShow.forEach(product => {
                 const card = document.createElement('div');
@@ -597,7 +611,7 @@
             window.open(waLink, '_blank');
         };
         
-        // ---------- ПОШУК (з затримкою) ----------
+        // ---------- ПОШУК ----------
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
@@ -635,7 +649,7 @@
             setTimeout(() => div.remove(), 2000);
         }
         
-        // глобальний доступ для onclick
+        // Робимо функції глобальними для onclick
         window.removeCartItem = removeCartItem;
         window.addToCartById = addToCartById;
         
