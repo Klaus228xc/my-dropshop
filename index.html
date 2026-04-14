@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>DropShop — Дропшиппинг маркет</title>
-    <!-- Font Awesome 6 (бесплатные иконки) -->
+    <title>DropShop — импорт товаров из XML (websklad.biz.ua)</title>
+    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts: Inter + Fallback -->
+    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -20,13 +20,11 @@
             background: #f8fafc;
             color: #0f172a;
             line-height: 1.5;
-            transition: background 0.2s;
         }
 
         /* Шапка */
         .header {
             background: white;
-            backdrop-filter: blur(0px);
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 2px rgba(0, 0, 0, 0.05);
             position: sticky;
             top: 0;
@@ -52,10 +50,6 @@
             font-size: 0.8rem;
             font-weight: 400;
             color: #3b7c6e;
-            background: none;
-            background-clip: unset;
-            -webkit-background-clip: unset;
-            color: #2c7a6e;
             display: block;
         }
 
@@ -71,7 +65,6 @@
             align-items: center;
             gap: 10px;
             transition: all 0.2s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .cart-icon-btn:hover {
             background: #e2e8f0;
@@ -86,7 +79,7 @@
             font-weight: 700;
         }
 
-        /* Контейнер товаров */
+        /* Контейнер */
         .container {
             max-width: 1300px;
             margin: 2rem auto;
@@ -170,7 +163,7 @@
             transform: scale(0.96);
         }
 
-        /* Боковая корзина (slide-out) */
+        /* Боковая корзина */
         .cart-overlay {
             position: fixed;
             top: 0;
@@ -275,7 +268,6 @@
             color: #e07c6c;
             cursor: pointer;
             font-size: 0.8rem;
-            margin-left: 8px;
         }
         .cart-footer {
             padding: 1.5rem;
@@ -331,6 +323,23 @@
             transition: opacity 0.2s;
             pointer-events: none;
         }
+        .loader-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 4rem;
+            gap: 1rem;
+            font-size: 1.2rem;
+            color: #2c7a6e;
+        }
+        .error-message {
+            background: #fee2e2;
+            border-left: 5px solid #dc2626;
+            padding: 1rem;
+            border-radius: 20px;
+            margin: 2rem;
+            color: #991b1b;
+        }
         footer {
             text-align: center;
             margin: 3rem 1rem 1rem;
@@ -340,15 +349,9 @@
             padding-top: 1.5rem;
         }
         @media (max-width: 640px) {
-            .header {
-                padding: 0.8rem 1rem;
-            }
-            .products-grid {
-                gap: 1rem;
-            }
-            .cart-sidebar {
-                max-width: 100%;
-            }
+            .header { padding: 0.8rem 1rem; }
+            .products-grid { gap: 1rem; }
+            .cart-sidebar { max-width: 100%; }
         }
     </style>
 </head>
@@ -357,7 +360,7 @@
 <div class="header">
     <div class="logo">
         <h1>DropShop <i class="fas fa-box-open" style="color:#2c7a6e;"></i></h1>
-        <span>Прямые поставки без склада</span>
+        <span>Дропшиппинг | Товары из XML фида websklad.biz.ua</span>
     </div>
     <button class="cart-icon-btn" id="openCartBtn">
         <i class="fas fa-shopping-cart"></i> Корзина
@@ -366,12 +369,16 @@
 </div>
 
 <main class="container">
-    <div class="products-grid" id="productsGrid"></div>
+    <div id="productsGrid" class="products-grid">
+        <div class="loader-container">
+            <i class="fas fa-spinner fa-pulse fa-2x"></i> Загрузка товаров из XML-фида...
+        </div>
+    </div>
 </main>
 
 <footer>
-    <p><i class="fas fa-truck-fast"></i> Дропшиппинг модель — товары отправляются напрямую от проверенных поставщиков.</p>
-    <p style="margin-top: 8px;">© 2025 DropShop — ваш надежный маркетплейс</p>
+    <p><i class="fas fa-truck-fast"></i> Дропшиппинг модель — товары напрямую от поставщика (<strong>websklad.biz.ua</strong>)</p>
+    <p style="margin-top: 8px;">© 2025 DropShop — автоматический импорт из Universalnaya.xml</p>
 </footer>
 
 <!-- Боковая корзина -->
@@ -382,8 +389,7 @@
             <button class="close-cart" id="closeCartBtn">&times;</button>
         </div>
         <div class="cart-items-list" id="cartItemsList">
-            <!-- динамически -->
-            <div class="empty-cart-msg">Корзина пуста, добавьте товары</div>
+            <div class="empty-cart-msg">Корзина пуста</div>
         </div>
         <div class="cart-footer" id="cartFooter">
             <div class="total-price" id="cartTotalPrice">0 ₽</div>
@@ -401,76 +407,17 @@
 <div id="toastMsg" class="toast-msg"></div>
 
 <script>
-    // ---------- ТОВАРЫ ДЛЯ ДРОПШИПИНГА ----------
-    const products = [
-        {
-            id: 1,
-            name: "Смартфон Aether X",
-            price: 29990,
-            image: "https://picsum.photos/id/0/300/220",
-            desc: "6.7\" AMOLED, 128GB, камера 108MP, быстрая зарядка.",
-            supplier: "Поставщик: TechDirect"
-        },
-        {
-            id: 2,
-            name: "Беспроводные наушники SonicBuds",
-            price: 4990,
-            image: "https://picsum.photos/id/1/300/220",
-            desc: "Шумоподавление, 30ч работы, Bluetooth 5.3.",
-            supplier: "Поставщик: AudioGlobal"
-        },
-        {
-            id: 3,
-            name: "Футболка Premium Cotton",
-            price: 1290,
-            image: "https://picsum.photos/id/20/300/220",
-            desc: "100% хлопок, принт, качество премиум.",
-            supplier: "Поставщик: FashionHub"
-        },
-        {
-            id: 4,
-            name: "Кроссовки Urban Run",
-            price: 5490,
-            image: "https://picsum.photos/id/12/300/220",
-            desc: "Легкие, дышащие, амортизация. Размеры 36-45.",
-            supplier: "Поставщик: SportWay"
-        },
-        {
-            id: 5,
-            name: "Умные часы Watch Pro 4",
-            price: 11990,
-            image: "https://picsum.photos/id/106/300/220",
-            desc: "GPS, мониторинг здоровья, 7 дней автономности.",
-            supplier: "Поставщик: WearableTech"
-        },
-        {
-            id: 6,
-            name: "Рюкзак City Explorer",
-            price: 3490,
-            image: "https://picsum.photos/id/126/300/220",
-            desc: "Водоотталкивающий, 25л, отдел для ноутбука.",
-            supplier: "Поставщик: BagMaster"
-        },
-        {
-            id: 7,
-            name: "Настольная LED лампа",
-            price: 2190,
-            image: "https://picsum.photos/id/26/300/220",
-            desc: "Регулировка яркости, USB порт, современный дизайн.",
-            supplier: "Поставщик: HomeSmart"
-        },
-        {
-            id: 8,
-            name: "Книга-бестселлер 'Сила привычки'",
-            price: 890,
-            image: "https://picsum.photos/id/24/300/220",
-            desc: "Твердый переплет, 320 стр. Мотивация.",
-            supplier: "Поставщик: BookExpress"
-        }
-    ];
+    // ------------------------------------------------------------------
+    // 1. Конфигурация: URL XML-фида и CORS-прокси (публичный allorigins.win)
+    // ------------------------------------------------------------------
+    const XML_FEED_URL = "https://www.websklad.biz.ua/wp-content/uploads/current-Universalnaya.xml";
+    const CORS_PROXY = "https://api.allorigins.win/get?url=";  // возвращает JSON { contents: "xml text" }
 
-    // ----- Корзина (храним в localStorage) -----
-    let cart = []; // { id, quantity }
+    // Глобальный массив товаров (после парсинга)
+    let products = [];
+
+    // Корзина (структура: { id, quantity })
+    let cart = [];
 
     // DOM элементы
     const productsGrid = document.getElementById('productsGrid');
@@ -484,7 +431,7 @@
     const checkoutBtn = document.getElementById('checkoutBtn');
     const toastMsgDiv = document.getElementById('toastMsg');
 
-    // Вспомогательные функции
+    // Вспомогательные UI
     function showToast(message, duration = 2500) {
         toastMsgDiv.textContent = message;
         toastMsgDiv.style.opacity = '1';
@@ -493,18 +440,227 @@
         }, duration);
     }
 
-    // Сохранить корзину в localStorage
-    function saveCart() {
-        localStorage.setItem('dropshop_cart', JSON.stringify(cart));
+    // ------------------------------------------------------------------
+    // 2. Парсинг XML (универсальный для Яндекс.Маркет / стандартных фидов)
+    // ------------------------------------------------------------------
+    function parseXMLToProducts(xmlText) {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+        
+        // Проверка на ошибки парсинга
+        if (xmlDoc.querySelector('parsererror')) {
+            throw new Error("Ошибка структуры XML");
+        }
+
+        // Ищем offers / offer (стандарт YML) или просто товары в узлах 'offer'
+        let offerNodes = xmlDoc.querySelectorAll('offer');
+        // Если нет offer, попробуем найти 'product' или 'item'
+        if (offerNodes.length === 0) {
+            offerNodes = xmlDoc.querySelectorAll('product');
+        }
+        if (offerNodes.length === 0) {
+            offerNodes = xmlDoc.querySelectorAll('item');
+        }
+        // Если ничего не найдено, пробуем более общий поиск: любые узлы с name и price
+        if (offerNodes.length === 0) {
+            // ищем любые элементы, у которых есть потомки name и price (альтернативный парсинг)
+            const allElements = xmlDoc.getElementsByTagName('*');
+            const possibleParents = [];
+            for (let el of allElements) {
+                if (el.querySelector(':scope > name, :scope > Name') && el.querySelector(':scope > price, :scope > Price')) {
+                    possibleParents.push(el);
+                }
+            }
+            if (possibleParents.length > 0) offerNodes = possibleParents;
+        }
+
+        const productList = [];
+        for (let i = 0; i < offerNodes.length; i++) {
+            const node = offerNodes[i];
+            // Извлечение ID
+            let id = node.getAttribute('id');
+            if (!id) {
+                const idNode = node.querySelector('id, offerId, productId, article');
+                if (idNode) id = idNode.textContent.trim();
+                else id = `xml_${i + 1}_${Date.now()}_${Math.random()}`;
+            }
+            // Название
+            let name = '';
+            const nameNode = node.querySelector('name, Name, title, productName, model');
+            if (nameNode) name = nameNode.textContent.trim();
+            else name = `Товар ${i+1}`;
+            
+            // Цена
+            let price = 0;
+            const priceNode = node.querySelector('price, Price, amount, retailPrice');
+            if (priceNode) {
+                let priceRaw = priceNode.textContent.trim();
+                price = parseFloat(priceRaw.replace(/[^0-9.,]/g, '').replace(',', '.'));
+                if (isNaN(price)) price = 0;
+            }
+            // Если цена 0, ищем в атрибутах
+            if (price === 0 && node.getAttribute('price')) price = parseFloat(node.getAttribute('price'));
+            
+            // Изображение
+            let image = '';
+            const imgNode = node.querySelector('picture, image, img, gallery img, mainImage');
+            if (imgNode) {
+                let imgUrl = imgNode.textContent.trim();
+                if (!imgUrl.startsWith('http')) imgUrl = 'https://via.placeholder.com/300x220?text=No+Image';
+                image = imgUrl;
+            } else {
+                const imgAttr = node.getAttribute('image');
+                if (imgAttr && imgAttr.startsWith('http')) image = imgAttr;
+                else image = 'https://picsum.photos/300/220?random=' + id;
+            }
+            
+            // Описание
+            let description = '';
+            const descNode = node.querySelector('description, desc, shortDescription, fullDescription');
+            if (descNode) description = descNode.textContent.trim().substring(0, 150);
+            if (!description) description = 'Поставка напрямую от проверенного поставщика.';
+            
+            // Поставщик (можно указать из фида или общий)
+            let supplier = 'Поставщик: websklad.biz.ua';
+            const vendorNode = node.querySelector('vendor, brand, manufacturer');
+            if (vendorNode) supplier = `Поставщик: ${vendorNode.textContent.trim()}`;
+            
+            productList.push({
+                id: String(id),
+                name: name,
+                price: price,
+                image: image,
+                desc: description,
+                supplier: supplier
+            });
+        }
+        
+        // Фильтруем товары с нулевой ценой (опционально)
+        const validProducts = productList.filter(p => p.price > 0);
+        if (validProducts.length === 0 && productList.length > 0) {
+            // Если у всех цена 0, но товары есть — всё равно покажем с предупреждением
+            return productList;
+        }
+        return validProducts.length ? validProducts : productList;
     }
 
-    // Загрузить корзину
-    function loadCart() {
-        const saved = localStorage.getItem('dropshop_cart');
+    // ------------------------------------------------------------------
+    // 3. Загрузка и парсинг XML через прокси
+    // ------------------------------------------------------------------
+    async function loadProductsFromXML() {
+        try {
+            // Показываем лоадер
+            productsGrid.innerHTML = `<div class="loader-container"><i class="fas fa-spinner fa-pulse fa-2x"></i> Загрузка каталога от websklad.biz.ua ...</div>`;
+            
+            const proxyUrl = CORS_PROXY + encodeURIComponent(XML_FEED_URL);
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json();
+            if (!data.contents) throw new Error('Прокси не вернул содержимое');
+            
+            const xmlString = data.contents;
+            const parsedProducts = parseXMLToProducts(xmlString);
+            if (!parsedProducts.length) {
+                throw new Error('В XML не найдено ни одного товара с ценой/названием');
+            }
+            
+            products = parsedProducts;
+            // При успешной загрузке новых товаров очищаем корзину (старые ID могут не совпадать)
+            if (cart.length > 0) {
+                cart = [];
+                saveCart();
+                updateCartUI();
+                updateCartBadge();
+                showToast('🔄 Каталог обновлён из XML, корзина очищена', 2000);
+            } else {
+                showToast(`✅ Загружено ${products.length} товаров из XML-фида!`, 2500);
+            }
+            renderProducts();
+        } catch (err) {
+            console.error('Ошибка загрузки XML:', err);
+            productsGrid.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i> Не удалось загрузить товары из XML-фида.<br>
+                    ${err.message}<br><br>
+                    <button id="retryLoadBtn" style="background:#0f172a; color:white; border:none; padding:8px 20px; border-radius:40px; cursor:pointer;">🔄 Повторить попытку</button>
+                </div>
+            `;
+            const retryBtn = document.getElementById('retryLoadBtn');
+            if (retryBtn) retryBtn.addEventListener('click', () => loadProductsFromXML());
+            // Показываем заглушку с демо-товарами, чтобы магазин не был пустым
+            setFallbackProducts();
+            renderProducts();
+        }
+    }
+    
+    // Запасной вариант: статические товары (если XML не загрузился)
+    function setFallbackProducts() {
+        if (products.length === 0) {
+            products = [
+                { id: "demo1", name: "Демо-товар (XML недоступен)", price: 1990, image: "https://picsum.photos/id/13/300/220", desc: "Пожалуйста, проверьте URL фида или настройки CORS. Это демо-позиция.", supplier: "Резервный источник" },
+                { id: "demo2", name: "Универсальный адаптер", price: 790, image: "https://picsum.photos/id/26/300/220", desc: "Запасной товар для демонстрации работы магазина.", supplier: "Техно-склад" }
+            ];
+        }
+    }
+    
+    // ------------------------------------------------------------------
+    // 4. Рендер товаров в сетке
+    // ------------------------------------------------------------------
+    function renderProducts() {
+        if (!productsGrid) return;
+        if (products.length === 0) {
+            productsGrid.innerHTML = `<div class="loader-container">Нет товаров для отображения</div>`;
+            return;
+        }
+        productsGrid.innerHTML = '';
+        products.forEach(product => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                <img class="product-img" src="${product.image}" alt="${product.name}" loading="lazy" onerror="this.src='https://picsum.photos/300/220?random=fallback'">
+                <div class="product-info">
+                    <div class="product-title">${escapeHtml(product.name)}</div>
+                    <div class="product-desc">${escapeHtml(product.desc)}</div>
+                    <div class="supplier-badge"><i class="fas fa-shipping-fast"></i> ${escapeHtml(product.supplier)}</div>
+                    <div class="price-row">
+                        <span class="price">${Math.round(product.price).toLocaleString()} ₽</span>
+                        <button class="add-to-cart" data-id="${product.id}"><i class="fas fa-cart-plus"></i> В корзину</button>
+                    </div>
+                </div>
+            `;
+            productsGrid.appendChild(card);
+        });
+        // Добавляем события на кнопки "В корзину"
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                addToCart(id, 1);
+            });
+        });
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    // ------------------------------------------------------------------
+    // 5. Работа с корзиной (localStorage)
+    // ------------------------------------------------------------------
+    function saveCart() {
+        localStorage.setItem('dropshop_cart_xml', JSON.stringify(cart));
+    }
+    
+    function loadCartFromStorage() {
+        const saved = localStorage.getItem('dropshop_cart_xml');
         if (saved) {
             try {
                 cart = JSON.parse(saved);
-                // валидация: если quantity <=0 удалить
                 cart = cart.filter(item => item.quantity > 0);
             } catch(e) { cart = []; }
         } else {
@@ -513,26 +669,26 @@
         updateCartUI();
         updateCartBadge();
     }
-
-    // Общее количество товаров в корзине
+    
     function getTotalItems() {
         return cart.reduce((sum, item) => sum + item.quantity, 0);
     }
-
-    // Обновить бейдж у корзины
+    
     function updateCartBadge() {
-        const total = getTotalItems();
-        cartCountBadge.textContent = total;
+        cartCountBadge.textContent = getTotalItems();
     }
-
-    // Получить товар по id из массива products
+    
     function getProductById(id) {
-        return products.find(p => p.id === id);
+        return products.find(p => p.id == id);
     }
-
-    // Добавить товар
+    
     function addToCart(productId, quantity = 1) {
-        const existing = cart.find(item => item.id === productId);
+        const product = getProductById(productId);
+        if (!product) {
+            showToast('❌ Товар не найден в каталоге', 1500);
+            return;
+        }
+        const existing = cart.find(item => item.id == productId);
         if (existing) {
             existing.quantity += quantity;
         } else {
@@ -541,45 +697,40 @@
         saveCart();
         updateCartUI();
         updateCartBadge();
-        const product = getProductById(productId);
-        showToast(`✅ ${product.name} добавлен в корзину!`);
+        showToast(`➕ ${product.name} добавлен в корзину`, 1800);
     }
-
-    // Изменить количество
+    
     function updateQuantity(productId, newQuantity) {
         if (newQuantity <= 0) {
-            cart = cart.filter(item => item.id !== productId);
+            cart = cart.filter(item => item.id != productId);
         } else {
-            const item = cart.find(item => item.id === productId);
+            const item = cart.find(item => item.id == productId);
             if (item) item.quantity = newQuantity;
         }
         saveCart();
         updateCartUI();
         updateCartBadge();
     }
-
-    // Удалить товар полностью
+    
     function removeItem(productId) {
-        cart = cart.filter(item => item.id !== productId);
+        cart = cart.filter(item => item.id != productId);
         saveCart();
         updateCartUI();
         updateCartBadge();
-        showToast(`🗑 Товар удален из корзины`);
+        showToast('🗑 Товар удалён');
     }
-
-    // Получить общую сумму корзины
+    
     function getCartTotal() {
         return cart.reduce((sum, item) => {
             const prod = getProductById(item.id);
             return sum + (prod ? prod.price * item.quantity : 0);
         }, 0);
     }
-
-    // Отрисовка товаров в корзине (боковая панель)
+    
     function renderCartItems() {
         if (!cartItemsList) return;
         if (cart.length === 0) {
-            cartItemsList.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-box-open"></i> Корзина пуста<br>Добавьте интересные товары!</div>`;
+            cartItemsList.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-box-open"></i> Корзина пуста</div>`;
             return;
         }
         let html = '';
@@ -590,11 +741,11 @@
                 <div class="cart-item" data-id="${item.id}">
                     <img class="cart-item-img" src="${product.image}" alt="${product.name}">
                     <div class="cart-item-details">
-                        <div class="cart-item-title">${product.name}</div>
-                        <div class="cart-item-price">${product.price.toLocaleString()} ₽</div>
+                        <div class="cart-item-title">${escapeHtml(product.name)}</div>
+                        <div class="cart-item-price">${Math.round(product.price).toLocaleString()} ₽</div>
                         <div class="cart-qty-control">
                             <button class="cart-qty-dec" data-id="${item.id}">−</button>
-                            <span style="min-width: 28px; text-align:center;">${item.quantity}</span>
+                            <span style="min-width:28px; text-align:center;">${item.quantity}</span>
                             <button class="cart-qty-inc" data-id="${item.id}">+</button>
                             <button class="cart-item-remove" data-id="${item.id}"><i class="fas fa-trash-alt"></i></button>
                         </div>
@@ -603,175 +754,112 @@
             `;
         });
         cartItemsList.innerHTML = html;
-
-        // Навесить события на кнопки внутри корзины (делегирование)
+        // Делегирование
         document.querySelectorAll('.cart-qty-dec').forEach(btn => {
-            btn.removeEventListener('click', handleDecClick);
-            btn.addEventListener('click', handleDecClick);
+            btn.removeEventListener('click', handleDec);
+            btn.addEventListener('click', handleDec);
         });
         document.querySelectorAll('.cart-qty-inc').forEach(btn => {
-            btn.removeEventListener('click', handleIncClick);
-            btn.addEventListener('click', handleIncClick);
+            btn.removeEventListener('click', handleInc);
+            btn.addEventListener('click', handleInc);
         });
         document.querySelectorAll('.cart-item-remove').forEach(btn => {
-            btn.removeEventListener('click', handleRemoveClick);
-            btn.addEventListener('click', handleRemoveClick);
+            btn.removeEventListener('click', handleRemove);
+            btn.addEventListener('click', handleRemove);
         });
     }
-
-    function handleDecClick(e) {
-        const id = parseInt(e.currentTarget.getAttribute('data-id'));
-        const item = cart.find(i => i.id === id);
-        if (item) {
-            const newQty = item.quantity - 1;
-            updateQuantity(id, newQty);
-        }
+    
+    function handleDec(e) {
+        const id = e.currentTarget.getAttribute('data-id');
+        const item = cart.find(i => i.id == id);
+        if (item) updateQuantity(id, item.quantity - 1);
     }
-    function handleIncClick(e) {
-        const id = parseInt(e.currentTarget.getAttribute('data-id'));
-        const item = cart.find(i => i.id === id);
-        if (item) {
-            updateQuantity(id, item.quantity + 1);
-        }
+    function handleInc(e) {
+        const id = e.currentTarget.getAttribute('data-id');
+        const item = cart.find(i => i.id == id);
+        if (item) updateQuantity(id, item.quantity + 1);
     }
-    function handleRemoveClick(e) {
-        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+    function handleRemove(e) {
+        const id = e.currentTarget.getAttribute('data-id');
         removeItem(id);
     }
-
+    
     function updateCartTotalPrice() {
-        const total = getCartTotal();
-        if (cartTotalSpan) cartTotalSpan.innerText = total.toLocaleString() + ' ₽';
+        if (cartTotalSpan) cartTotalSpan.innerText = getCartTotal().toLocaleString() + ' ₽';
     }
-
+    
     function updateCartUI() {
         renderCartItems();
         updateCartTotalPrice();
     }
-
-    // ----- Оформление заказа (дропшиппинг логика) -----
-    function validateCheckout() {
+    
+    // ------------------------------------------------------------------
+    // 6. Оформление заказа (дропшиппинг)
+    // ------------------------------------------------------------------
+    async function onCheckout() {
         const name = document.getElementById('customerName').value.trim();
         const email = document.getElementById('customerEmail').value.trim();
         const phone = document.getElementById('customerPhone').value.trim();
         const address = document.getElementById('customerAddress').value.trim();
         if (!name || !email || !phone || !address) {
-            showToast('❌ Заполните все поля для оформления заказа!', 2500);
-            return false;
+            showToast('❌ Заполните все поля для заказа', 2500);
+            return;
         }
-        if (!email.includes('@') || !email.includes('.')) {
+        if (!email.includes('@')) {
             showToast('❌ Введите корректный email', 2000);
-            return false;
+            return;
         }
         if (cart.length === 0) {
-            showToast('🛒 Корзина пуста, добавьте товары', 2000);
-            return false;
+            showToast('🛒 Корзина пуста', 2000);
+            return;
         }
-        return { name, email, phone, address };
-    }
-
-    // Имитация отправки заказа поставщикам (дропшиппинг)
-    function placeOrder(customerData, orderItems, totalSum) {
-        // В реальном проекте тут POST на ваш API / бэкенд
-        // Для демонстрации просто показываем уведомление и очищаем корзину
-        console.log('Заказ отправлен поставщикам:', { customerData, orderItems, totalSum });
-        // Эмуляция успешного ответа
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({ success: true, orderId: 'DS-' + Math.floor(Math.random() * 1000000) });
-            }, 500);
-        });
-    }
-
-    async function onCheckout() {
-        const validation = validateCheckout();
-        if (!validation) return;
-        const { name, email, phone, address } = validation;
         const orderProducts = cart.map(item => {
             const p = getProductById(item.id);
-            return { name: p.name, quantity: item.quantity, price: p.price, supplier: p.supplier };
+            return { name: p?.name, quantity: item.quantity, price: p?.price, supplier: p?.supplier };
         });
         const total = getCartTotal();
-        // Имитация отправки дропшиппинг-заказа поставщикам
-        try {
-            const result = await placeOrder({ name, email, phone, address }, orderProducts, total);
-            if (result.success) {
-                // Очищаем корзину
-                cart = [];
-                saveCart();
-                updateCartUI();
-                updateCartBadge();
-                // Закрываем корзину
-                closeCartSidebar();
-                // Показываем приятное сообщение о дропшиппинг-отправке
-                showToast(`🎉 Заказ №${result.orderId} оформлен! Товары будут отправлены напрямую от поставщиков в течение 2-3 дней. Спасибо!`, 5000);
-                // Очистить форму
-                document.getElementById('customerName').value = '';
-                document.getElementById('customerEmail').value = '';
-                document.getElementById('customerPhone').value = '';
-                document.getElementById('customerAddress').value = '';
-            } else {
-                showToast('⚠️ Ошибка при оформлении, попробуйте снова', 2500);
-            }
-        } catch (err) {
-            showToast('⚠️ Ошибка сети. Проверьте соединение', 2500);
-        }
+        // Симуляция отправки заказа поставщикам
+        showToast('⏳ Оформление заказа...', 1500);
+        setTimeout(() => {
+            const orderId = 'DS-' + Math.floor(Math.random() * 1000000);
+            cart = [];
+            saveCart();
+            updateCartUI();
+            updateCartBadge();
+            closeCartSidebar();
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerEmail').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerAddress').value = '';
+            showToast(`🎉 Заказ ${orderId} оформлен! Товары будут отправлены напрямую от поставщиков (дропшиппинг).`, 5000);
+        }, 600);
     }
-
-    // Открыть/Закрыть корзину
+    
     function openCartSidebar() {
         cartOverlay.classList.add('open');
         cartSidebar.classList.add('open');
-        // Обновить UI корзины перед показом
         updateCartUI();
     }
     function closeCartSidebar() {
         cartOverlay.classList.remove('open');
         cartSidebar.classList.remove('open');
     }
-
-    // Рендер сетки товаров
-    function renderProducts() {
-        if (!productsGrid) return;
-        productsGrid.innerHTML = '';
-        products.forEach(product => {
-            const card = document.createElement('div');
-            card.className = 'product-card';
-            card.innerHTML = `
-                <img class="product-img" src="${product.image}" alt="${product.name}" loading="lazy">
-                <div class="product-info">
-                    <div class="product-title">${product.name}</div>
-                    <div class="product-desc">${product.desc}</div>
-                    <div class="supplier-badge"><i class="fas fa-shipping-fast"></i> ${product.supplier}</div>
-                    <div class="price-row">
-                        <span class="price">${product.price.toLocaleString()} ₽</span>
-                        <button class="add-to-cart" data-id="${product.id}"><i class="fas fa-cart-plus"></i> В корзину</button>
-                    </div>
-                </div>
-            `;
-            productsGrid.appendChild(card);
-        });
-        // добавим события на кнопки "В корзину"
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const id = parseInt(btn.getAttribute('data-id'));
-                addToCart(id, 1);
-            });
-        });
-    }
-
-    // Инициализация событий и загрузка данных
+    
+    // ------------------------------------------------------------------
+    // 7. Инициализация приложения
+    // ------------------------------------------------------------------
     function init() {
-        renderProducts();
-        loadCart(); // загрузит корзину и обновит UI, бейдж
+        loadCartFromStorage();
         openCartBtn.addEventListener('click', openCartSidebar);
         closeCartBtn.addEventListener('click', closeCartSidebar);
         cartOverlay.addEventListener('click', (e) => {
             if (e.target === cartOverlay) closeCartSidebar();
         });
         checkoutBtn.addEventListener('click', onCheckout);
+        // Загружаем товары из XML фида
+        loadProductsFromXML();
     }
-
+    
     init();
 </script>
 </body>
