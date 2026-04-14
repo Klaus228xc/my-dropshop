@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>ua drop | Каталог + Корзина</title>
+    <title>ua drop | Каталог + Онлайн-оплата</title>
     <style>
         * {
             margin: 0;
@@ -20,7 +20,6 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-        /* header */
         .shop-header {
             display: flex;
             justify-content: space-between;
@@ -41,21 +40,15 @@
             color: transparent;
         }
         .cart-icon {
-            position: relative;
             background: white;
             padding: 10px 18px;
             border-radius: 60px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             border: 1px solid #e2e8f0;
             cursor: pointer;
-            transition: 0.2s;
             display: flex;
             align-items: center;
             gap: 8px;
             font-weight: 500;
-        }
-        .cart-icon:hover {
-            background: #f1f5f9;
         }
         .cart-count {
             background: #3b82f6;
@@ -63,9 +56,7 @@
             border-radius: 30px;
             padding: 2px 8px;
             font-size: 0.75rem;
-            font-weight: 600;
         }
-        /* фильтры */
         .filters-panel {
             display: flex;
             flex-wrap: wrap;
@@ -76,7 +67,6 @@
             background: white;
             padding: 16px 20px;
             border-radius: 28px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
             border: 1px solid #e2e8f0;
         }
         .search-box input, .category-filter select {
@@ -88,7 +78,6 @@
         .search-box { flex: 2; min-width: 180px; }
         .category-filter { flex: 1; min-width: 160px; }
         .stats { font-size: 0.85rem; background: #eef2ff; padding: 6px 14px; border-radius: 30px; }
-        /* сетка */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -162,10 +151,7 @@
             font-weight: 500;
             cursor: pointer;
             margin-top: 12px;
-            transition: 0.2s;
         }
-        .btn-cart:hover { background: #0f172a; }
-        /* корзина */
         .cart-view {
             background: white;
             border-radius: 28px;
@@ -227,13 +213,34 @@
             display: inline-block;
         }
         .empty-cart { text-align: center; padding: 40px; color: #475569; }
-        .no-results { text-align: center; padding: 60px; background: white; border-radius: 32px; }
         footer { margin-top: 48px; text-align: center; font-size: 0.8rem; color: #64748b; }
         @media (max-width: 640px) {
             body { padding: 16px; }
             .cart-item { flex-direction: column; align-items: start; }
         }
+        .payment-options {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        .payment-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+        }
+        .payment-btn.active {
+            background: #1e293b;
+            color: white;
+            border-color: #1e293b;
+        }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -247,7 +254,6 @@
         </div>
     </div>
 
-    <!-- Панель фильтров (только для каталога) -->
     <div id="filtersPanel" class="filters-panel">
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="🔍 Поиск по названию, артикулу...">
@@ -260,18 +266,12 @@
         <div class="stats" id="stats">Загрузка...</div>
     </div>
 
-    <!-- Контейнер для отображения каталога или корзины -->
     <div id="mainContent"></div>
-
-    <footer>
-        <p>© ua drop — интернет-витрина. Для заказа заполните форму в корзине.</p>
-    </footer>
+    <footer><p>© ua drop — интернет-витрина. Для заказа заполните форму в корзине.</p></footer>
 </div>
 
 <script>
-    // --------------------------------------------------------------
-    // ПОЛНЫЙ КАТАЛОГ ТОВАРОВ (без зачёркнутых цен)
-    // --------------------------------------------------------------
+    // ---------- КАТАЛОГ ТОВАРОВ ----------
     const catalogData = [
   {title:"Массажная подушка Car and Home Massage Pillow", sku:"ws78472", price:529, stock:"instock", category:"Автотовары", img:"https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg"},
   {title:"Настольный бокс для хранения косметики с выдвижными ящиками", sku:"ws30483", price:399, stock:"outofstock", category:"Красота и здоровье", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg"},
@@ -323,53 +323,167 @@
   {title:"Пульсоксиметр Fingertip Oximeter", sku:"ws85953", price:399, stock:"outofstock", category:"Спорт, здоровье, отдых", img:"https://www.websklad.biz.ua/wp-content/uploads/2020/11/IMG_4158.jpg"}
     ];
 
-    // Корзина (localStorage)
     let cart = JSON.parse(localStorage.getItem('ua_drop_cart')) || [];
 
     function saveCart() {
         localStorage.setItem('ua_drop_cart', JSON.stringify(cart));
         updateCartUI();
     }
-
     function updateCartUI() {
-        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const count = cart.reduce((sum, i) => sum + i.quantity, 0);
         document.getElementById('cartCount').innerText = count;
     }
-
     function addToCart(product) {
-        if (product.stock !== 'instock') {
-            alert("Товар временно отсутствует");
-            return;
-        }
-        const existing = cart.find(item => item.sku === product.sku);
-        if (existing) {
-            existing.quantity++;
-        } else {
-            cart.push({ ...product, quantity: 1 });
-        }
+        if (product.stock !== 'instock') { alert("Товар временно отсутствует"); return; }
+        const existing = cart.find(i => i.sku === product.sku);
+        if (existing) existing.quantity++;
+        else cart.push({ ...product, quantity: 1 });
         saveCart();
         alert(`✅ ${product.title} добавлен в корзину`);
     }
-
     function removeFromCart(sku) {
-        cart = cart.filter(item => item.sku !== sku);
+        cart = cart.filter(i => i.sku !== sku);
         saveCart();
         renderCartView();
     }
-
-    function updateQuantity(sku, newQty) {
+    function updateQuantity(sku, qty) {
         const item = cart.find(i => i.sku === sku);
-        if (item && newQty > 0) {
-            item.quantity = newQty;
-        } else if (item && newQty <= 0) {
-            cart = cart.filter(i => i.sku !== sku);
-        }
+        if (item && qty > 0) item.quantity = qty;
+        else if (item && qty <= 0) cart = cart.filter(i => i.sku !== sku);
         saveCart();
         renderCartView();
     }
 
-    // рендер каталога
-    let currentFiltered = [...catalogData];
+    // ---------- LiqPay online payment (TEST MODE) ----------
+    // Замените ключи на свои после регистрации в LiqPay
+    const LIQPAY_PUBLIC_KEY = "i1234567890"; // ваш публичный ключ
+    const LIQPAY_PRIVATE_KEY = "your_private_key_here"; // ваш секретный ключ
+
+    function generateLiqPayForm(amount, orderId, description, resultUrl) {
+        const data = {
+            version: 3,
+            public_key: LIQPAY_PUBLIC_KEY,
+            action: "pay",
+            amount: amount,
+            currency: "UAH",
+            description: description,
+            order_id: orderId,
+            result_url: resultUrl,
+            server_url: resultUrl // для подтверждения (можно настроить свой)
+        };
+        const dataBase64 = btoa(JSON.stringify(data));
+        const signature = CryptoJS.SHA1(LIQPAY_PRIVATE_KEY + dataBase64 + LIQPAY_PRIVATE_KEY).toString();
+        return `
+            <form method="POST" action="https://www.liqpay.ua/api/3/checkout" accept-charset="utf-8">
+                <input type="hidden" name="data" value="${dataBase64}">
+                <input type="hidden" name="signature" value="${signature}">
+                <button type="submit" style="background:#22c55e; color:white; border:none; padding:12px; border-radius:40px; width:100%; font-weight:600; margin-top:12px;">💳 Оплатити карткою онлайн (LiqPay)</button>
+            </form>
+        `;
+    }
+
+    // ---------- РЕНДЕР КОРЗИНЫ С ВЫБОРОМ ОПЛАТЫ ----------
+    let selectedPayment = "card"; // card / cod / cash
+    function renderCartView() {
+        if (cart.length === 0) {
+            document.getElementById('mainContent').innerHTML = `
+                <div class="cart-view">
+                    <button class="back-to-catalog" id="backToCatalogBtn">← Назад в каталог</button>
+                    <div class="empty-cart">🛒 Корзина пуста. Добавьте товары из каталога.</div>
+                </div>`;
+            document.getElementById('backToCatalogBtn')?.addEventListener('click', () => showCatalog());
+            return;
+        }
+        let total = 0;
+        const itemsHtml = cart.map(item => {
+            total += item.price * item.quantity;
+            return `
+                <div class="cart-item">
+                    <div class="cart-item-img"><img src="${item.img}" onerror="this.src='https://placehold.co/70x70?text=img'" style="width:60px"></div>
+                    <div class="cart-item-info"><strong>${item.title}</strong><br>${item.sku}</div>
+                    <div class="cart-item-price">${item.price} ₴</div>
+                    <div class="cart-item-quantity">
+                        <button onclick="updateQuantity('${item.sku}', ${item.quantity-1})">-</button>
+                        <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity('${item.sku}', parseInt(this.value))" style="width:60px">
+                        <button onclick="updateQuantity('${item.sku}', ${item.quantity+1})">+</button>
+                        <button onclick="removeFromCart('${item.sku}')" style="background:none; border:none; color:red;">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const paymentHtml = `
+            <div class="payment-options">
+                <div class="payment-btn ${selectedPayment === 'card' ? 'active' : ''}" onclick="setPayment('card')">💳 Онлайн-карта (Visa/Mastercard)</div>
+                <div class="payment-btn ${selectedPayment === 'cod' ? 'active' : ''}" onclick="setPayment('cod')">📦 Наложенный платёж (при получении)</div>
+                <div class="payment-btn ${selectedPayment === 'cash' ? 'active' : ''}" onclick="setPayment('cash')">💰 Наличные при получении</div>
+            </div>
+        `;
+
+        let orderFormHtml = '';
+        if (selectedPayment === 'card') {
+            const orderId = "order_" + Date.now();
+            const description = `Замовлення ua drop #${orderId}`;
+            orderFormHtml = generateLiqPayForm(total, orderId, description, "https://klaus228xc.github.io/my-dropshop/#success");
+            orderFormHtml += `<p style="font-size:0.7rem; margin-top:8px;">Після успішної оплати замовлення буде автоматично відправлено менеджеру.</p>`;
+        } else {
+            orderFormHtml = `
+                <form id="orderForm" action="https://formsubmit.co/your-email@example.com" method="POST">
+                    <input type="hidden" name="_subject" value="Новый заказ с ua drop (${selectedPayment === 'cod' ? 'Наложенный платеж' : 'Наличные при получении'})">
+                    <input type="hidden" name="_captcha" value="false">
+                    <input type="hidden" name="_next" value="https://klaus228xc.github.io/my-dropshop/#">
+                    <input type="text" name="Имя" placeholder="Ваше имя *" required>
+                    <input type="tel" name="Телефон" placeholder="Номер телефона *" required>
+                    <input type="email" name="Email" placeholder="Email для подтверждения">
+                    <select name="Доставка" required>
+                        <option value="">Выберите службу доставки</option>
+                        <option value="Новая почта">Новая почта (отделение / адресная)</option>
+                        <option value="Укрпочта">Укрпочта</option>
+                    </select>
+                    <textarea name="Комментарий" rows="3" placeholder="Дополнительная информация (город, отделение, примечания)"></textarea>
+                    <input type="hidden" name="Товары" value="${cart.map(i => `${i.title} (${i.quantity} шт.) - ${i.price*i.quantity}₴`).join('; ')}">
+                    <input type="hidden" name="Сумма" value="${total} ₴">
+                    <button type="submit">📦 Оформить заказ</button>
+                </form>
+                <p style="font-size:0.7rem;">После отправки менеджер свяжется с вами для подтверждения.</p>
+            `;
+        }
+
+        const cartHtml = `
+            <div class="cart-view">
+                <button class="back-to-catalog" id="backToCatalogBtn">← Назад в каталог</button>
+                <h2>🛒 Корзина</h2>
+                ${itemsHtml}
+                <div class="cart-total">Итого: ${total} ₴</div>
+                ${paymentHtml}
+                ${orderFormHtml}
+            </div>
+        `;
+        document.getElementById('mainContent').innerHTML = cartHtml;
+        document.getElementById('backToCatalogBtn')?.addEventListener('click', () => showCatalog());
+
+        if (selectedPayment !== 'card') {
+            const form = document.getElementById('orderForm');
+            if(form) {
+                form.addEventListener('submit', (e) => {
+                    if(confirm('Подтверждаете заказ? После отправки с вами свяжется менеджер.')) {
+                        cart = [];
+                        saveCart();
+                        setTimeout(() => { showCatalog(); }, 500);
+                    } else {
+                        e.preventDefault();
+                    }
+                });
+            }
+        }
+    }
+
+    function setPayment(type) {
+        selectedPayment = type;
+        renderCartView();
+    }
+
+    // ---------- КАТАЛОГ ----------
     function renderCatalog() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         const selectedCat = document.getElementById('categorySelect').value;
@@ -378,7 +492,6 @@
             const matchCat = selectedCat === 'all' || p.category === selectedCat;
             return matchSearch && matchCat;
         });
-        currentFiltered = filtered;
         const html = `<div class="products-grid">${filtered.map(p => `
             <div class="product-card">
                 <div class="product-img"><img src="${p.img}" onerror="this.src='https://placehold.co/400x400?text=No+Image'" loading="lazy"></div>
@@ -395,103 +508,17 @@
         document.getElementById('stats').innerText = `${filtered.length} товаров`;
     }
 
-    // рендер корзины с выбором доставки и оплаты
-    function renderCartView() {
-        if (cart.length === 0) {
-            document.getElementById('mainContent').innerHTML = `
-                <div class="cart-view">
-                    <button class="back-to-catalog" id="backToCatalogBtn">← Назад в каталог</button>
-                    <div class="empty-cart">🛒 Корзина пуста. Добавьте товары из каталога.</div>
-                </div>`;
-            document.getElementById('backToCatalogBtn')?.addEventListener('click', () => showCatalog());
-            return;
-        }
-        let total = 0;
-        const itemsHtml = cart.map(item => {
-            const sum = item.price * item.quantity;
-            total += sum;
-            return `
-                <div class="cart-item">
-                    <div class="cart-item-img"><img src="${item.img}" onerror="this.src='https://placehold.co/70x70?text=img'" style="width:60px"></div>
-                    <div class="cart-item-info"><strong>${item.title}</strong><br>${item.sku}</div>
-                    <div class="cart-item-price">${item.price} ₴</div>
-                    <div class="cart-item-quantity">
-                        <button onclick="updateQuantity('${item.sku}', ${item.quantity-1})">-</button>
-                        <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity('${item.sku}', parseInt(this.value))" style="width:60px">
-                        <button onclick="updateQuantity('${item.sku}', ${item.quantity+1})">+</button>
-                        <button onclick="removeFromCart('${item.sku}')" style="background:none; border:none; color:red;">🗑️</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        // ВАЖНО: замените your-email@example.com на реальный email для получения заказов
-        const formHtml = `
-            <div class="order-form">
-                <h3>Оформление заказа</h3>
-                <form id="orderForm" action="https://formsubmit.co/your-email@example.com" method="POST">
-                    <input type="hidden" name="_subject" value="Новый заказ с ua drop">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_next" value="https://klaus228xc.github.io/my-dropshop/#">
-                    <input type="text" name="Имя" placeholder="Ваше имя *" required>
-                    <input type="tel" name="Телефон" placeholder="Номер телефона *" required>
-                    <input type="email" name="Email" placeholder="Email для подтверждения">
-                    <select name="Доставка" required>
-                        <option value="">Выберите службу доставки</option>
-                        <option value="Новая почта">Новая почта (отделение / адресная)</option>
-                        <option value="Укрпочта">Укрпочта</option>
-                    </select>
-                    <select name="Оплата" required>
-                        <option value="">Выберите способ оплаты</option>
-                        <option value="Наложенный платеж (оплата при получении)">Наложенный платеж (при получении)</option>
-                        <option value="Онлайн-карта (Visa/Mastercard)">Оплата картой онлайн (ссылка в письме)</option>
-                        <option value="Наличные при получении">Наличные при получении</option>
-                    </select>
-                    <textarea name="Комментарий" rows="3" placeholder="Дополнительная информация (город, отделение, примечания)"></textarea>
-                    <input type="hidden" name="Товары" value="${cart.map(i => `${i.title} (${i.quantity} шт.) - ${i.price*i.quantity}₴`).join('; ')}">
-                    <input type="hidden" name="Сумма" value="${total} ₴">
-                    <button type="submit">📦 Оформить заказ</button>
-                </form>
-                <p style="font-size:0.7rem; margin-top:8px;">После отправки менеджер свяжется с вами для подтверждения.</p>
-            </div>
-        `;
-        const cartHtml = `
-            <div class="cart-view">
-                <button class="back-to-catalog" id="backToCatalogBtn">← Назад в каталог</button>
-                <h2>🛒 Корзина</h2>
-                ${itemsHtml}
-                <div class="cart-total">Итого: ${total} ₴</div>
-                ${formHtml}
-            </div>
-        `;
-        document.getElementById('mainContent').innerHTML = cartHtml;
-        document.getElementById('backToCatalogBtn')?.addEventListener('click', () => showCatalog());
-        const form = document.getElementById('orderForm');
-        if(form) {
-            form.addEventListener('submit', (e) => {
-                if(confirm('Подтверждаете заказ? После отправки с вами свяжется менеджер.')) {
-                    cart = [];
-                    saveCart();
-                    setTimeout(() => { showCatalog(); }, 500);
-                } else {
-                    e.preventDefault();
-                }
-            });
-        }
-    }
-
     function showCatalog() {
         document.getElementById('filtersPanel').style.display = 'flex';
         renderCatalog();
         const search = document.getElementById('searchInput');
         const catSelect = document.getElementById('categorySelect');
-        const filterHandler = () => renderCatalog();
-        search.removeEventListener('input', filterHandler);
-        catSelect.removeEventListener('change', filterHandler);
-        search.addEventListener('input', filterHandler);
-        catSelect.addEventListener('change', filterHandler);
+        const handler = () => renderCatalog();
+        search.removeEventListener('input', handler);
+        catSelect.removeEventListener('change', handler);
+        search.addEventListener('input', handler);
+        catSelect.addEventListener('change', handler);
     }
-
     function showCart() {
         document.getElementById('filtersPanel').style.display = 'none';
         renderCartView();
@@ -503,12 +530,12 @@
         select.innerHTML = '<option value="all">📂 Все категории</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
     }
 
-    // Глобальные функции для onclick
     window.addToCart = addToCart;
     window.removeFromCart = removeFromCart;
     window.updateQuantity = updateQuantity;
     window.showCatalog = showCatalog;
     window.showCart = showCart;
+    window.setPayment = setPayment;
 
     document.getElementById('cartIcon').addEventListener('click', showCart);
     document.getElementById('logoBtn').addEventListener('click', showCatalog);
