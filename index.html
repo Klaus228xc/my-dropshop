@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>WebSklad - Магазин товаров | Загрузка CSV</title>
+    <title>WebSklad — Стильный магазин товаров</title>
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif;
         }
+
         body {
-            background: #f8f9fc;
-            color: #1a1f2b;
+            font-family: 'Inter', sans-serif;
+            background: #f4f6fa;
+            color: #1e293b;
         }
+
+        /* Header */
         .header {
-            background: white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            background: #ffffff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 100;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid #eef2ff;
         }
+
         .header-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -33,220 +40,309 @@
             flex-wrap: wrap;
             gap: 1rem;
         }
+
         .logo {
-            font-size: 1.7rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 800;
             background: linear-gradient(135deg, #1e2b3c, #2c4c6c);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-        }
-        .cart-icon, .admin-btn {
-            background: #f0f3f8;
-            padding: 10px 18px;
-            border-radius: 60px;
-            display: inline-flex;
+            letter-spacing: -0.3px;
+            display: flex;
             align-items: center;
             gap: 8px;
+        }
+
+        .logo i {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            color: #2c4c6c;
+        }
+
+        .cart-icon {
+            background: #f1f5f9;
+            padding: 12px 24px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
-            border: none;
-            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: 1px solid #e2e8f0;
         }
-        .admin-btn { background: #e9ecef; }
-        .cart-icon:hover, .admin-btn:hover { background: #e0e6ef; }
+
+        .cart-icon:hover {
+            background: #e9eef3;
+            transform: scale(1.02);
+        }
+
         .cart-count {
             background: #c5283e;
             color: white;
-            border-radius: 30px;
-            padding: 2px 10px;
-            font-size: 0.8rem;
+            border-radius: 40px;
+            padding: 2px 12px;
+            font-size: 0.85rem;
+            font-weight: 700;
         }
+
+        /* Filters */
         .filters {
             max-width: 1400px;
-            margin: 1rem auto 0;
+            margin: 2rem auto 0;
             padding: 0 2rem;
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
+            gap: 0.75rem;
             align-items: center;
         }
+
         .filter-btn {
             background: white;
-            border: 1px solid #dce3ec;
-            padding: 0.5rem 1.2rem;
+            border: 1px solid #e2e8f0;
+            padding: 0.6rem 1.5rem;
             border-radius: 40px;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: 0.2s;
+            color: #475569;
         }
+
         .filter-btn.active {
             background: #1e2b3c;
             color: white;
             border-color: #1e2b3c;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
+
+        .filter-btn:hover:not(.active) {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+
+        /* Products Grid */
         .products-grid {
             max-width: 1400px;
             margin: 2rem auto;
             padding: 0 2rem;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
             gap: 2rem;
         }
+
         .product-card {
             background: white;
-            border-radius: 1.2rem;
+            border-radius: 1.5rem;
             overflow: hidden;
-            transition: 0.25s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 4px rgba(0,0,0,0.02);
+            border: 1px solid #eef2ff;
             display: flex;
             flex-direction: column;
-            border: 1px solid #edf2f7;
         }
+
         .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.12);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
+            border-color: #e0e7ff;
         }
+
         .product-img {
             width: 100%;
             aspect-ratio: 1 / 1;
             object-fit: contain;
-            background: #fafcff;
-            padding: 1rem;
-            border-bottom: 1px solid #f0f4fa;
+            background: #ffffff;
+            padding: 1.5rem;
+            transition: transform 0.4s ease;
         }
+
+        .product-card:hover .product-img {
+            transform: scale(1.02);
+        }
+
         .product-info {
-            padding: 1rem 1rem 1.2rem;
+            padding: 1rem 1.2rem 1.5rem;
             flex: 1;
             display: flex;
             flex-direction: column;
         }
+
         .product-title {
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 700;
             line-height: 1.4;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
+            color: #0f172a;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
+
         .product-price {
-            margin-top: 0.5rem;
-            font-size: 1.4rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 800;
             color: #1f3b4c;
+            margin: 0.5rem 0 0.25rem;
         }
+
         .stock {
-            font-size: 0.75rem;
-            margin-top: 0.3rem;
-            color: #2c7a4d;
-            background: #e6f4ea;
+            font-size: 0.7rem;
+            font-weight: 600;
             display: inline-block;
-            padding: 0.2rem 0.6rem;
+            padding: 0.25rem 0.8rem;
             border-radius: 30px;
             width: fit-content;
+            margin: 0.5rem 0;
         }
+
+        .stock.in {
+            background: #e0f2e9;
+            color: #1e6f3f;
+        }
+
         .stock.out {
-            background: #ffe6e5;
+            background: #fee9e6;
             color: #b91c2c;
         }
+
         .btn-add {
             margin-top: 1rem;
             background: #1f3b4c;
             color: white;
             border: none;
-            padding: 0.7rem 0;
-            border-radius: 2rem;
-            font-weight: 600;
+            padding: 0.8rem 0;
+            border-radius: 3rem;
+            font-weight: 700;
             cursor: pointer;
+            transition: 0.2s;
             width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
+        .btn-add i {
+            font-size: 0.9rem;
+        }
+
+        .btn-add:hover:not(:disabled) {
+            background: #0e2a38;
+            transform: scale(0.98);
+        }
+
         .btn-add:disabled {
             background: #cbd5e1;
             cursor: not-allowed;
+            opacity: 0.7;
         }
+
+        /* Modal & Admin */
         .modal {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(6px);
             z-index: 1100;
             justify-content: center;
             align-items: center;
         }
+
         .modal-content {
             background: white;
-            max-width: 700px;
+            max-width: 650px;
             width: 90%;
-            max-height: 90vh;
+            max-height: 85vh;
             overflow-y: auto;
             border-radius: 2rem;
-            padding: 1.5rem;
+            padding: 1.8rem;
+            box-shadow: 0 30px 50px rgba(0,0,0,0.2);
         }
+
+        .admin-btn {
+            background: #f1f5f9;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 60px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .admin-btn:hover {
+            background: #e2e8f0;
+        }
+
         .admin-product-list {
             margin-top: 1.5rem;
-            max-height: 300px;
+            max-height: 260px;
             overflow-y: auto;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #eef2ff;
         }
+
         .admin-product-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #f0f2f8;
         }
-        .admin-product-item button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-            margin-left: 0.5rem;
-        }
+
         .form-group {
             margin-bottom: 1rem;
         }
+
         .form-group label {
-            display: block;
-            font-weight: 500;
+            font-weight: 600;
             margin-bottom: 0.3rem;
+            display: block;
         }
-        .form-group input, .form-group select, .form-group textarea {
+
+        .form-group input, .form-group select {
             width: 100%;
-            padding: 0.6rem;
-            border: 1px solid #ccc;
+            padding: 0.7rem;
             border-radius: 1rem;
+            border: 1px solid #cbd5e1;
         }
+
         .btn-save {
             background: #2c7a4d;
             color: white;
-            border: none;
             padding: 0.7rem;
             border-radius: 2rem;
+            border: none;
             font-weight: bold;
             width: 100%;
             cursor: pointer;
             margin-top: 0.5rem;
         }
+
         .import-section {
             margin-top: 1.5rem;
-            border-top: 2px dashed #ccc;
-            padding-top: 1rem;
+            border-top: 2px dashed #e2e8f0;
+            padding-top: 1.2rem;
         }
+
         .preview-list {
-            background: #f9f9f9;
-            padding: 0.5rem;
+            background: #f8fafc;
+            padding: 0.8rem;
             border-radius: 1rem;
-            max-height: 200px;
-            overflow-y: auto;
-            font-size: 0.8rem;
-            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            max-height: 180px;
+            overflow: auto;
+            margin: 0.5rem 0;
         }
+
+        /* Cart sidebar */
         .cart-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -256,6 +352,7 @@
             display: none;
             justify-content: flex-end;
         }
+
         .cart-sidebar {
             width: 100%;
             max-width: 500px;
@@ -263,41 +360,62 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
         }
+
         .cart-header, .cart-footer {
-            padding: 1rem;
+            padding: 1.2rem;
             border-bottom: 1px solid #eef2f8;
         }
+
         .cart-items {
             flex: 1;
             overflow-y: auto;
             padding: 1rem;
         }
+
         .cart-item {
             display: flex;
             gap: 1rem;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
+            border-bottom: 1px solid #f0f2f8;
+            padding-bottom: 0.8rem;
         }
+
         .cart-item-img {
-            width: 70px;
-            height: 70px;
+            width: 75px;
+            height: 75px;
             object-fit: contain;
+            background: #fff;
+            border-radius: 12px;
         }
+
         .checkout-form input, .checkout-form select, .checkout-form textarea {
             width: 100%;
-            margin-bottom: 0.8rem;
-            padding: 0.6rem;
+            margin-bottom: 0.7rem;
+            padding: 0.7rem;
             border-radius: 1rem;
             border: 1px solid #ccc;
         }
+
         .order-btn {
             background: #2c7a4d;
             color: white;
-            padding: 0.7rem;
+            padding: 0.8rem;
             border: none;
             border-radius: 2rem;
             font-weight: bold;
             width: 100%;
+        }
+
+        @media (max-width: 680px) {
+            .header-container, .filters, .products-grid {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            .product-title {
+                font-size: 0.9rem;
+            }
         }
     </style>
 </head>
@@ -305,11 +423,14 @@
 
 <div class="header">
     <div class="header-container">
-        <div class="logo">🛒 WebSklad</div>
-        <div style="display: flex; gap: 0.8rem;">
-            <button class="admin-btn" id="adminBtn">📦 Управление товарами</button>
+        <div class="logo">
+            <i class="fas fa-store"></i> WebSklad
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="admin-btn" id="adminBtn"><i class="fas fa-cog"></i> Управление</button>
             <div class="cart-icon" id="cartIcon">
-                🛍️ Корзина <span class="cart-count" id="cartCount">0</span>
+                <i class="fas fa-shopping-cart"></i> Корзина
+                <span class="cart-count" id="cartCount">0</span>
             </div>
         </div>
     </div>
@@ -318,30 +439,27 @@
 <div class="filters" id="filtersContainer"></div>
 <div class="products-grid" id="productsGrid"></div>
 
-<!-- Админ-модалка -->
+<!-- Админ панель -->
 <div id="adminModal" class="modal">
     <div class="modal-content">
-        <div style="display: flex; justify-content: space-between;">
-            <h3>Управление товарами</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3><i class="fas fa-boxes"></i> Товары и импорт</h3>
             <button id="closeAdminBtn" style="background:none; border:none; font-size:1.8rem;">&times;</button>
         </div>
         <form id="productForm">
-            <div class="form-group"><label>Название товара *</label><input type="text" id="prodName" required></div>
-            <div class="form-group"><label>Цена (грн) *</label><input type="number" id="prodPrice" required></div>
-            <div class="form-group"><label>Категория *</label><input type="text" id="prodCategory" placeholder="Например: Электроника" required></div>
+            <div class="form-group"><label>Название</label><input type="text" id="prodName" required></div>
+            <div class="form-group"><label>Цена (грн)</label><input type="number" id="prodPrice" required></div>
+            <div class="form-group"><label>Категория</label><input type="text" id="prodCategory" required></div>
             <div class="form-group"><label>Наличие</label><select id="prodStock"><option value="instock">В наличии</option><option value="outofstock">Нет в наличии</option></select></div>
-            <div class="form-group"><label>URL изображения</label><input type="text" id="prodImage" placeholder="https://..."></div>
-            <button type="submit" class="btn-save">➕ Добавить товар</button>
+            <div class="form-group"><label>Фото URL</label><input type="text" id="prodImage" placeholder="https://..."></div>
+            <button type="submit" class="btn-save"><i class="fas fa-plus-circle"></i> Добавить товар</button>
         </form>
-
         <div class="import-section">
-            <h4>📂 Импорт товаров из CSV</h4>
-            <input type="file" id="csvFileInput" accept=".csv, .xlsx, .xls" style="margin: 0.5rem 0;">
+            <h4><i class="fas fa-upload"></i> Импорт из CSV</h4>
+            <input type="file" id="csvFileInput" accept=".csv">
             <div id="csvPreview" class="preview-list" style="display:none;"></div>
-            <button id="importBtn" class="btn-save" style="background:#3a6b92;">📥 Заменить ассортимент из файла</button>
-            <p style="font-size:0.7rem; margin-top:0.3rem;">Ожидается CSV с колонками: Название товара, Рекомендовання розничная цена, Наличие, Категории товара, Изображения (первая ссылка).</p>
+            <button id="importBtn" class="btn-save" style="background:#3a6b92;">📥 Заменить ассортимент</button>
         </div>
-
         <div class="admin-product-list" id="adminProductList"></div>
     </div>
 </div>
@@ -349,7 +467,10 @@
 <!-- Корзина модалка -->
 <div class="cart-overlay" id="cartOverlay">
     <div class="cart-sidebar">
-        <div class="cart-header"><h3>🛒 Ваш заказ</h3><button id="closeCartBtn" style="background:none; border:none; font-size:1.8rem; float:right;">&times;</button></div>
+        <div class="cart-header">
+            <h3><i class="fas fa-shopping-bag"></i> Ваш заказ</h3>
+            <button id="closeCartBtn" style="background:none; border:none; font-size:1.8rem; float:right;">&times;</button>
+        </div>
         <div class="cart-items" id="cartItemsList"></div>
         <div class="cart-footer">
             <div><strong>Итого: <span id="cartTotal">0</span> грн</strong></div>
@@ -358,9 +479,9 @@
                 <input type="text" id="phone" placeholder="Телефон" required>
                 <select id="deliveryMethod" required><option value="">Способ доставки</option><option value="Новая Почта">Новая Почта (наложенный платеж)</option><option value="Укрпочта">Укрпочта (наложенный платеж)</option></select>
                 <input type="text" id="city" placeholder="Город" required>
-                <input type="text" id="warehouse" placeholder="Отделение / Индекс" required>
+                <input type="text" id="warehouse" placeholder="Отделение / индекс" required>
                 <textarea id="comment" rows="2" placeholder="Комментарий"></textarea>
-                <button type="submit" class="order-btn">✅ Оформить заказ</button>
+                <button type="submit" class="order-btn"><i class="fas fa-check-circle"></i> Оформить заказ</button>
             </form>
         </div>
     </div>
@@ -368,37 +489,37 @@
 
 <script>
     // --------------------------------------------------------------
-    // Базовый массив товаров (если нет сохранённых)
+    // Базовые товары (для красивого демо)
     // --------------------------------------------------------------
-    let products = [];
-    
+    let products = [
+        { id: 1, name: "Массажная подушка Car and Home", price: 529, stock: "instock", category: "Автотовары", img: "https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg" },
+        { id: 2, name: "Настольный бокс для косметики", price: 399, stock: "outofstock", category: "Красота и здоровье", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg" },
+        { id: 3, name: "УФ-лампа для маникюра ZH-818", price: 499, stock: "instock", category: "Красота и здоровье", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wdefqd.jpg" },
+        { id: 4, name: "Точилка Bavarian Edge", price: 249, stock: "instock", category: "Все для кухни", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/wqd132.jpg" }
+    ];
+
     function loadProducts() {
         const stored = localStorage.getItem('websklad_products');
-        if (stored) {
-            products = JSON.parse(stored);
-        } else {
-            // Несколько демо-товаров для первого запуска
-            products = [
-                { id: 1, name: "Массажная подушка Car and Home", price: 529, stock: "instock", category: "Автотовары", img: "https://www.websklad.biz.ua/wp-content/uploads/jcayvpe4kcuvyaay.jpg" },
-                { id: 2, name: "Настольный бокс для косметики", price: 399, stock: "outofstock", category: "Красота и здоровье", img: "https://www.websklad.biz.ua/wp-content/uploads/2020/09/qsd2wzd.jpg" },
-            ];
-            saveProducts();
-        }
+        if (stored) products = JSON.parse(stored);
+        else saveProducts();
         const maxId = products.length ? Math.max(...products.map(p => p.id)) : 0;
         window.nextProductId = maxId + 1;
-    }
-
-    function saveProducts() {
-        localStorage.setItem('websklad_products', JSON.stringify(products));
         renderFilters();
         renderProducts();
         renderAdminList();
     }
 
+    function saveProducts() {
+        localStorage.setItem('websklad_products', JSON.stringify(products));
+    }
+
     function addProduct(product) {
-        const newId = window.nextProductId++;
-        products.push({ ...product, id: newId });
+        product.id = window.nextProductId++;
+        products.push(product);
         saveProducts();
+        renderFilters();
+        renderProducts();
+        renderAdminList();
     }
 
     function updateProduct(id, updated) {
@@ -406,6 +527,9 @@
         if (index !== -1) {
             products[index] = { ...products[index], ...updated };
             saveProducts();
+            renderFilters();
+            renderProducts();
+            renderAdminList();
         }
     }
 
@@ -413,17 +537,20 @@
         products = products.filter(p => p.id !== id);
         saveProducts();
         let cart = getCart();
-        cart = cart.filter(item => item.id !== id);
+        cart = cart.filter(i => i.id !== id);
         localStorage.setItem('websklad_cart', JSON.stringify(cart));
+        renderFilters();
+        renderProducts();
+        renderAdminList();
         updateCartUI();
     }
 
-    // -------- Корзина --------
+    // Корзина
     function getCart() { return JSON.parse(localStorage.getItem('websklad_cart')) || []; }
     function saveCart(cart) { localStorage.setItem('websklad_cart', JSON.stringify(cart)); updateCartUI(); }
 
     function addToCart(product) {
-        if (product.stock !== 'instock') return alert("Товар отсутствует!");
+        if (product.stock !== 'instock') return alert("Товар временно отсутствует");
         let cart = getCart();
         const existing = cart.find(i => i.id === product.id);
         if (existing) existing.qty += 1;
@@ -447,9 +574,9 @@
         if (!cart.length) { container.innerHTML = '<div class="empty-cart">Корзина пуста</div>'; return; }
         container.innerHTML = cart.map(item => `
             <div class="cart-item">
-                <img class="cart-item-img" src="${item.img}" onerror="this.src='https://placehold.co/100x100?text=No+Image'">
+                <img class="cart-item-img" src="${item.img || 'https://placehold.co/100x100'}" onerror="this.src='https://placehold.co/100x100?text=No+Image'">
                 <div style="flex:1">
-                    <div>${escapeHtml(item.name)}</div>
+                    <div><strong>${escapeHtml(item.name)}</strong></div>
                     <div>${item.price} грн</div>
                     <div style="display:flex; gap:0.5rem; margin-top:0.3rem;">
                         <button data-id="${item.id}" data-delta="-1">-</button>
@@ -478,7 +605,7 @@
         });
     }
 
-    // -------- Фильтры и отображение --------
+    // Фильтры и отображение
     let currentFilter = 'all';
     function renderFilters() {
         const cats = ['all', ...new Set(products.map(p => p.category))];
@@ -496,15 +623,15 @@
     function renderProducts() {
         const grid = document.getElementById('productsGrid');
         let filtered = currentFilter === 'all' ? products : products.filter(p => p.category === currentFilter);
-        if (!filtered.length) { grid.innerHTML = '<div style="padding:3rem; text-align:center;">Товары не найдены</div>'; return; }
+        if (!filtered.length) { grid.innerHTML = '<div style="text-align:center; padding:3rem;">Товары не найдены</div>'; return; }
         grid.innerHTML = filtered.map(p => `
             <div class="product-card">
                 <img class="product-img" src="${p.img || 'https://placehold.co/300x300?text=Фото'}" onerror="this.src='https://placehold.co/300x300?text=No+Image'">
                 <div class="product-info">
                     <div class="product-title">${escapeHtml(p.name)}</div>
-                    <div class="product-price">${p.price} грн</div>
-                    <div class="stock ${p.stock === 'instock' ? '' : 'out'}">${p.stock === 'instock' ? '✅ В наличии' : '❌ Нет в наличии'}</div>
-                    <button class="btn-add" data-id="${p.id}" ${p.stock !== 'instock' ? 'disabled' : ''}>Добавить в корзину</button>
+                    <div class="product-price">${p.price} ₴</div>
+                    <div class="stock ${p.stock === 'instock' ? 'in' : 'out'}">${p.stock === 'instock' ? '✅ В наличии' : '❌ Нет в наличии'}</div>
+                    <button class="btn-add" data-id="${p.id}" ${p.stock !== 'instock' ? 'disabled' : ''}><i class="fas fa-cart-plus"></i> В корзину</button>
                 </div>
             </div>
         `).join('');
@@ -515,16 +642,16 @@
         });
     }
 
-    // -------- Админка (ручное добавление/удаление) --------
+    // Админка
     function renderAdminList() {
         const container = document.getElementById('adminProductList');
         if (!container) return;
         container.innerHTML = products.map(p => `
             <div class="admin-product-item">
-                <span><strong>${escapeHtml(p.name)}</strong> (${p.category}) - ${p.price} грн</span>
+                <span><strong>${escapeHtml(p.name)}</strong> (${p.category}) — ${p.price} грн</span>
                 <div>
-                    <button class="edit-product" data-id="${p.id}">✏️</button>
-                    <button class="delete-product" data-id="${p.id}">❌</button>
+                    <button class="edit-product" data-id="${p.id}"><i class="fas fa-edit"></i></button>
+                    <button class="delete-product" data-id="${p.id}"><i class="fas fa-trash-alt"></i></button>
                 </div>
             </div>
         `).join('');
@@ -560,121 +687,73 @@
         const editId = document.querySelector('#productForm button[type="submit"]').dataset.editId;
         if (editId) {
             updateProduct(parseInt(editId), { name, price, category, stock, img });
-            const submitBtn = document.querySelector('#productForm button[type="submit"]');
-            submitBtn.textContent = '➕ Добавить товар';
-            delete submitBtn.dataset.editId;
+            const btn = document.querySelector('#productForm button[type="submit"]');
+            btn.textContent = '➕ Добавить товар';
+            delete btn.dataset.editId;
         } else {
             addProduct({ name, price, category, stock, img });
         }
         document.getElementById('productForm').reset();
     });
 
-    // -------- Импорт из CSV --------
-    let importedProductsPreview = [];
-    const fileInput = document.getElementById('csvFileInput');
-    const previewDiv = document.getElementById('csvPreview');
-    const importBtn = document.getElementById('importBtn');
-
-    function parseCSVToProducts(csvText) {
-        const lines = csvText.split(/\r?\n/);
-        if (lines.length < 2) return [];
-        const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-        const nameIdx = headers.findIndex(h => h.includes('Название товара'));
-        const priceIdx = headers.findIndex(h => h.includes('Рекомендовання розничная цена'));
-        const stockIdx = headers.findIndex(h => h.includes('Наличие'));
-        const categoryIdx = headers.findIndex(h => h.includes('Категории товара'));
-        const imgIdx = headers.findIndex(h => h.includes('Изображения'));
-        if (nameIdx === -1 || priceIdx === -1) throw new Error('Не найдены обязательные колонки: Название товара, Рекомендовання розничная цена');
-        
-        const productsList = [];
-        for (let i = 1; i < lines.length; i++) {
-            if (!lines[i].trim()) continue;
-            const values = parseCSVLine(lines[i]);
-            const name = values[nameIdx]?.replace(/^"|"$/g, '').trim();
-            const priceRaw = values[priceIdx]?.replace(/[^0-9.]/g, '');
-            const price = parseFloat(priceRaw);
-            if (!name || isNaN(price)) continue;
-            let stock = (values[stockIdx] || '').toLowerCase().includes('instock') ? 'instock' : 'outofstock';
-            let category = values[categoryIdx] ? values[categoryIdx].replace(/^"|"$/g, '').trim() : 'Разное';
-            let img = '';
-            if (imgIdx !== -1 && values[imgIdx]) {
-                let imgStr = values[imgIdx].replace(/^"|"$/g, '');
-                img = imgStr.split(',')[0].trim();
-            }
-            productsList.push({ name, price, stock, category, img });
-        }
-        return productsList;
-    }
-
-    function parseCSVLine(line) {
-        const result = [];
-        let inQuote = false;
-        let current = '';
-        for (let i = 0; i < line.length; i++) {
-            const ch = line[i];
-            if (ch === '"') {
-                inQuote = !inQuote;
-            } else if (ch === ',' && !inQuote) {
-                result.push(current);
-                current = '';
-            } else {
-                current += ch;
-            }
-        }
-        result.push(current);
-        return result;
-    }
-
-    fileInput.addEventListener('change', (e) => {
+    // CSV импорт
+    let importedPreview = [];
+    document.getElementById('csvFileInput').addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = function(ev) {
-            try {
-                const csvText = ev.target.result;
-                const parsed = parseCSVToProducts(csvText);
-                if (!parsed.length) throw new Error('Нет данных для импорта');
-                importedProductsPreview = parsed;
-                previewDiv.style.display = 'block';
-                previewDiv.innerHTML = `<strong>Найдено товаров: ${parsed.length}</strong><br>Первые 5:<br>` + 
-                    parsed.slice(0,5).map(p => `📦 ${p.name} - ${p.price} грн (${p.category})`).join('<br>');
-                importBtn.disabled = false;
-                importBtn.textContent = `📥 Заменить ассортимент (${parsed.length} товаров)`;
-            } catch(err) {
-                alert('Ошибка парсинга CSV: ' + err.message);
-                previewDiv.style.display = 'none';
+        reader.onload = (ev) => {
+            const text = ev.target.result;
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) return;
+            const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
+            const nameIdx = headers.findIndex(h => h.includes('Название товара'));
+            const priceIdx = headers.findIndex(h => h.includes('Рекомендовання розничная цена'));
+            const stockIdx = headers.findIndex(h => h.includes('Наличие'));
+            const catIdx = headers.findIndex(h => h.includes('Категории товара'));
+            const imgIdx = headers.findIndex(h => h.includes('Изображения'));
+            if (nameIdx === -1 || priceIdx === -1) { alert('Не найдены колонки'); return; }
+            const items = [];
+            for (let i=1; i<lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const vals = lines[i].split(',').map(v => v.replace(/^"|"$/g, ''));
+                const name = vals[nameIdx]?.trim();
+                const price = parseFloat(vals[priceIdx]?.replace(/[^0-9.]/g, ''));
+                if (!name || isNaN(price)) continue;
+                let stock = (vals[stockIdx] || '').toLowerCase().includes('instock') ? 'instock' : 'outofstock';
+                let category = vals[catIdx] ? vals[catIdx].trim() : 'Разное';
+                let img = imgIdx !== -1 ? (vals[imgIdx] || '').split(',')[0].trim() : '';
+                items.push({ name, price, stock, category, img });
             }
+            importedPreview = items;
+            const previewDiv = document.getElementById('csvPreview');
+            previewDiv.style.display = 'block';
+            previewDiv.innerHTML = `<strong>Найдено ${items.length} товаров</strong><br>Первые 5:<br>${items.slice(0,5).map(p => `📦 ${p.name} — ${p.price} грн`).join('<br>')}`;
+            document.getElementById('importBtn').disabled = false;
         };
         reader.readAsText(file, 'UTF-8');
     });
 
-    importBtn.addEventListener('click', () => {
-        if (!importedProductsPreview.length) return;
-        if (confirm(`Заменить текущий ассортимент (${products.length} товаров) на ${importedProductsPreview.length} товаров из файла?`)) {
-            const newProducts = importedProductsPreview.map((p, idx) => ({
-                id: idx + 1,
-                name: p.name,
-                price: p.price,
-                stock: p.stock,
-                category: p.category,
-                img: p.img || 'https://placehold.co/300x300?text=Фото'
-            }));
+    document.getElementById('importBtn').addEventListener('click', () => {
+        if (!importedPreview.length) return;
+        if (confirm(`Заменить ассортимент (${products.length} товаров) на ${importedPreview.length} товаров?`)) {
+            const newProducts = importedPreview.map((p, idx) => ({ id: idx+1, ...p }));
             products = newProducts;
             window.nextProductId = products.length + 1;
             saveProducts();
-            // очистить корзину
             localStorage.setItem('websklad_cart', JSON.stringify([]));
             updateCartUI();
+            renderFilters();
+            renderProducts();
+            renderAdminList();
             alert('Ассортимент обновлён!');
-            previewDiv.style.display = 'none';
-            fileInput.value = '';
-            importedProductsPreview = [];
-            importBtn.disabled = true;
-            importBtn.textContent = '📥 Заменить ассортимент из файла';
+            document.getElementById('csvPreview').style.display = 'none';
+            document.getElementById('csvFileInput').value = '';
+            importedPreview = [];
         }
     });
 
-    // -------- UI модалок --------
+    // Модалки
     function openAdminModal() { document.getElementById('adminModal').style.display = 'flex'; }
     function closeAdminModal() { document.getElementById('adminModal').style.display = 'none'; }
     function openCartSidebar() { document.getElementById('cartOverlay').style.display = 'flex'; }
@@ -688,11 +767,10 @@
         const phone = document.getElementById('phone').value.trim();
         const delivery = document.getElementById('deliveryMethod').value;
         const city = document.getElementById('city').value.trim();
-        const warehouse = document.getElementById('warehouse').value.trim();
-        if (!name || !phone || !delivery || !city || !warehouse) { alert("Заполните все поля доставки"); return; }
+        const wh = document.getElementById('warehouse').value.trim();
+        if (!name || !phone || !delivery || !city || !wh) { alert("Заполните все поля"); return; }
         const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
-        const details = cart.map(i => `${i.name} x${i.qty} = ${i.price*i.qty} грн`).join('\n');
-        alert(`✅ Заказ оформлен! Наш менеджер свяжется с вами.\n\n${name}\n${phone}\n${delivery}, ${city}, отд.${warehouse}\n\n${details}\nИтого: ${total} грн\nОплата при получении.`);
+        alert(`✅ Заказ оформлен!\n\n${name}, ${phone}\nДоставка: ${delivery}, ${city}, отд.${wh}\nИтого: ${total} грн (наложенный платеж)`);
         localStorage.setItem('websklad_cart', JSON.stringify([]));
         updateCartUI();
         closeCartSidebar();
@@ -702,8 +780,6 @@
     function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
 
     loadProducts();
-    renderFilters();
-    renderProducts();
     updateCartUI();
     document.getElementById('adminBtn').addEventListener('click', openAdminModal);
     document.getElementById('closeAdminBtn').addEventListener('click', closeAdminModal);
